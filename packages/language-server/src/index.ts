@@ -49,6 +49,7 @@ connection.onInitialize((params) => {
             path.resolve(params.initializationOptions.ohos.sdkPath, 'ets/@internal/full/*'),
           ],
         }
+        const baseUrl = path.resolve(params.initializationOptions.ohos.sdkPath, 'ets')
 
         options.project.typescript.languageServiceHost.getCompilationSettings = (): any => {
           const settings = {
@@ -60,6 +61,7 @@ connection.onInitialize((params) => {
             moduleResolution: ts.ModuleResolutionKind.NodeNext,
             moduleDetection: ts.ModuleDetectionKind.Force,
             typeRoots,
+            baseUrl,
             strict: true,
             lib,
             experimentalDecorators: true,
