@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./packages/vscode/icon.png" width="100" />
+<img src="./packages/vscode/assets/icon.png" width="100" />
 
 # Naily's ArkTS Support
 
