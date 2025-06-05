@@ -27,45 +27,48 @@ connection.onInitialize((params) => {
         if (!options.project || !options.project.typescript || !options.project.typescript.languageServiceHost)
           return
         const originalSettings = options.project.typescript?.languageServiceHost.getCompilationSettings() || {}
+        const baseLibFolderPath = path.resolve(params.initializationOptions.ohos.sdkPath, 'ets', 'component')
+        const lib = fs.readdirSync(baseLibFolderPath)
+        .filter(file => file.endsWith('.d.ts') || file.endsWith('.d.ets'))
+        .map(file => path.resolve(baseLibFolderPath, file))
+        const typeRoots = params.rootPath
+        ? [
+            path.resolve(params.rootPath, './node_modules/@types'),
+            path.resolve(params.rootPath, './oh_modules/@types'),
+            path.resolve(params.initializationOptions.ohos.sdkPath, 'api', '@internal'),
+          ]
+        : undefined
+        const etsLoaderPath = path.resolve(params.initializationOptions.ohos.sdkPath, 'ets/build-tools/ets-loader')
+        const paths = {
+          '*': [
+            './oh_modules/*',
+            path.resolve(params.initializationOptions.ohos.sdkPath, 'ets/api/*'),
+            path.resolve(params.initializationOptions.ohos.sdkPath, 'ets/kits/*'),
+          ],
+          '@internal/full/*': [
+            path.resolve(params.initializationOptions.ohos.sdkPath, 'ets/@internal/full/*'),
+          ],
+        }
 
         options.project.typescript.languageServiceHost.getCompilationSettings = (): any => {
           const settings = {
             ...originalSettings as ets.CompilerOptions,
             ets: getEtsOptions(),
-            etsLoaderPath: path.resolve(params.initializationOptions.ohos.sdkPath, 'ets/build-tools/ets-loader'),
+            etsLoaderPath,
             target: ts.ScriptTarget.ESNext,
             module: ts.ModuleKind.ESNext,
             moduleResolution: ts.ModuleResolutionKind.NodeNext,
             moduleDetection: ts.ModuleDetectionKind.Force,
-            typeRoots: params.rootPath
-              ? [
-                  path.resolve(params.rootPath, './node_modules/@types'),
-                  path.resolve(params.rootPath, './oh_modules/@types'),
-                  path.resolve(params.initializationOptions.ohos.sdkPath, 'api', '@internal'),
-                ]
-              : undefined,
+            typeRoots,
             strict: true,
-            lib: fs.readdirSync(path.resolve(params.initializationOptions.ohos.sdkPath, 'ets', 'component'))
-              .filter(file => file.endsWith('.d.ts') || file.endsWith('.d.ets'))
-              .map(file => {
-                return path.resolve(params.initializationOptions.ohos.sdkPath, 'ets', 'component', file)
-              }),
+            lib,
             experimentalDecorators: true,
             allowArbitraryExtensions: true,
             allowImportingTsExtensions: true,
             emitDeclarationOnly: true,
             strictPropertyInitialization: false,
             declaration: true,
-            paths: {
-              '*': [
-                './oh_modules/*',
-                path.resolve(params.initializationOptions.ohos.sdkPath, 'ets/api/*'),
-                path.resolve(params.initializationOptions.ohos.sdkPath, 'ets/kits/*'),
-              ],
-              '@internal/full/*': [
-                path.resolve(params.initializationOptions.ohos.sdkPath, 'ets/@internal/full/*'),
-              ],
-            },
+            paths,
           } satisfies ets.CompilerOptions
 
           logger.getConsola().info(`compilerOptions: ${JSON.stringify(settings)}`)
