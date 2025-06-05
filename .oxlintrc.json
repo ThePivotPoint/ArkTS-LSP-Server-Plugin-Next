@@ -1,0 +1,7 @@
+{
+  "ignorePatterns": [
+    "ohos-typescript/**/*",
+    "sample/**/*",
+    "packages/declarations/ets/**/*"
+  ]
+}

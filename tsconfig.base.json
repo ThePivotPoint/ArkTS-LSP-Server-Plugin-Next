@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "target": "ES2021",
+    "lib": [
+      "ES2021"
+    ],
+    "baseUrl": "./",
+    "module": "Node16",
+    "paths": {
+      "@arkts/language-server": [
+        "packages/language-server/src"
+      ]
+    },
+    "resolveJsonModule": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "declaration": true,
+    "sourceMap": true,
+    "skipLibCheck": true
+  }
+}

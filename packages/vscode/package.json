@@ -1,0 +1,110 @@
+{
+  "publisher": "NailyZero",
+  "name": "vscode-naily-ets",
+  "displayName": "Naily's ArkTS Support",
+  "version": "2.0.0-alpha.1",
+  "private": true,
+  "description": "自用ArkTS扩展,支持代码跳转,欢迎PR! Naily's ArkTS Support.",
+  "author": "Naily Zero <zero@naily.cc>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Groupguanfang/arkTS",
+    "directory": "packages/vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/Groupguanfang/arkTS/issues",
+    "email": "zero@naily.cc"
+  },
+  "keywords": [
+    "ArkTS",
+    "ets",
+    "huawei"
+  ],
+  "categories": [
+    "Programming Languages"
+  ],
+  "main": "./dist/client.js",
+  "icon": "assets/icon.png",
+  "engines": {
+    "vscode": "^1.87.0"
+  },
+  "activationEvents": [],
+  "contributes": {
+    "jsonValidation": [
+      {
+        "fileMatch": "module.json5",
+        "url": "./schemas/module.schema.json"
+      },
+      {
+        "fileMatch": "oh-package.json5",
+        "url": "./schemas/oh-package.schema.json"
+      },
+      {
+        "fileMatch": "build-profile.json5",
+        "url": "./schemas/build-profile.schema.json"
+      },
+      {
+        "fileMatch": "main_pages.json",
+        "url": "./schemas/main_pages.schema.json"
+      },
+      {
+        "fileMatch": [
+          "**/resources/**/element/*.json"
+        ],
+        "url": "./schemas/element.schema.json"
+      },
+      {
+        "fileMatch": "code-linter.json5",
+        "url": "./schemas/code-linter.schema.json"
+      }
+    ],
+    "languages": [
+      {
+        "id": "ets",
+        "extensions": [
+          ".ets",
+          ".d.ets"
+        ],
+        "aliases": [
+          "ArkTS",
+          "ets"
+        ],
+        "configuration": "./syntaxes/language-configuration.json",
+        "bases": ["typescript"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ets",
+        "scopeName": "source.ets",
+        "path": "./syntaxes/ets.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "ets.restartServer",
+        "title": "Restart ETS Language Server",
+        "category": "ETS"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node scripts/build -- --minify && pnpm -F @arkts/declarations build",
+    "watch": "npm run build -- --watch",
+    "pack": "npm run build && vsce package",
+    "release": "npm run build && vsce publish --pre-release"
+  },
+  "devDependencies": {
+    "@arkts/language-server": "workspace:*",
+    "@types/properties-parser": "catalog:dev",
+    "@types/vscode": "catalog:dev",
+    "@volar/language-server": "catalog:prod",
+    "@volar/vscode": "catalog:prod",
+    "chokidar": "catalog:prod",
+    "esbuild": "catalog:build",
+    "kleur": "catalog:prod",
+    "properties-parser": "catalog:prod",
+    "vsce": "catalog:scripts"
+  }
+}

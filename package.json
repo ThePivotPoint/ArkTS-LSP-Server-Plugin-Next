@@ -1,0 +1,34 @@
+{
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.11.1+",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/volarjs/starter.git"
+  },
+  "scripts": {
+    "build": "cd ./packages/vscode && npm run build",
+    "watch": "cd ./packages/vscode && npm run watch",
+    "pack": "cd ./packages/vscode && npm run pack",
+    "release": "pnpm -r release",
+    "test": "vitest",
+    "lint": "eslint && oxlint"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "catalog:lint",
+    "@antfu/nip": "catalog:scripts",
+    "@changesets/changelog-github": "catalog:scripts",
+    "@changesets/cli": "catalog:scripts",
+    "@release-it/bumper": "catalog:scripts",
+    "@types/node": "catalog:dev",
+    "consola": "catalog:prod",
+    "eslint": "catalog:lint",
+    "oxlint": "catalog:lint",
+    "pnpm": "catalog:scripts",
+    "simple-git-hooks": "catalog:scripts",
+    "tsdown": "catalog:build",
+    "tsx": "catalog:scripts",
+    "type-fest": "catalog:dev",
+    "typescript": "catalog:prod"
+  }
+}

@@ -1,0 +1,46 @@
+packages:
+  - packages/*
+  - ohos-typescript
+
+catalogs:
+  build:
+    esbuild: latest
+    tsdown: ^0.12.6
+  dev:
+    '@types/node': latest
+    '@types/properties-parser': ^0.3.3
+    '@types/vscode': ^1.82.0
+    type-fest: ^4.41.0
+  lint:
+    '@antfu/eslint-config': latest
+    eslint: latest
+    oxlint: ^0.17.0
+  prod:
+    '@volar/language-core': ~2.4.0
+    '@volar/language-server': ~2.4.0
+    '@volar/typescript': ~2.4.0
+    '@volar/vscode': ~2.4.0
+    chokidar: ^4.0.3
+    consola: ^3.4.2
+    kleur: ^4.1.5
+    properties-parser: ^0.6.0
+    typescript: latest
+    volar-service-css: volar-2.4
+    volar-service-emmet: volar-2.4
+    volar-service-html: volar-2.4
+    volar-service-typescript: volar-2.4
+    vscode-html-languageservice: ^5.3.1
+    vscode-uri: ^3.0.8
+  scripts:
+    '@antfu/nip': ^0.1.0
+    '@changesets/changelog-github': ^0.5.1
+    '@changesets/cli': ^2.29.4
+    '@release-it/bumper': ^7.0.5
+    pnpm: ^10.11.1
+    simple-git-hooks: ^2.13.0
+    tsx: ^4.19.4
+    vsce: latest
+
+onlyBuiltDependencies:
+  - esbuild
+  - unrs-resolver

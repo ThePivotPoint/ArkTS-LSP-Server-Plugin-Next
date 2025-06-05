@@ -1,0 +1,3 @@
+[submodule "ohos-typescript"]
+	path = ohos-typescript
+	url = https://gitee.com/openharmony/third_party_typescript
