@@ -97,14 +97,12 @@
   },
   "devDependencies": {
     "@arkts/language-server": "workspace:*",
-    "@types/properties-parser": "catalog:dev",
     "@types/vscode": "catalog:dev",
     "@volar/language-server": "catalog:prod",
     "@volar/vscode": "catalog:prod",
     "chokidar": "catalog:prod",
     "esbuild": "catalog:build",
     "kleur": "catalog:prod",
-    "properties-parser": "catalog:prod",
     "vsce": "catalog:scripts"
   }
 }

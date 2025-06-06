@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import path from 'node:path'
 import { createConnection, createServer, createTypeScriptProject, loadTsdkByPath } from '@volar/language-server/node'
 import ts, * as ets from 'ohos-typescript'
@@ -6,7 +7,6 @@ import { create as createTypeScriptServices } from 'volar-service-typescript'
 import { getEtsOptions } from './config/ets-options'
 import { etsLanguagePlugin } from './languagePlugin'
 import { Logger } from './log/logger'
-import fs from 'node:fs'
 
 const connection = createConnection()
 const server = createServer(connection)
@@ -29,15 +29,15 @@ connection.onInitialize((params) => {
         const originalSettings = options.project.typescript?.languageServiceHost.getCompilationSettings() || {}
         const baseLibFolderPath = path.resolve(params.initializationOptions.ohos.sdkPath, 'ets', 'component')
         const lib = fs.readdirSync(baseLibFolderPath)
-        .filter(file => file.endsWith('.d.ts') || file.endsWith('.d.ets'))
-        .map(file => path.resolve(baseLibFolderPath, file))
+          .filter(file => file.endsWith('.d.ts') || file.endsWith('.d.ets'))
+          .map(file => path.resolve(baseLibFolderPath, file))
         const typeRoots = params.rootPath
-        ? [
-            path.resolve(params.rootPath, './node_modules/@types'),
-            path.resolve(params.rootPath, './oh_modules/@types'),
-            path.resolve(params.initializationOptions.ohos.sdkPath, 'api', '@internal'),
-          ]
-        : undefined
+          ? [
+              path.resolve(params.rootPath, './node_modules/@types'),
+              path.resolve(params.rootPath, './oh_modules/@types'),
+              path.resolve(params.initializationOptions.ohos.sdkPath, 'api', '@internal'),
+            ]
+          : undefined
         const etsLoaderPath = path.resolve(params.initializationOptions.ohos.sdkPath, 'ets/build-tools/ets-loader')
         const paths = {
           '*': [
