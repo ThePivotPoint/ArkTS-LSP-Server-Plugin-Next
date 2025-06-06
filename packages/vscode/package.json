@@ -90,7 +90,7 @@
     ]
   },
   "scripts": {
-    "build": "node scripts/build -- --minify && pnpm -F @arkts/declarations build",
+    "build": "node scripts/build -- --minify",
     "watch": "npm run build -- --watch",
     "pack": "npm run build && vsce package",
     "release": "npm run build && vsce publish --pre-release"
