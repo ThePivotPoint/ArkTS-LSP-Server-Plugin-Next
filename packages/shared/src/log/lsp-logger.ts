@@ -1,12 +1,12 @@
-import type { ConsolaInstance } from 'consola'
+import type { ConsolaInstance, ConsolaOptions } from 'consola'
 import { createConsola } from 'consola'
 import { version } from '../../package.json'
 
-export class Logger {
+export class LanguageServerLogger {
   private logger: ConsolaInstance
 
-  constructor() {
-    this.logger = createConsola()
+  constructor(consolaOptions: Partial<ConsolaOptions> = {}) {
+    this.logger = createConsola(consolaOptions)
     this.logger.info(`ETS Support language server version: ${version}`)
   }
 

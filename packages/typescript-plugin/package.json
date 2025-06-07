@@ -1,14 +1,15 @@
 {
-  "name": "@arkts/language-server",
+  "name": "@arkts/typescript-plugin",
   "version": "2.0.0-alpha.1",
-  "description": "ArkTS Language Server",
+  "private": true,
+  "description": "ArkTS Typescript Plugin",
   "author": "Naily Zero <zero@naily.cc>",
   "license": "MIT",
-  "homepage": "https://github.com/Groupguanfang/arkTS/tree/main/packages/language-server",
+  "homepage": "https://github.com/Groupguanfang/arkTS/tree/main/packages/typescript-plugin",
   "repository": {
     "type": "git",
     "url": "https://github.com/Groupguanfang/arkTS",
-    "directory": "packages/language-server"
+    "directory": "packages/language-plugin"
   },
   "bugs": {
     "url": "https://github.com/Groupguanfang/arkTS/issues",
@@ -23,16 +24,18 @@
   ],
   "exports": {
     ".": {
-      "types": "./out/index.d.ts",
+      "types": {
+        "import": "./out/index.d.mts",
+        "require": "./out/index.d.cts"
+      },
       "import": "./out/index.mjs",
-      "default": "./out/index.js"
+      "require": "./out/index.js"
     },
-    "./dist/*": "./dist/*"
+    "./out/*": "./out/*"
   },
-  "main": "out/index.js",
-  "bin": {
-    "ets-language-server": "./bin/ets-language-server.js"
-  },
+  "main": "./out/index.js",
+  "module": "./out/index.mjs",
+  "types": "./out/index.d.ts",
   "files": [
     "bin",
     "out",
@@ -49,7 +52,7 @@
     "prepublishOnly": "tsdown --tsconfig ./tsconfig.build.json",
     "release": "pnpm publish"
   },
-  "dependencies": {
+  "devDependencies": {
     "@arkts/language-plugin": "workspace:*",
     "@volar/language-core": "catalog:prod",
     "@volar/language-server": "catalog:prod",

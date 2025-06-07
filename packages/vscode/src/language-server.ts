@@ -1,12 +1,22 @@
+import type { EtsServerClientOptions, TypescriptLanguageFeatures } from '@arkts/shared'
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClientOptions, ServerOptions } from '@volar/vscode/node'
 import * as serverProtocol from '@volar/language-server/protocol'
 import { activateAutoInsertion, createLabsInfo, getTsdk } from '@volar/vscode'
 import { LanguageClient, TransportKind } from '@volar/vscode/node'
+import defu from 'defu'
+import { executeCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
 import { LanguageServerContext } from './context/server-context'
+import { SdkAnalyzer } from './sdk/sdk-analyzer'
 
 export class EtsLanguageServer extends LanguageServerContext {
+  /**
+   * Get the server options for the ETS Language Server.
+   *
+   * @param context The extension context.
+   * @returns The server options.
+   */
   private async getServerOptions(context: vscode.ExtensionContext): Promise<ServerOptions> {
     const serverModule = vscode.Uri.joinPath(context.extensionUri, 'dist', 'server.js')
     const runOptions = { execArgv: <string[]>[] }
@@ -26,40 +36,73 @@ export class EtsLanguageServer extends LanguageServerContext {
     }
   }
 
+  /**
+   * Get the client options for the ETS Language Server.
+   *
+   * @param context The extension context.
+   * @returns The client options.
+   * @throws {SdkAnalyzerException} If the SDK path have any no right, it will throw an error.
+   */
   private async getClientOptions(context: vscode.ExtensionContext): Promise<LanguageClientOptions> {
-    const ohosSdkPath = await this.getOhosSdkPath()
+    const localSdkPath = await this.getOhosSdkPathFromLocalProperties()
+    const configSdkPath = vscode.workspace.getConfiguration('ets').get('sdkPath') as string | undefined
+    const sdkPath = localSdkPath || configSdkPath
+    if (!sdkPath)
+      throw new Error('sdkPath is not set!!')
+    const sdkAnalyzer = new SdkAnalyzer(vscode.Uri.parse(sdkPath), this)
+    const tsdk = await getTsdk(context)
 
     return {
       documentSelector: [{ language: 'ets' }],
       initializationOptions: {
         typescript: {
-          tsdk: (await getTsdk(context))!.tsdk,
+          tsdk: tsdk!.tsdk,
         },
-        ohos: {
-          sdkPath: ohosSdkPath,
-          tsconfigPath: vscode.Uri.joinPath(context.extensionUri, 'dist', 'types', 'tsconfig.base.json').fsPath,
-        },
-      },
+        ohos: await sdkAnalyzer.toOhosClientOptions(false, tsdk?.tsdk),
+      } satisfies EtsServerClientOptions,
     }
   }
 
+  /** Current language client is persisted here. */
   private _client: LanguageClient | undefined
 
-  async start(context: vscode.ExtensionContext): Promise<LabsInfo | undefined> {
-    if (this._client) {
-      await this._client.stop()
-      this._client = undefined
-    }
+  getCurrentLanguageClient(): LanguageClient | undefined {
+    return this._client
+  }
 
+  async configureTypeScriptPlugin(clientOptions: LanguageClientOptions): Promise<void> {
+    const typescriptLanguageFeatures = vscode.extensions.getExtension<TypescriptLanguageFeatures>('vscode.typescript-language-features')
+    await typescriptLanguageFeatures?.activate()
+    typescriptLanguageFeatures?.exports.getAPI?.(0)?.configurePlugin?.('ets-typescript-plugin', {
+      workspaceFolder: this.getCurrentWorkspaceDir()?.fsPath,
+      lspOptions: clientOptions.initializationOptions,
+    })
+  }
+
+  /**
+   * Start the ETS Language Server.
+   *
+   * @param context The extension context.
+   * @param overrideClientOptions The override client options.
+   * @returns The labs info.
+   * @throws {SdkAnalyzerException} If the SDK path have any no right, it will throw an error.
+   */
+  async start(context: vscode.ExtensionContext, overrideClientOptions: LanguageClientOptions = {}): Promise<LabsInfo | undefined> {
     const [serverOptions, clientOptions] = await Promise.all([
       this.getServerOptions(context),
       this.getClientOptions(context),
     ])
+    await this.configureTypeScriptPlugin(clientOptions)
+
+    if (this._client) {
+      await this._client.start()
+      return
+    }
     this._client = new LanguageClient(
       'ets-language-server',
       'ETS Language Server',
       serverOptions,
-      clientOptions,
+      defu(overrideClientOptions, clientOptions),
     )
     this.listenAllLocalPropertiesFile(context)
     await this._client.start()
@@ -75,25 +118,31 @@ export class EtsLanguageServer extends LanguageServerContext {
     return labsInfo.extensionExports
   }
 
-  getCurrentLanguageClient(): LanguageClient | undefined {
-    return this._client
-  }
-
+  /**
+   * Stop the ETS Language Server.
+   *
+   * @returns {Promise<void>}
+   */
   async stop(): Promise<void> {
     if (this._client) {
       await this._client.stop()
-      this._client = undefined
+      this._client.outputChannel.clear()
       this.getConsola().info('ETS Language Server stopped!')
       vscode.window.setStatusBarMessage('ETS Language Server stopped!', 1000)
     }
-    else {
-      this.getConsola().warn('ETS Language Server is not running, cannot stop it.')
-      vscode.window.setStatusBarMessage('ETS Language Server is not running, cannot stop it.', 1000)
-    }
   }
 
-  async restart(context: vscode.ExtensionContext): Promise<void> {
+  /**
+   * Restart the ETS Language Server.
+   *
+   * @param context The extension context.
+   * @param overrideClientOptions The override client options.
+   * @throws {SdkAnalyzerException} If the SDK path have any no right, it will throw an error.
+   */
+  async restart(context: vscode.ExtensionContext, overrideClientOptions: LanguageClientOptions = {}): Promise<void> {
+    await executeCommand('typescript.restartTsServer')
     await this.stop()
-    await this.start(context)
+    await this.start(context, overrideClientOptions)
+    vscode.window.showInformationMessage('ETS Language Server restarted!')
   }
 }

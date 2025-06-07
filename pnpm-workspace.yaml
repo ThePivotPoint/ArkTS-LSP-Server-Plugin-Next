@@ -9,7 +9,11 @@ catalogs:
   dev:
     '@types/node': latest
     '@types/vscode': ^1.82.0
+    fast-glob: ^3.3.3
+    reactive-vscode: ^0.2.19
+    ts-macro: ^0.1.32
     type-fest: ^4.41.0
+    vscode-ext-gen: ^1.0.2
   lint:
     '@antfu/eslint-config': latest
     eslint: latest

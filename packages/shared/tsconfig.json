@@ -4,14 +4,6 @@
     "rootDir": "src",
     "outDir": "out"
   },
-  "references": [
-    {
-      "path": "../shared/tsconfig.json"
-    },
-    {
-      "path": "../language-plugin/tsconfig.json"
-    }
-  ],
   "include": [
     "src"
   ]

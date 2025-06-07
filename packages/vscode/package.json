@@ -29,7 +29,10 @@
   "engines": {
     "vscode": "^1.87.0"
   },
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact"
+  ],
   "contributes": {
     "jsonValidation": [
       {
@@ -87,22 +90,43 @@
         "title": "Restart ETS Language Server",
         "category": "ETS"
       }
+    ],
+    "configuration": {
+      "title": "Naily's ArkTS Support",
+      "type": "object",
+      "properties": {
+        "ets.sdkPath": {
+          "type": "string",
+          "description": "The default OpenHarmony SDK path.",
+          "default": ""
+        }
+      }
+    },
+    "typescriptServerPlugins": [
+      {
+        "name": "ets-typescript-plugin",
+        "enableForWorkspaceTypeScriptVersions": true
+      }
     ]
   },
   "scripts": {
     "build": "node scripts/build -- --minify",
     "watch": "npm run build -- --watch",
     "pack": "npm run build && vsce package",
-    "release": "npm run build && vsce publish --pre-release"
+    "release": "npm run build && vsce publish --pre-release",
+    "update": "vscode-ext-gen --output src/generated/meta.ts"
   },
   "devDependencies": {
     "@arkts/language-server": "workspace:*",
+    "@arkts/typescript-plugin": "workspace:*",
     "@types/vscode": "catalog:dev",
     "@volar/language-server": "catalog:prod",
     "@volar/vscode": "catalog:prod",
     "chokidar": "catalog:prod",
     "esbuild": "catalog:build",
+    "fast-glob": "catalog:dev",
     "kleur": "catalog:prod",
+    "ts-macro": "catalog:dev",
     "vsce": "catalog:scripts"
   }
 }

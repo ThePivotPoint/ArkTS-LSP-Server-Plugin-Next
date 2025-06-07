@@ -7,4 +7,7 @@ export default antfu({
     'sample/**/*',
     'packages/declarations/ets/**/*',
   ],
+  rules: {
+    'ts/no-namespace': 'off',
+  },
 })

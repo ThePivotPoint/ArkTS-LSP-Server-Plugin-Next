@@ -1,4 +1,5 @@
 import type { LabsInfo } from '@volar/vscode'
+import type { LanguageClient } from '@volar/vscode/node'
 import path from 'node:path'
 import * as vscode from 'vscode'
 import { AbstractWatcher } from '../abstract-watcher'
@@ -10,6 +11,8 @@ export abstract class LanguageServerContext extends AbstractWatcher {
   abstract stop(): Promise<void>
   /** Restart the language server. */
   abstract restart(context: vscode.ExtensionContext): Promise<void>
+  /** Get the current language client. */
+  abstract getCurrentLanguageClient(): LanguageClient | undefined
 
   /** Listen to all local.properties files in the workspace. */
   listenAllLocalPropertiesFile(context: vscode.ExtensionContext): void {
@@ -28,8 +31,8 @@ export abstract class LanguageServerContext extends AbstractWatcher {
     await this.restart(context)
   }
 
-  /** Get the path of the Ohos SDK. */
-  protected async getOhosSdkPath(): Promise<string | undefined> {
+  /** Get the path of the Ohos SDK from local.properties file. */
+  protected async getOhosSdkPathFromLocalProperties(): Promise<string | undefined> {
     const workspaceDir = this.getCurrentWorkspaceDir()
     if (!workspaceDir)
       return undefined
@@ -43,17 +46,6 @@ export abstract class LanguageServerContext extends AbstractWatcher {
     const content = await vscode.workspace.fs.readFile(localPropPath)
     const lines = content.toString().split('\n')
     const sdkPath = lines.find(line => line.startsWith('sdk.dir'))
-    if (!sdkPath) {
-      await vscode.window.showErrorMessage(`${path.relative(workspaceDir.fsPath, localPropPath.fsPath)}文件不存在sdk.dir配置，请先配置sdk.dir。`)
-      return
-    }
-
-    const sdkDir = sdkPath.split('=')[1].trim()
-    if (!sdkDir) {
-      await vscode.window.showErrorMessage(`${path.relative(workspaceDir.fsPath, localPropPath.fsPath)}文件存在sdk.dir配置，但配置为空。`)
-      return
-    }
-
-    return sdkDir
+    return sdkPath?.split('=')?.[1]?.trim()
   }
 }

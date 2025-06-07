@@ -7,6 +7,12 @@
   "references": [
     {
       "path": "../language-server/tsconfig.json"
+    },
+    {
+      "path": "../shared/tsconfig.json"
+    },
+    {
+      "path": "../typescript-plugin/tsconfig.json"
     }
   ],
   "include": [

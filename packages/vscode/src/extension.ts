@@ -1,14 +1,38 @@
 import type { LabsInfo } from '@volar/vscode'
-import type * as vscode from 'vscode'
+import { useCommand } from 'reactive-vscode'
+import * as vscode from 'vscode'
 import { EtsLanguageServer } from './language-server'
 
 let lsp: EtsLanguageServer | undefined
 
-export async function activate(context: vscode.ExtensionContext): Promise<LabsInfo> {
-  lsp = new EtsLanguageServer()
+function handleLspError(e: any): void {
+  lsp?.getConsola().error(e)
+  vscode.window.showErrorMessage(`Failed to restart ETS Language Server: ${e.code} ${e.message}`)
+}
 
-  // First start it will be return LabsInfo object for volar.js labs extension
-  return await lsp.start(context) as LabsInfo
+export async function activate(context: vscode.ExtensionContext): Promise<LabsInfo> {
+  try {
+    lsp = new EtsLanguageServer()
+
+    useCommand('ets.restartServer', () => {
+      lsp?.restart(context).catch(e => handleLspError(e))
+    })
+
+    vscode.workspace.onDidChangeConfiguration(async (e) => {
+      if (!e.affectsConfiguration('ets.sdkPath'))
+        return
+
+      lsp?.getConsola().info(`ets.sdkPath changed: ${vscode.workspace.getConfiguration('ets').get('sdkPath')}`)
+      await lsp?.restart(context).catch(e => handleLspError(e))
+    })
+
+    // First start it will be return LabsInfo object for volar.js labs extension
+    return await lsp.start(context) as LabsInfo
+  }
+  catch (error) {
+    handleLspError(error)
+    throw error
+  }
 }
 
 export function deactivate(): Promise<void> | undefined {

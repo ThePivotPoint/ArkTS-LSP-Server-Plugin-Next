@@ -2,13 +2,14 @@ const process = require('node:process')
 
 require('esbuild').context({
   entryPoints: {
-    client: './src/extension.ts',
-    server: '../language-server/src/index.ts',
+    'dist/client': './src/extension.ts',
+    'dist/server': '../language-server/src/index.ts',
+    'node_modules/ets-typescript-plugin/index': '../typescript-plugin/src/index.ts',
   },
   sourcemap: true,
   bundle: true,
   metafile: process.argv.includes('--metafile'),
-  outdir: './dist',
+  outdir: '.',
   external: ['vscode'],
   format: 'cjs',
   platform: 'node',
