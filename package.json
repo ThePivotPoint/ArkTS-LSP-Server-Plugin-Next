@@ -25,6 +25,7 @@
     "@types/node": "catalog:dev",
     "consola": "catalog:prod",
     "eslint": "catalog:lint",
+    "lodash": "^4.17.21",
     "oxlint": "catalog:lint",
     "pnpm": "catalog:scripts",
     "reactive-vscode": "catalog:dev",
@@ -33,6 +34,10 @@
     "tsx": "catalog:scripts",
     "type-fest": "catalog:dev",
     "typescript": "catalog:prod",
-    "vscode-ext-gen": "catalog:dev"
+    "vscode-ext-gen": "catalog:dev",
+    "vscode-nls": "catalog:prod"
+  },
+  "dependencies": {
+    "@types/lodash": "catalog:lodash"
   }
 }

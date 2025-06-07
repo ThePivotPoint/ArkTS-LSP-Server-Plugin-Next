@@ -1,0 +1,13 @@
+{
+  "extension.name": "Naily's ArkTS Support",
+  "extension.description": "VS Code的OpenHarmony ArkTS语言支持",
+  "command.installSDK": "安装 OpenHarmony SDK",
+  "command.restartServer": "重启 ArkTS 服务器",
+  "sdk.install.success": "OpenHarmony SDK {0} 安装成功。",
+  "sdk.install.cancelled": "OpenHarmony SDK {0} 安装已取消。",
+  "sdk.install.alreadyDownloading": "OpenHarmony SDK {0} 正在下载中。",
+  "sdk.path.notSet": "SDK路径未设置！",
+  "sdk.install.title": "选择要安装的 OpenHarmony API 版本",
+  "sdk.install.placeHolder": "选择要安装的 OpenHarmony API 版本",
+  "sdk.install.installing": "正在安装 OpenHarmony SDK {0}"
+}

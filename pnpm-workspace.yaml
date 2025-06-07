@@ -23,15 +23,19 @@ catalogs:
     '@volar/language-server': ~2.4.0
     '@volar/typescript': ~2.4.0
     '@volar/vscode': ~2.4.0
+    axios: ^1.9.0
     chokidar: ^4.0.3
     consola: ^3.4.2
+    extract-zip: ^2.0.1
     kleur: ^4.1.5
+    tar: ^7.4.3
     typescript: latest
     volar-service-css: volar-2.4
     volar-service-emmet: volar-2.4
     volar-service-html: volar-2.4
     volar-service-typescript: volar-2.4
     vscode-html-languageservice: ^5.3.1
+    vscode-nls: ^5.2.0
     vscode-uri: ^3.0.8
   scripts:
     '@antfu/nip': ^0.1.0
@@ -42,6 +46,8 @@ catalogs:
     simple-git-hooks: ^2.13.0
     tsx: ^4.19.4
     vsce: latest
+  lodash:
+    '@types/lodash': ^4.17.17
 
 onlyBuiltDependencies:
   - esbuild
