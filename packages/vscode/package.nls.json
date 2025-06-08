@@ -9,5 +9,8 @@
   "sdk.path.notSet": "SDK path is not set!",
   "sdk.install.title": "Select OpenHarmony API version to install",
   "sdk.install.placeHolder": "Select OpenHarmony API version to install",
-  "sdk.install.installing": "Installing OpenHarmony SDK {0}"
+  "sdk.install.installing": "Installing OpenHarmony SDK {0}",
+  "sdk.install.alreadyDownloaded": "OpenHarmony SDK {0} already downloaded, skip downloading...",
+  "sdk.install.extracting": "Extracting OpenHarmony SDK {0}",
+  "sdk.install.extractingProgress": "Extracting sub package {1}, progress {2}%"
 }

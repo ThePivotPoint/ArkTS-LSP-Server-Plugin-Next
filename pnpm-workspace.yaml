@@ -19,6 +19,7 @@ catalogs:
     eslint: latest
     oxlint: ^0.17.0
   prod:
+    '@types/unzipper': ^0.10.11
     '@volar/language-core': ~2.4.0
     '@volar/language-server': ~2.4.0
     '@volar/typescript': ~2.4.0
@@ -30,6 +31,7 @@ catalogs:
     kleur: ^4.1.5
     tar: ^7.4.3
     typescript: latest
+    unzipper: ^0.12.3
     volar-service-css: volar-2.4
     volar-service-emmet: volar-2.4
     volar-service-html: volar-2.4

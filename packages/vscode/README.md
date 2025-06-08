@@ -14,8 +14,9 @@
 
 <!-- commands -->
 
-| Command             | Title                            |
-| ------------------- | -------------------------------- |
-| `ets.restartServer` | ETS: Restart ETS Language Server |
+| Command             | Title                        |
+| ------------------- | ---------------------------- |
+| `ets.restartServer` | ETS: %command.restartServer% |
+| `ets.installSDK`    | ETS: %command.installSDK%    |
 
 <!-- commands -->

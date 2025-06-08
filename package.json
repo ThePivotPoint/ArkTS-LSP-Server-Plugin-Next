@@ -22,7 +22,9 @@
     "@changesets/changelog-github": "catalog:scripts",
     "@changesets/cli": "catalog:scripts",
     "@release-it/bumper": "catalog:scripts",
+    "@types/lodash": "catalog:lodash",
     "@types/node": "catalog:dev",
+    "@types/unzipper": "catalog:prod",
     "consola": "catalog:prod",
     "eslint": "catalog:lint",
     "lodash": "^4.17.21",
@@ -34,10 +36,8 @@
     "tsx": "catalog:scripts",
     "type-fest": "catalog:dev",
     "typescript": "catalog:prod",
+    "unzipper": "catalog:prod",
     "vscode-ext-gen": "catalog:dev",
     "vscode-nls": "catalog:prod"
-  },
-  "dependencies": {
-    "@types/lodash": "catalog:lodash"
   }
 }

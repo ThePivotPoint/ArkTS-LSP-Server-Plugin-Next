@@ -2,7 +2,7 @@ import type { LabsInfo } from '@volar/vscode'
 import { useCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
 import { EtsLanguageServer } from './language-server'
-import { SdkInstaller } from './sdk/sdk-installer'
+import { SdkManager } from './sdk/sdk-manager'
 import { Translator } from './translate'
 
 let lsp: EtsLanguageServer | undefined
@@ -14,7 +14,7 @@ function handleLspError(e: any): void {
 
 export async function activate(context: vscode.ExtensionContext): Promise<LabsInfo> {
   const translator = new Translator()
-  SdkInstaller.from(translator)
+  SdkManager.from(translator)
 
   try {
     lsp = new EtsLanguageServer()

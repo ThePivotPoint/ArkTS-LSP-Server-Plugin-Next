@@ -2,52 +2,59 @@
 // @see https://github.com/antfu/vscode-ext-gen
 
 // Meta info
-export const publisher = 'NailyZero'
-export const name = 'vscode-naily-ets'
-export const version = '2.0.0-alpha.1'
-export const displayName = 'Naily\'s ArkTS Support'
-export const description = '自用ArkTS扩展,支持代码跳转,欢迎PR! Naily\'s ArkTS Support.'
+export const publisher = "NailyZero"
+export const name = "vscode-naily-ets"
+export const version = "2.0.0-alpha.1"
+export const displayName = "Naily's ArkTS Support"
+export const description = "自用ArkTS扩展,支持代码跳转,欢迎PR! Naily's ArkTS Support."
 export const extensionId = `${publisher}.${name}`
 
 /**
  * Type union of all commands
  */
-export type CommandKey =
-  | 'ets.restartServer'
+export type CommandKey = 
+  | "ets.restartServer"
+  | "ets.installSDK"
 
 /**
  * Commands map registed by `NailyZero.vscode-naily-ets`
  */
 export const commands = {
   /**
-   * Restart ETS Language Server
+   * %command.restartServer%
    * @value `ets.restartServer`
    */
-  etsRestartServer: 'ets.restartServer',
+  etsRestartServer: "ets.restartServer",
+  /**
+   * %command.installSDK%
+   * @value `ets.installSDK`
+   */
+  etsInstallSDK: "ets.installSDK",
 } satisfies Record<string, CommandKey>
 
 /**
  * Type union of all configs
  */
-export type ConfigKey =
-  | 'ets.sdkPath'
+export type ConfigKey = 
+  | "ets.sdkPath"
 
 export interface ConfigKeyTypeMap {
-  'ets.sdkPath': string
+  "ets.sdkPath": string,
 }
 
 export interface ConfigShorthandMap {
-  etsSdkPath: 'ets.sdkPath'
+  etsSdkPath: "ets.sdkPath",
 }
 
 export interface ConfigShorthandTypeMap {
-  etsSdkPath: string
+  etsSdkPath: string,
 }
 
 export interface ConfigItem<T extends keyof ConfigKeyTypeMap> {
-  key: T
-  default: ConfigKeyTypeMap[T]
+  key: T,
+  default: ConfigKeyTypeMap[T],
 }
+
 
 /**
  * Configs map registered by `NailyZero.vscode-naily-ets`
@@ -60,25 +67,26 @@ export const configs = {
    * @type `string`
    */
   etsSdkPath: {
-    key: 'ets.sdkPath',
-    default: '',
-  } as ConfigItem<'ets.sdkPath'>,
+    key: "ets.sdkPath",
+    default: "",
+  } as ConfigItem<"ets.sdkPath">,
 }
 
 export interface ScopedConfigKeyTypeMap {
 }
 
 export const scopedConfigs = {
-  scope: 'vscode-naily-ets',
+  scope: "vscode-naily-ets",
   defaults: {
   } satisfies ScopedConfigKeyTypeMap,
 }
 
 export interface NestedConfigs {
-  ets: {
-    sdkPath: string
-  }
+  "ets": {
+    "sdkPath": string,
+  },
 }
 
 export interface NestedScopedConfigs {
 }
+

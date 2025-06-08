@@ -9,5 +9,8 @@
   "sdk.path.notSet": "SDK路径未设置！",
   "sdk.install.title": "选择要安装的 OpenHarmony API 版本",
   "sdk.install.placeHolder": "选择要安装的 OpenHarmony API 版本",
-  "sdk.install.installing": "正在安装 OpenHarmony SDK {0}"
+  "sdk.install.installing": "正在安装 OpenHarmony SDK {0}",
+  "sdk.install.alreadyDownloaded": "OpenHarmony SDK {0} 已下载完毕，跳过下载...",
+  "sdk.install.extracting": "正在解压 OpenHarmony SDK {0}",
+  "sdk.install.extractingProgress": "正在解压子包 {1}, 进度 {2}%"
 }

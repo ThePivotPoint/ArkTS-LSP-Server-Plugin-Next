@@ -1,7 +1,7 @@
-import get from 'lodash/get'
-import path from 'node:path'
-import * as vscode from 'vscode'
 import fs from 'node:fs'
+import path from 'node:path'
+import get from 'lodash/get'
+import * as vscode from 'vscode'
 
 export interface LocaleFile {
   locale: string
@@ -22,10 +22,10 @@ export class Translator {
     this.load()
   }
 
-  public load() {
+  public load(): void {
     this.localeFiles = fs.readdirSync(this.localeFolder)
       .filter(file => file.endsWith('.json') && file.startsWith('package.nls'))
-      .map(fileName => {
+      .map((fileName) => {
         const fileLocale = fileName.replace('package.nls.', '').replace('.json', '')
         const fileContent = JSON.parse(fs.readFileSync(path.join(this.localeFolder, fileName), 'utf-8'))
 
@@ -44,7 +44,7 @@ export class Translator {
     const value = get(localeFile.content, key)
     if (!value)
       return key
-    return value.replace(/{(\d+)}/g, (match, p1) => {
+    return value.replace(/\{(\d+)\}/g, (match, p1) => {
       const arg = options.args?.[p1]
       if (typeof arg === 'string')
         return arg

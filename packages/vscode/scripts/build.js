@@ -10,7 +10,7 @@ require('esbuild').context({
   bundle: true,
   metafile: process.argv.includes('--metafile'),
   outdir: '.',
-  external: ['vscode'],
+  external: ['vscode', '@aws-sdk/client-s3'],
   format: 'cjs',
   platform: 'node',
   tsconfig: './tsconfig.json',
