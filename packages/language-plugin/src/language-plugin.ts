@@ -6,8 +6,15 @@ import '@volar/typescript'
 
 export function ETSLanguagePlugin(): LanguagePlugin<URI | string> {
   return {
-    getLanguageId() {
-      return undefined
+    getLanguageId(uri) {
+      if (typeof uri === 'string') {
+        if (uri.endsWith('.d.ets') || uri.endsWith('.ets'))
+          return 'ets'
+      }
+      else {
+        if (uri.fsPath.endsWith('.d.ets') || uri.fsPath.endsWith('.ets'))
+          return 'ets'
+      }
     },
     createVirtualCode(_uri, languageId, snapshot) {
       if (languageId === 'ets')
