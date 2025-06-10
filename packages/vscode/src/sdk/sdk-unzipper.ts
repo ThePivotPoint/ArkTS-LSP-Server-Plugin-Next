@@ -47,15 +47,15 @@ export class SdkUnzipper {
     const onProgressCallback: SdkExtractOptions['onProgress'] = ({ progress, subPackageName }) => {
       // 更新当前子包的进度
       subPackageProgresses.set(subPackageName, progress)
-      
+
       // 计算所有子包的总进度
       const totalProgress = Array.from(subPackageProgresses.values()).reduce((sum, p) => sum + p, 0)
       const currentTotalProgress = Math.round(totalProgress / 5)
-      
+
       // 计算总进度的增量
       const totalIncrement = currentTotalProgress - lastTotalProgress
       lastTotalProgress = currentTotalProgress
-      
+
       // 只有当总进度实际增长时才报告
       if (totalIncrement > 0) {
         options.onProgress?.({ progress: currentTotalProgress, increment: totalIncrement, subPackageName })
@@ -70,7 +70,7 @@ export class SdkUnzipper {
 
         if (fileName.includes('ets')) {
           await this.unzipSubPackage(zipFilePath, path.join(targetPath, 'ets'), {
-            onProgress: onProgressCallback
+            onProgress: onProgressCallback,
           })
         }
         else if (fileName.includes('js')) {
@@ -110,8 +110,7 @@ export class SdkUnzipper {
         // Remove the first element of the path, which is the name of the sub package.
         file.path = file.path.split(path.sep).slice(1).join(path.sep)
         const filePath = path.join(dest, file.path)
-        if (!fs.existsSync(path.dirname(filePath)))
-          fs.mkdirSync(path.dirname(filePath), { recursive: true })
+        await this.urlSelector.createDirectoryIfNotExists(path.dirname(filePath))
 
         const writeStream = fs.createWriteStream(filePath)
         await new Promise<void>((resolve, reject) => (
@@ -121,12 +120,13 @@ export class SdkUnzipper {
               extracted++
               const progress = Math.round((extracted / files.length) * 100)
               const increment = progress - lastProgress
-              
+
               // 只有当子包进度实际增长时才报告
               if (increment > 0) {
                 lastProgress = progress
                 options.onProgress?.({ progress, increment, subPackageName })
               }
+              this.urlSelector.getConsola().info(`Extracting ${path.relative(dest, filePath)}...`)
               resolve()
             })
             .on('error', reject)
@@ -145,7 +145,20 @@ export class SdkUnzipper {
    * @param targetPath - The target path to install the SDK.
    */
   async unzip(cacheFilePath: string, version: SdkVersion, targetPath: string, options: SdkExtractOptions = {}): Promise<void> {
-    const unzipRoot = await this.unzipRoot(cacheFilePath, version)
-    await this.unzipSubPackages(unzipRoot, targetPath, options)
+    try {
+      await this.urlSelector.createDirectoryIfNotExists(targetPath)
+      await this.urlSelector.createDirectoryIfNotExists(path.join(targetPath, 'ets'))
+      await this.urlSelector.createDirectoryIfNotExists(path.join(targetPath, 'js'))
+      await this.urlSelector.createDirectoryIfNotExists(path.join(targetPath, 'native'))
+      await this.urlSelector.createDirectoryIfNotExists(path.join(targetPath, 'previewer'))
+      await this.urlSelector.createDirectoryIfNotExists(path.join(targetPath, 'toolchains'))
+
+      const unzipRoot = await this.unzipRoot(cacheFilePath, version)
+      await this.unzipSubPackages(unzipRoot, targetPath, options)
+    }
+    catch (error) {
+      this.urlSelector.getConsola().error(`Failed to unzip the SDK ${version}, error: ${error}`)
+      // throw error
+    }
   }
 }

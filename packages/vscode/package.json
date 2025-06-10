@@ -102,8 +102,13 @@
       "properties": {
         "ets.sdkPath": {
           "type": "string",
-          "description": "The default OpenHarmony SDK path.",
+          "description": "%configuration.ets.sdkPath.description%",
           "default": ""
+        },
+        "ets.baseSdkPath": {
+          "type": "string",
+          "description": "%configuration.ets.baseSdkPath.description%",
+          "default": "${os.homedir}/OpenHarmony"
         }
       }
     },
@@ -123,6 +128,7 @@
   },
   "devDependencies": {
     "@arkts/language-server": "workspace:*",
+    "@arkts/sdk-downloader": "catalog:prod",
     "@arkts/typescript-plugin": "workspace:*",
     "@types/vscode": "catalog:dev",
     "@volar/language-server": "catalog:prod",

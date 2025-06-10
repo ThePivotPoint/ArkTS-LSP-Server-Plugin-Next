@@ -12,5 +12,7 @@
   "sdk.install.installing": "正在安装 OpenHarmony SDK {0}",
   "sdk.install.alreadyDownloaded": "OpenHarmony SDK {0} 已下载完毕，跳过下载...",
   "sdk.install.extracting": "正在解压 OpenHarmony SDK {0}",
-  "sdk.install.extractingProgress": "正在解压子包 {1}, 进度 {2}%"
+  "sdk.install.extractingProgress": "正在解压子包 {1}, 进度 {2}%",
+  "configuration.ets.sdkPath.description": "默认 OpenHarmony SDK 路径。",
+  "configuration.ets.baseSdkPath.description": "默认 OpenHarmony SDK 基础路径。所有 SDK 都将安装在此路径下。（您可以使用 `${os.homedir}` 代表用户主目录）"
 }

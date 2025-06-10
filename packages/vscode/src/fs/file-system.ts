@@ -52,4 +52,14 @@ export abstract class FileSystem extends ExtensionLogger {
     if (statInfo.type !== vscode.FileType.File)
       throw new FileSystemException(notFileCode, `Path ${uri.fsPath} is not a file.`)
   }
+
+  /**
+   * Create a directory if it does not exist.
+   *
+   * @param folderPath - The path to the directory.
+   */
+  async createDirectoryIfNotExists(folderPath: string): Promise<void> {
+    if (!fs.existsSync(folderPath))
+      fs.mkdirSync(folderPath, { recursive: true })
+  }
 }

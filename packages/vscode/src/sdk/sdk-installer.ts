@@ -3,7 +3,6 @@ import type { Translator } from '../translate'
 import type { DownloadResponse, UnzipDownloadedOptions } from './sdk-downloader'
 import type { SdkInstallOptions, SdkVersion } from './sdk-url-selector'
 import fs from 'node:fs'
-import os from 'node:os'
 import path from 'node:path'
 import { useCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
@@ -43,6 +42,13 @@ export abstract class SdkInstaller extends SdkUrlSelector {
    * @param sdkFolderPath - The path to the OpenHarmony SDK.
    */
   abstract setOhosSdkPath(sdkFolderPath: string): Promise<void>
+
+  /**
+   * Get the base path of the OpenHarmony SDK.
+   *
+   * @returns The base path of the OpenHarmony SDK.
+   */
+  abstract getOhosSdkBasePath(): Promise<string>
 
   private readonly unzipper = new SdkUnzipper(this)
 
@@ -124,8 +130,9 @@ export abstract class SdkInstaller extends SdkUrlSelector {
     if (!version || !version.label)
       return
     const apiVersion = this.toApiVersion(version.label)
-    const cacheFilePath = path.join(os.homedir(), 'ohos-sdk', `.tmp`, `${apiVersion}.tar.gz`)
-    const targetPath = path.join(os.homedir(), 'ohos-sdk', apiVersion.toString())
+    const baseSdkPath = await this.getOhosSdkBasePath()
+    const cacheFilePath = path.join(baseSdkPath, `.tmp`, `${apiVersion}.tar.gz`)
+    const targetPath = path.join(baseSdkPath, apiVersion.toString())
     let downloadResponse: DownloadResponse | undefined
 
     await vscode.window.withProgress({

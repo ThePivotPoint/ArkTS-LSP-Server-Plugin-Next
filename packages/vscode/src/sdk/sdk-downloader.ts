@@ -2,8 +2,8 @@ import type { AxiosProgressEvent, AxiosResponse, GenericAbortSignal } from 'axio
 import type { SdkExtractOptions } from './sdk-unzipper'
 import type { SdkInstallOptions, SdkVersion } from './sdk-url-selector'
 import fs from 'node:fs'
-import { ExtensionLogger } from '@arkts/shared/vscode'
 import axios from 'axios'
+import { FileSystem } from '../fs/file-system'
 
 export type SpeedText = `${number} MB/s` | `${number} KB/s`
 /** Calculate the current speed of the download from the progress event. */
@@ -55,7 +55,7 @@ export interface UnzipDownloadedOptions extends Omit<SdkInstallOptions, 'onProgr
   version: SdkVersion
 }
 
-export abstract class SdkDownloader extends ExtensionLogger {
+export abstract class SdkDownloader extends FileSystem {
   /**
    * Install the selected SDK.
    *
