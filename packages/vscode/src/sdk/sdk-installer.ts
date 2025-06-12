@@ -1,9 +1,16 @@
 import type { Translator } from '../translate'
 import path from 'node:path'
-import { download, DownloadError, getSdkUrl, getSdkUrls, SdkVersion as SdkVersionEnum } from '@arkts/sdk-downloader'
+import { createDownloader, DownloadError, getSdkUrl, getSdkUrls, SdkVersion as SdkVersionEnum } from '@arkts/sdk-downloader'
 import { useCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
 import { Environment } from '../environment'
+
+interface SdkQuickPickItem extends vscode.QuickPickItem {
+  /** Current install status of the SDK. */
+  installStatus: 'incomplete' | boolean
+  /** The version of the SDK. */
+  version: keyof typeof SdkVersionEnum
+}
 
 export abstract class SdkInstaller extends Environment {
   /**
@@ -33,7 +40,7 @@ export abstract class SdkInstaller extends Environment {
     useCommand('ets.installSDK', async () => await this.selectSdkToInstall())
   }
 
-  private async buildQuickPickItem(urls: ReturnType<typeof getSdkUrls>): Promise<vscode.QuickPickItem[]> {
+  private async buildQuickPickItem(urls: ReturnType<typeof getSdkUrls>): Promise<SdkQuickPickItem[]> {
     return (await Promise.all(Object.entries(urls).map(async ([openHarmonyVersion]) => {
       const apiVersion = Object.keys(SdkVersionEnum).find(key => SdkVersionEnum[key as keyof typeof SdkVersionEnum] === openHarmonyVersion) as keyof typeof SdkVersionEnum
       const installStatus = await this.isInstalled(apiVersion.toString().split('API')[1])
@@ -43,77 +50,198 @@ export abstract class SdkInstaller extends Environment {
         label: apiVersion,
         description: `OpenHarmony ${apiVersion} Release`,
         detail: `OpenHarmony ${SdkVersionEnum[apiVersion as keyof typeof SdkVersionEnum]} Release (${installStatusTranslation})`,
-      } satisfies vscode.QuickPickItem
-    }))).filter(Boolean) as vscode.QuickPickItem[]
+        installStatus,
+        version: apiVersion as keyof typeof SdkVersionEnum,
+      } satisfies SdkQuickPickItem
+    }))).filter(Boolean) as SdkQuickPickItem[]
   }
 
   private async selectSdkToInstall(): Promise<void> {
     const urls = getSdkUrls()
-    const version = await vscode.window.showQuickPick(await this.buildQuickPickItem(urls), {
+    const quickPickItems = await this.buildQuickPickItem(urls)
+    const versionChoice = await vscode.window.showQuickPick(quickPickItems, {
       canPickMany: false,
       title: this.translator.t('sdk.install.title'),
       placeHolder: this.translator.t('sdk.install.placeHolder'),
     })
 
-    if (!version || !version.label)
+    if (!versionChoice || !versionChoice.label)
       return
-    const currentSdkVersion = version.label as keyof typeof SdkVersionEnum
+
+    if (versionChoice.installStatus === false) {
+      await this.installSdk(versionChoice.version)
+      return
+    }
+
+    const choiceSwitch = this.translator.t('sdk.install.switchOrReinstall.switch')
+    const choiceReinstall = this.translator.t('sdk.install.switchOrReinstall.reinstall')
+    const choice = await vscode.window.showQuickPick([
+      {
+        label: choiceSwitch,
+        description: this.translator.t('sdk.install.switchOrReinstall.switch.description', { args: [versionChoice.version] }),
+        detail: this.translator.t('sdk.install.switchOrReinstall.switch.detail'),
+        iconPath: new vscode.ThemeIcon('check'),
+      },
+      {
+        label: choiceReinstall,
+        description: this.translator.t('sdk.install.switchOrReinstall.reinstall.description', { args: [versionChoice.version] }),
+        detail: this.translator.t('sdk.install.switchOrReinstall.reinstall.detail'),
+        iconPath: new vscode.ThemeIcon('refresh'),
+      },
+    ] satisfies vscode.QuickPickItem[], {
+      canPickMany: false,
+      title: this.translator.t('sdk.install.switchOrReinstall.title'),
+    })
+
+    if (!choice || !choice.label)
+      return
+
+    if (choice?.label === choiceSwitch) {
+      await this.setOhosSdkPath(path.join(await this.getOhosSdkBasePath(), versionChoice.version.split('API')[1]))
+      vscode.window.showInformationMessage(this.translator.t('sdk.install.switchOrReinstall.switch.success', { args: [versionChoice.version] }))
+    }
+    else if (choice?.label === choiceReinstall) {
+      await this.installSdk(versionChoice.version)
+    }
+  }
+
+  /**
+   * Install the SDK.
+   *
+   * It will open a {@linkcode vscode.window.withProgress} to install the SDK.
+   *
+   * @param version - The version of the SDK.
+   */
+  async installSdk(version: keyof typeof SdkVersionEnum): Promise<void> {
     const baseSdkPath = await this.getOhosSdkBasePath()
+    const url = getSdkUrl(SdkVersionEnum[version], this.getArch(), this.getOS())
+    if (!url)
+      throw new Error('Current SDK version is not supported by the current platform.')
+    const apiNumberVersion = version.toString().split('API')[1]
+
+    const downloader = await createDownloader({
+      url,
+      cacheDir: path.join(baseSdkPath, '.tmp', apiNumberVersion),
+      targetDir: path.join(baseSdkPath, apiNumberVersion),
+      resumeDownload: true,
+      clean: true,
+    })
 
     await vscode.window.withProgress({
       location: vscode.ProgressLocation.Notification,
-      title: this.translator.t('sdk.install.installing', { args: [version.label] }),
+      title: this.translator.t('sdk.install.installing', { args: [version] }),
       cancellable: true,
     }, async (progress, token) => {
       if (token.isCancellationRequested)
         return
 
       try {
-        const apiNumberVersion = currentSdkVersion.toString().split('API')[1]
-        console.warn(`Arch: ${this.getArch()}, OS: ${this.getOS()}, version: ${SdkVersionEnum[currentSdkVersion]}, ${currentSdkVersion}`)
-
-        const url = getSdkUrl(SdkVersionEnum[currentSdkVersion], this.getArch(), this.getOS())
-        if (!url)
-          throw new Error('Current SDK version is not supported by the current platform.')
-        await download({
-          url,
-          cacheDir: path.join(baseSdkPath, '.tmp', apiNumberVersion),
-          targetDir: path.join(baseSdkPath, apiNumberVersion),
-          resumeDownload: true,
-          clean: true,
-          onDownloadProgress: (e) => {
-            progress.report({
-              increment: e.increment,
-              message: `${e.percentage.toFixed(2)}% ${e.network.toFixed(2)}${e.unit}/s`,
-            })
-            this.getConsola().info(`Downloading SDK ${apiNumberVersion}: ${e.percentage.toFixed(2)}% ${e.network.toFixed(2)}${e.unit}/s`)
-          },
-          onTarExtracted: (e) => {
-            progress.report({
-              message: this.translator.t('sdk.install.extractingTar', { args: [e.path] }),
-            })
-            this.getConsola().info(`Extracting tar.gz API ${apiNumberVersion}: ${e.path}`)
-          },
-          onZipExtracted: (e) => {
-            progress.report({
-              message: this.translator.t('sdk.install.extractingZip', { args: [e.path] }),
-            })
-            this.getConsola().info(`Extracting zip API ${apiNumberVersion}: ${e.path}`)
-          },
+        const abortController = new AbortController()
+        token.onCancellationRequested(() => {
+          abortController.abort()
+          vscode.window.showInformationMessage(this.translator.t('sdk.install.cancelled', { args: [version] }))
         })
+        downloader.on('download-progress', (e) => {
+          progress.report({
+            increment: e.increment,
+            message: `${e.percentage.toFixed(2)}% ${e.network.toFixed(2)}${e.unit}/s`,
+          })
+          this.getConsola().info(`Downloading SDK ${apiNumberVersion}: ${e.percentage.toFixed(2)}% ${e.network.toFixed(2)}${e.unit}/s`)
+        })
+
+        await downloader.startDownload({ signal: abortController.signal })
       }
       catch (error) {
+        if (error instanceof Error && error.name === 'AbortError')
+          return console.warn(`ArkTS SDK download has been canceled!`)
         if (error instanceof DownloadError) {
           vscode.window.showErrorMessage(`下载错误: ${error.code} ${error.message}`)
         }
         else {
           vscode.window.showErrorMessage(`下载错误: ${(error && typeof error === 'object' && 'message' in error) ? error.message : '未知错误'}`)
         }
+
         console.error(error)
         throw error
       }
     })
 
-    vscode.window.showInformationMessage(this.translator.t('sdk.install.success', { args: [version.label] }))
+    await vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification,
+      title: this.translator.t('sdk.install.checkingSha256', { args: [version] }),
+      cancellable: true,
+    }, async (_progress, token) => {
+      if (token.isCancellationRequested)
+        return
+      await downloader.checkSha256()
+    })
+
+    await vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification,
+      title: this.translator.t('sdk.install.extractingTar', { args: [version] }),
+      cancellable: false,
+    }, async (progress, token) => {
+      if (token.isCancellationRequested)
+        return
+
+      downloader.on('tar-extracted', (e) => {
+        progress.report({
+          message: this.translator.t('sdk.install.extractingTar', { args: [e.path] }),
+        })
+        this.getConsola().info(`Extracting tar.gz API ${apiNumberVersion}: ${e.path}`)
+      })
+      downloader.on('zip-extracted', (e) => {
+        progress.report({
+          message: this.translator.t('sdk.install.extractingZip', { args: [e.path] }),
+        })
+        this.getConsola().info(`Extracting zip API ${apiNumberVersion}: ${e.path}`)
+      })
+      await downloader.extractTar()
+    })
+
+    await vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification,
+      title: this.translator.t('sdk.install.extractingZip', { args: [version] }),
+      cancellable: false,
+    }, async (progress, token) => {
+      if (token.isCancellationRequested)
+        return
+      downloader.on('zip-extracted', (e) => {
+        progress.report({
+          message: this.translator.t('sdk.install.extractingZip', { args: [e.path] }),
+        })
+        this.getConsola().info(`Extracting zip API ${apiNumberVersion}: ${e.path}`)
+      })
+      await downloader.extractZip()
+    })
+
+    const installStatus = await this.isInstalled(apiNumberVersion)
+    if (installStatus === 'incomplete') {
+      await vscode.window.showWarningMessage(this.translator.t('sdk.install.mayBeIncomplete', { args: [version] }))
+      return
+    }
+    else if (!installStatus) {
+      await vscode.window.showErrorMessage(this.translator.t('sdk.install.mayBeError', { args: [version] }))
+      return
+    }
+
+    vscode.window.showInformationMessage(this.translator.t('sdk.install.success', { args: [version] }))
+    const isSwitchToNewSdkYes = this.translator.t('sdk.install.isSwitchToNewSdk.yes')
+    const isSwitchToNewSdkNo = this.translator.t('sdk.install.isSwitchToNewSdk.no')
+    const isSwitchToNewSdk = await vscode.window.showInformationMessage(
+      this.translator.t('sdk.install.isSwitchToNewSdk.title', { args: [version] }),
+      {
+        modal: true,
+      },
+      isSwitchToNewSdkYes,
+      isSwitchToNewSdkNo,
+    )
+    if (isSwitchToNewSdk === isSwitchToNewSdkYes) {
+      await this.setOhosSdkPath(path.join(baseSdkPath, apiNumberVersion))
+      vscode.window.showInformationMessage(this.translator.t('sdk.install.isSwitchToNewSdk.success', { args: [version] }))
+    }
+    else {
+      vscode.window.showInformationMessage(this.translator.t('sdk.install.isSwitchToNewSdk.cancel', { args: [version] }))
+    }
   }
 }
