@@ -1,8 +1,8 @@
 import process from 'node:process'
 import { SdkArch as SdkArchEnum, SdkOS as SdkOSEnum } from '@arkts/sdk-downloader'
-import { FileSystem } from '../fs/file-system'
+import { FileSystem } from './fs/file-system'
 
-export abstract class SdkUrlSelector extends FileSystem {
+export abstract class Environment extends FileSystem {
   getArch(): SdkArchEnum {
     const arch = process.arch
 
@@ -14,7 +14,7 @@ export abstract class SdkUrlSelector extends FileSystem {
       throw new Error(`Unsupported arch: ${arch}.`)
   }
 
-  getOs(): SdkOSEnum {
+  getOS(): SdkOSEnum {
     const os = process.platform
 
     if (os === 'darwin')

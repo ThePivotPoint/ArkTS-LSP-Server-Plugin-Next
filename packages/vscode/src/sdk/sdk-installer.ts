@@ -3,9 +3,9 @@ import path from 'node:path'
 import { download, DownloadError, getSdkUrl, getSdkUrls, SdkVersion as SdkVersionEnum } from '@arkts/sdk-downloader'
 import { useCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
-import { SdkUrlSelector } from './sdk-url-selector'
+import { Environment } from '../environment'
 
-export abstract class SdkInstaller extends SdkUrlSelector {
+export abstract class SdkInstaller extends Environment {
   /**
    * Set the path to the OpenHarmony SDK.
    *
@@ -20,25 +20,36 @@ export abstract class SdkInstaller extends SdkUrlSelector {
    */
   abstract getOhosSdkBasePath(): Promise<string>
 
+  /**
+   * Check if the SDK is installed.
+   *
+   * @param version - The version of the SDK.
+   * @returns `true` if the SDK is installed, `false` if the SDK is not installed, `'incomplete'` if the SDK is installed but is incomplete.
+   */
+  abstract isInstalled(version: string): Promise<boolean | 'incomplete'>
+
   protected constructor(private readonly translator: Translator) {
     super()
     useCommand('ets.installSDK', async () => await this.selectSdkToInstall())
   }
 
-  private buildQuickPickItem(urls: ReturnType<typeof getSdkUrls>): vscode.QuickPickItem[] {
-    return Object.entries(urls).map(([openHarmonyVersion]) => {
+  private async buildQuickPickItem(urls: ReturnType<typeof getSdkUrls>): Promise<vscode.QuickPickItem[]> {
+    return (await Promise.all(Object.entries(urls).map(async ([openHarmonyVersion]) => {
       const apiVersion = Object.keys(SdkVersionEnum).find(key => SdkVersionEnum[key as keyof typeof SdkVersionEnum] === openHarmonyVersion) as keyof typeof SdkVersionEnum
+      const installStatus = await this.isInstalled(apiVersion.toString().split('API')[1])
+      const installStatusTranslation = installStatus === 'incomplete' ? this.translator.t('sdk.install.incomplete') : installStatus ? this.translator.t('sdk.install.installed') : this.translator.t('sdk.install.notInstalled')
+
       return {
         label: apiVersion,
         description: `OpenHarmony ${apiVersion} Release`,
-        detail: `OpenHarmony ${SdkVersionEnum[apiVersion as keyof typeof SdkVersionEnum]} Release`,
+        detail: `OpenHarmony ${SdkVersionEnum[apiVersion as keyof typeof SdkVersionEnum]} Release (${installStatusTranslation})`,
       } satisfies vscode.QuickPickItem
-    })
+    }))).filter(Boolean) as vscode.QuickPickItem[]
   }
 
   private async selectSdkToInstall(): Promise<void> {
     const urls = getSdkUrls()
-    const version = await vscode.window.showQuickPick(this.buildQuickPickItem(urls), {
+    const version = await vscode.window.showQuickPick(await this.buildQuickPickItem(urls), {
       canPickMany: false,
       title: this.translator.t('sdk.install.title'),
       placeHolder: this.translator.t('sdk.install.placeHolder'),
@@ -59,9 +70,9 @@ export abstract class SdkInstaller extends SdkUrlSelector {
 
       try {
         const apiNumberVersion = currentSdkVersion.toString().split('API')[1]
-        console.warn(`Arch: ${this.getArch()}, OS: ${this.getOs()}, version: ${SdkVersionEnum[currentSdkVersion]}, ${currentSdkVersion}`)
+        console.warn(`Arch: ${this.getArch()}, OS: ${this.getOS()}, version: ${SdkVersionEnum[currentSdkVersion]}, ${currentSdkVersion}`)
 
-        const url = getSdkUrl(SdkVersionEnum[currentSdkVersion], this.getArch(), this.getOs())
+        const url = getSdkUrl(SdkVersionEnum[currentSdkVersion], this.getArch(), this.getOS())
         if (!url)
           throw new Error('Current SDK version is not supported by the current platform.')
         await download({

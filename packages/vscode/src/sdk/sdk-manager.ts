@@ -1,5 +1,7 @@
 import type { Translator } from '../translate'
+import fs from 'node:fs'
 import os from 'node:os'
+import path from 'node:path'
 import * as vscode from 'vscode'
 import { SdkInstaller } from './sdk-installer'
 
@@ -21,5 +23,25 @@ export class SdkManager extends SdkInstaller {
     ) as string
 
     return baseSdkPath.replace(/\$\{os\.homedir\}/g, os.homedir())
+  }
+
+  async isInstalled(version: string): Promise<boolean | 'incomplete'> {
+    const sdkPath = path.join(await this.getOhosSdkBasePath(), version)
+    const haveFolder = fs.existsSync(sdkPath) && fs.statSync(sdkPath).isDirectory()
+    if (!haveFolder)
+      return false
+
+    const dirs = fs.readdirSync(sdkPath)
+    if (
+      !dirs.includes('ets')
+      || !dirs.includes('js')
+      || !dirs.includes('native')
+      || !dirs.includes('previewer')
+      || !dirs.includes('toolchains')
+    ) {
+      return 'incomplete'
+    }
+
+    return true
   }
 }

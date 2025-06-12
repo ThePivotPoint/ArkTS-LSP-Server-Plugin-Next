@@ -13,6 +13,9 @@
   "sdk.install.alreadyDownloaded": "OpenHarmony SDK {0} already downloaded, skip downloading...",
   "sdk.install.extractingTar": "Extracting OpenHarmony SDK tar.gz: {0}",
   "sdk.install.extractingZip": "Extracting OpenHarmony SDK zip: {0}",
+  "sdk.install.incomplete": "⚠️ Incomplete <The SDK maybe not installed correctly, you can try to install it again.>",
+  "sdk.install.installed": "✅ Installed",
+  "sdk.install.notInstalled": "❌ Not Installed <Not found in base SDK path>",
   "configuration.ets.sdkPath.description": "The default OpenHarmony SDK path.",
   "configuration.ets.baseSdkPath.description": "The default OpenHarmony SDK base path. All SDKs will be installed under this path. (You can use `${os.homedir}` to get the home directory)"
 }
