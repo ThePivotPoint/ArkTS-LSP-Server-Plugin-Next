@@ -15,6 +15,9 @@
     "test": "vitest",
     "lint": "eslint && oxlint"
   },
+  "dependencies": {
+    "@types/progress-stream": "catalog:dev"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "catalog:lint",
     "@antfu/nip": "catalog:scripts",

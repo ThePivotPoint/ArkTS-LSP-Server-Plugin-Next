@@ -16,6 +16,9 @@ catalogs:
     '@types/node':
       specifier: latest
       version: 22.15.30
+    '@types/progress-stream':
+      specifier: ^2.0.5
+      version: 2.0.5
     '@types/vscode':
       specifier: ^1.82.0
       version: 1.90.0
@@ -46,8 +49,8 @@ catalogs:
       version: 0.17.0
   prod:
     '@arkts/sdk-downloader':
-      specifier: ^0.1.3
-      version: 0.1.3
+      specifier: ^0.1.12
+      version: 0.1.12
     '@types/lodash':
       specifier: ^4.17.17
       version: 4.17.17
@@ -143,6 +146,10 @@ catalogs:
 importers:
 
   .:
+    dependencies:
+      '@types/progress-stream':
+        specifier: catalog:dev
+        version: 2.0.5
     devDependencies:
       '@antfu/eslint-config':
         specifier: catalog:lint
@@ -434,7 +441,7 @@ importers:
         version: link:../language-server
       '@arkts/sdk-downloader':
         specifier: catalog:prod
-        version: 0.1.3
+        version: 0.1.12
       '@arkts/typescript-plugin':
         specifier: workspace:*
         version: link:../typescript-plugin
@@ -537,8 +544,8 @@ packages:
     resolution: {integrity: sha512-iNSjTsty20VIdjEeulB3zRmeZKnlnMD4ACVWWvGRgBoKLJiAGN3lBVffxtiKXGSJNHuqd+djNhjRNT3t7/6Jog==}
     hasBin: true
 
-  '@arkts/sdk-downloader@0.1.3':
-    resolution: {integrity: sha512-Gp3uq1Po+zuneegucuzAUkWuq4yX6YM6RzaAiVYfuKL7/JZC4UzfA0XgCXqHlJVrlaMY3vWxMwJxhrQLbNwn2Q==}
+  '@arkts/sdk-downloader@0.1.12':
+    resolution: {integrity: sha512-XCgoC2rtUGj92fTJsEvAlgsSg+Bdfam5RFpDUrC4qwACTohdjmptxqKxpzBXb/eqfEdvRJGOZm+qSDw1lnufHg==}
 
   '@babel/generator@7.27.5':
     resolution: {integrity: sha512-ZGhA37l0e/g2s1Cnzdix0O3aLYm66eF8aufiVteOgnwxgnRP8GoyMj7VWsgWnQbVKXyge7hqrFh2K2TQM6t1Hw==}
@@ -1234,25 +1241,21 @@ packages:
     resolution: {integrity: sha512-NoAWscdfVj6Sci3NdbHHc1OivSSKpwtkLff5SoAM8XgJ9t7flf+zW7XOy3OeSgZAxNbcF4QGruv+XcBLR7tWMA==}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@oxlint/linux-arm64-musl@0.17.0':
     resolution: {integrity: sha512-VQRmSdbuc0rpSZoLqdhKJG9nUjJmEymOU60dO3lKlCT5YXME4dxA+jf1AigtnmJS5FgOxQm54ECF9lh6dyP0ew==}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@oxlint/linux-x64-gnu@0.17.0':
     resolution: {integrity: sha512-KcaXWkBfqt7weerU1EXJysEupEHB8AtJytufBOQMuLE5vx2OoAbjAk0vt2V14W8Lss9Sz+ET7nXo6ZAEku4vCA==}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@oxlint/linux-x64-musl@0.17.0':
     resolution: {integrity: sha512-yWbFXWKKTrH4zR0FI1V6KDJp5NqOLFe1LZbKNeaoS1wtq5/aFPeM+d9dttGLoA5u6G9uhIK/nSnrPmtuNLPU4Q==}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@oxlint/win32-arm64@0.17.0':
     resolution: {integrity: sha512-zdoB3mbvcx3eGOh6ElPJ01S2MOzyZo/gijeHw7yb2PXcRis+3clVje6kpnG7/TN69zoHv7WwDX6poJu8FURTqg==}
@@ -1309,25 +1312,21 @@ packages:
     resolution: {integrity: sha512-kg7yeU3XIGmaoKF1+u8OGJ/NE2XMpwgtQpCWzJh7Z8DhJDjMlszhV3DrnKjywI3NmVNCEXYwGO6mYff31xuHug==}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@rolldown/binding-linux-arm64-musl@1.0.0-beta.10-commit.87188ed':
     resolution: {integrity: sha512-gvXDfeL4C6dql3Catf8HgnBnDy/zr8ZFX3f/edQ+QY0iJVHY/JG+bitRsNPWWOFmsv/Xm+qSyR44e5VW8Pi1oQ==}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@rolldown/binding-linux-x64-gnu@1.0.0-beta.10-commit.87188ed':
     resolution: {integrity: sha512-rpzxr4TyvM3+tXGNjM3AEtgnUM9tpYe6EsIuLiU3fs+KaMKj5vOTr5k/eCACxnjDi4s78ARmqT+Z3ZS2E06U5w==}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@rolldown/binding-linux-x64-musl@1.0.0-beta.10-commit.87188ed':
     resolution: {integrity: sha512-cq+Gd1jEie1xxBNllnna21FPaWilWzQK+sI8kF1qMWRI6U909JjS/SzYR0UNLbvNa+neZh8dj37XnxCTQQ40Lw==}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@rolldown/binding-wasm32-wasi@1.0.0-beta.10-commit.87188ed':
     resolution: {integrity: sha512-xN4bJ0DQeWJiyerA46d5Lyv5Cor/FoNlbaO9jEOHZDdWz78E2xt/LE3bOND3c59gZa+/YUBEifs4lwixU/wWPg==}
@@ -1415,6 +1414,9 @@ packages:
   '@types/parse-path@7.1.0':
     resolution: {integrity: sha512-EULJ8LApcVEPbrfND0cRQqutIOdiIgJ1Mgrhpy755r14xMohPTEpkV/k28SJvuOs9bHRFW8x+KeDAEPiGQPB9Q==}
     deprecated: This is a stub types definition. parse-path provides its own type definitions, so you do not need this installed.
+
+  '@types/progress-stream@2.0.5':
+    resolution: {integrity: sha512-5YNriuEZkHlFHHepLIaxzq3atGeav1qCTGzB74HKWpo66qjfostF+rHc785YYYHeBytve8ZG3ejg42jEIfXNiQ==}
 
   '@types/source-map-support@0.5.6':
     resolution: {integrity: sha512-b2nJ9YyXmkhGaa2b8VLM0kJ04xxwNyijcq12/kDoomCt43qbHBeK2SLNJ9iJmETaAj+bKUT05PQUu3Q66GvLhQ==}
@@ -5077,9 +5079,10 @@ snapshots:
       package-manager-detector: 1.3.0
       pnpm-workspace-yaml: 0.3.1
 
-  '@arkts/sdk-downloader@0.1.3':
+  '@arkts/sdk-downloader@0.1.12':
     dependencies:
       alien-signals: 2.0.5
+      fast-glob: 3.3.3
       progress-stream: 2.0.0
       tar: 7.4.3
       tar-stream: 3.1.7
@@ -5989,6 +5992,10 @@ snapshots:
   '@types/parse-path@7.1.0':
     dependencies:
       parse-path: 7.1.0
+
+  '@types/progress-stream@2.0.5':
+    dependencies:
+      '@types/node': 18.11.7
 
   '@types/source-map-support@0.5.6':
     dependencies:

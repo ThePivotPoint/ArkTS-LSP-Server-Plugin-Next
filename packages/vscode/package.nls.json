@@ -11,8 +11,8 @@
   "sdk.install.placeHolder": "Select OpenHarmony API version to install",
   "sdk.install.installing": "Installing OpenHarmony SDK {0}",
   "sdk.install.alreadyDownloaded": "OpenHarmony SDK {0} already downloaded, skip downloading...",
-  "sdk.install.extracting": "Extracting OpenHarmony SDK {0}",
-  "sdk.install.extractingProgress": "Extracting sub package {1}, progress {2}%",
+  "sdk.install.extractingTar": "Extracting OpenHarmony SDK tar.gz: {0}",
+  "sdk.install.extractingZip": "Extracting OpenHarmony SDK zip: {0}",
   "configuration.ets.sdkPath.description": "The default OpenHarmony SDK path.",
   "configuration.ets.baseSdkPath.description": "The default OpenHarmony SDK base path. All SDKs will be installed under this path. (You can use `${os.homedir}` to get the home directory)"
 }

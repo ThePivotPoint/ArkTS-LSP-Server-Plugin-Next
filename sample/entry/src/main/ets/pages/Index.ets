@@ -1,7 +1,7 @@
 @Entry
 @Component
 struct Index {
-  @State 
+  @State
   message: string = 'Hello World';
 
   build() {
