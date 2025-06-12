@@ -20,7 +20,7 @@ catalogs:
     eslint: latest
     oxlint: ^0.17.0
   prod:
-    '@arkts/sdk-downloader': ^0.1.12
+    '@arkts/sdk-downloader': ^0.1.15
     '@types/lodash': ^4.17.17
     '@types/unzipper': ^0.10.11
     '@volar/language-core': ~2.4.0
