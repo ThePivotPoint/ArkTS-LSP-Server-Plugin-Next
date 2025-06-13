@@ -28,6 +28,13 @@ export abstract class SdkInstaller extends Environment {
   abstract getOhosSdkBasePath(): Promise<string>
 
   /**
+   * Get the path of the OpenHarmony SDK.
+   *
+   * @returns The path of the OpenHarmony SDK.
+   */
+  abstract getOhosSdkPath(): Promise<string | undefined>
+
+  /**
    * Check if the SDK is installed.
    *
    * @param version - The version of the SDK.
@@ -127,6 +134,7 @@ export abstract class SdkInstaller extends Environment {
       clean: true,
     })
 
+    // Step 1: Download the SDK
     await vscode.window.withProgress({
       location: vscode.ProgressLocation.Notification,
       title: this.translator.t('sdk.install.installing', { args: [version] }),
@@ -166,6 +174,7 @@ export abstract class SdkInstaller extends Environment {
       }
     })
 
+    // Step 2: Check the SHA256 of the SDK
     await vscode.window.withProgress({
       location: vscode.ProgressLocation.Notification,
       title: this.translator.t('sdk.install.checkingSha256', { args: [version] }),
@@ -176,6 +185,7 @@ export abstract class SdkInstaller extends Environment {
       await downloader.checkSha256()
     })
 
+    // Step 3: Extract the SDK (tar.gz)
     await vscode.window.withProgress({
       location: vscode.ProgressLocation.Notification,
       title: this.translator.t('sdk.install.extractingTar', { args: [version] }),
@@ -199,6 +209,7 @@ export abstract class SdkInstaller extends Environment {
       await downloader.extractTar()
     })
 
+    // Step 4: Extract the SDK (zip, inside the tar.gz)
     await vscode.window.withProgress({
       location: vscode.ProgressLocation.Notification,
       title: this.translator.t('sdk.install.extractingZip', { args: [version] }),
@@ -215,6 +226,7 @@ export abstract class SdkInstaller extends Environment {
       await downloader.extractZip()
     })
 
+    // Step 5: Check the install status of the SDK
     const installStatus = await this.isInstalled(apiNumberVersion)
     if (installStatus === 'incomplete') {
       await vscode.window.showWarningMessage(this.translator.t('sdk.install.mayBeIncomplete', { args: [version] }))
@@ -225,6 +237,7 @@ export abstract class SdkInstaller extends Environment {
       return
     }
 
+    // Step 6: Show the success message, and ask the user if they want to switch to the new SDK
     vscode.window.showInformationMessage(this.translator.t('sdk.install.success', { args: [version] }))
     const isSwitchToNewSdkYes = this.translator.t('sdk.install.isSwitchToNewSdk.yes')
     const isSwitchToNewSdkNo = this.translator.t('sdk.install.isSwitchToNewSdk.no')

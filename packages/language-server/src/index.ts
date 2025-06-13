@@ -1,48 +1,36 @@
 import type { EtsServerClientOptions } from '@arkts/shared'
-import fs from 'node:fs'
-import path from 'node:path'
 import { ETSLanguagePlugin } from '@arkts/language-plugin'
 import { LanguageServerLogger } from '@arkts/shared'
-import { createConnection, createServer, createTypeScriptProject, loadTsdkByPath } from '@volar/language-server/node'
+import { createConnection, createServer, createTypeScriptProject } from '@volar/language-server/node'
 import defu from 'defu'
 import * as ets from 'ohos-typescript'
 import { create as createEmmetService } from 'volar-service-emmet'
 import { create as createTypeScriptServices } from 'volar-service-typescript'
 import { URI } from 'vscode-uri'
+import { LanguageServerConfigManager } from './language-server-config-manager'
 
 const connection = createConnection()
 const server = createServer(connection)
+const logger = new LanguageServerLogger()
+const lspConfiguration = new LanguageServerConfigManager(logger)
 
 connection.listen()
+
+server.configurations.onDidChange(async (e) => {
+  if (!e || !e.settings || !('configType' in e) || e.configType !== 'lspConfiguration') return
+  logger.getConsola().info(`ETS configuration changed: `)
+  logger.getConsola().info(JSON.stringify(e, null, 2))
+  lspConfiguration.setConfiguration(e.settings)
+})
 
 /** A helper function to assert the type of the value. */
 function typeAssert<T>(_value: unknown): asserts _value is T {}
 
 connection.onInitialize((params) => {
   typeAssert<EtsServerClientOptions>(params.initializationOptions)
-  const logger = new LanguageServerLogger()
-  const tsdk = loadTsdkByPath(params.initializationOptions.typescript.tsdk, params.locale)
-  logger.getConsola().info(`TSDK path: ${params.initializationOptions.typescript.tsdk} (initializationOptions.typescript.tsdk)`)
-  logger.getConsola().info(`OHOS SDK path: ${params.initializationOptions.ohos.sdkPath} (initializationOptions.ohos.sdkPath)`)
-  logger.getConsola().info(`ETS component path: ${params.initializationOptions.ohos.etsComponentPath} (initializationOptions.ohos.etsComponentPath)`)
-  logger.getConsola().info(`ETS loader config path: ${params.initializationOptions.ohos.etsLoaderConfigPath} (initializationOptions.ohos.etsLoaderConfigPath)`)
-  logger.getConsola().info(`ETS Libs: ${params.initializationOptions.ohos.lib.map(lib => path.basename(lib))} (initializationOptions.ohos.lib)`)
-  if (!params.initializationOptions.ohos.sdkPath)
-    throw new Error('sdkPath is not set, ETS Language Server will exited.')
-  else if (!params.initializationOptions.ohos.etsComponentPath)
-    throw new Error('etsComponentPath is not set, ETS Language Server will exited.')
-  else if (!params.initializationOptions.ohos.etsLoaderConfigPath)
-    throw new Error('etsLoaderConfigPath is not set, ETS Language Server will exited.')
-  else if (!params.initializationOptions.ohos.lib)
-    throw new Error('lib is not set, ETS Language Server will exited.')
-
-  const etsLoaderConfig = fs.readFileSync(params.initializationOptions.ohos.etsLoaderConfigPath, 'utf-8')
-  const { options: etsLoaderOptions = {}, errors = [] } = ets.parseJsonConfigFileContent(
-    ets.parseConfigFileTextToJson(params.initializationOptions.ohos.etsLoaderConfigPath, etsLoaderConfig).config || {},
-    ets.sys,
-    path.dirname(params.initializationOptions.ohos.etsLoaderConfigPath),
-  )
-  logger.getConsola().info(`ETS loader config errors: ${JSON.stringify(errors, null, 2)}`)
+  lspConfiguration.setConfiguration(params.initializationOptions)
+  const tsdk = lspConfiguration.getTypeScriptTsdk()
+  const etsLoaderOptions = lspConfiguration.getEtsLoaderConfigCompilerOptions()
 
   return server.initialize(
     params,
@@ -50,9 +38,7 @@ connection.onInitialize((params) => {
       typeAssert<EtsServerClientOptions>(params.initializationOptions)
 
       return {
-        languagePlugins: [
-          ETSLanguagePlugin(),
-        ],
+        languagePlugins: [ETSLanguagePlugin()],
         setup(options) {
           typeAssert<EtsServerClientOptions>(params.initializationOptions)
           if (!options.project || !options.project.typescript || !options.project.typescript.languageServiceHost)

@@ -10,6 +10,10 @@ export class SdkManager extends SdkInstaller {
     return new SdkManager(translator)
   }
 
+  private constructor(translator: Translator) {
+    super(translator)
+  }
+
   async setOhosSdkPath(sdkFolderPath: string): Promise<void> {
     await vscode.workspace.getConfiguration('ets')
       .update('sdkPath', sdkFolderPath, vscode.ConfigurationTarget.Global)
@@ -23,6 +27,11 @@ export class SdkManager extends SdkInstaller {
     ) as string
 
     return baseSdkPath.replace(/\$\{os\.homedir\}/g, os.homedir())
+  }
+
+  async getOhosSdkPath(): Promise<string | undefined> {
+    return vscode.workspace.getConfiguration('ets')
+      .get('sdkPath') as string | undefined
   }
 
   async isInstalled(version: string): Promise<boolean | 'incomplete'> {

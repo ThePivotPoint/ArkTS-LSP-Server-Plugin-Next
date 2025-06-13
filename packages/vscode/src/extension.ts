@@ -4,6 +4,7 @@ import * as vscode from 'vscode'
 import { EtsLanguageServer } from './language-server'
 import { SdkManager } from './sdk/sdk-manager'
 import { Translator } from './translate'
+import type { EtsServerClientOptions } from '@arkts/shared'
 
 let lsp: EtsLanguageServer | undefined
 
@@ -17,22 +18,25 @@ export async function activate(context: vscode.ExtensionContext): Promise<LabsIn
   SdkManager.from(translator)
 
   try {
-    lsp = new EtsLanguageServer()
+    lsp = new EtsLanguageServer(context)
 
     useCommand('ets.restartServer', () => {
-      lsp?.restart(context).catch(e => handleLspError(e))
+      lsp?.restart().catch(e => handleLspError(e))
     })
 
     vscode.workspace.onDidChangeConfiguration(async (e) => {
-      if (!e.affectsConfiguration('ets.sdkPath'))
+      if (!e.affectsConfiguration('ets'))
         return
 
-      lsp?.getConsola().info(`ets.sdkPath changed: ${vscode.workspace.getConfiguration('ets').get('sdkPath')}`)
-      await lsp?.restart(context).catch(e => handleLspError(e))
+      const clientOptions = await lsp?.getClientOptions() || {}
+      await lsp?.getCurrentLanguageClient()?.sendNotification('workspace/didChangeConfiguration', {
+        settings: clientOptions.initializationOptions as EtsServerClientOptions,
+        configType: 'lspConfiguration'
+      }).then(() => lsp?.getConsola().info(`ets configuration changed: ${JSON.stringify(vscode.workspace.getConfiguration().get('ets'), null, 2)}`))
     })
 
     // First start it will be return LabsInfo object for volar.js labs extension
-    return await lsp.start(context) as LabsInfo
+    return await lsp.start() as LabsInfo
   }
   catch (error) {
     handleLspError(error)

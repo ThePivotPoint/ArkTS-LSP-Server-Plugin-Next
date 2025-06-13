@@ -1,21 +1,22 @@
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClient } from '@volar/vscode/node'
+import type { LanguageClientOptions } from '@volar/vscode/node'
 import path from 'node:path'
 import * as vscode from 'vscode'
 import { AbstractWatcher } from '../abstract-watcher'
 
 export abstract class LanguageServerContext extends AbstractWatcher {
   /** Start the language server. */
-  abstract start(context: vscode.ExtensionContext): Promise<LabsInfo | undefined>
+  abstract start(overrideClientOptions: LanguageClientOptions): Promise<LabsInfo | undefined>
   /** Stop the language server. */
   abstract stop(): Promise<void>
   /** Restart the language server. */
-  abstract restart(context: vscode.ExtensionContext): Promise<void>
+  abstract restart(): Promise<void>
   /** Get the current language client. */
   abstract getCurrentLanguageClient(): LanguageClient | undefined
 
   /** Listen to all local.properties files in the workspace. */
-  listenAllLocalPropertiesFile(context: vscode.ExtensionContext): void {
+  protected listenAllLocalPropertiesFile(): void {
     const workspaceFolders = vscode.workspace.workspaceFolders ?? []
 
     for (const workspaceFolder of workspaceFolders) {
@@ -23,15 +24,15 @@ export abstract class LanguageServerContext extends AbstractWatcher {
       this.getConsola().info(`Listening ${vscode.Uri.joinPath(workspaceFolder.uri, 'local.properties').fsPath}`)
     }
 
-    this.watcher.on('all', (event, path) => this.localPropertiesWatcher(event, path, context))
+    this.watcher.on('all', (event, path) => this.localPropertiesWatcher(event, path))
   }
 
-  private async localPropertiesWatcher(event: string, path: string, context: vscode.ExtensionContext): Promise<void> {
+  private async localPropertiesWatcher(event: string, path: string): Promise<void> {
     this.getConsola().warn(`${path} is ${event.toUpperCase()}, restarting ETS Language Server...`)
-    await this.restart(context)
+    await this.restart()
   }
 
-  /** Get the path of the Ohos SDK from local.properties file. */
+  /** Get the path of the Ohos SDK from `local.properties` file. */
   protected async getOhosSdkPathFromLocalProperties(): Promise<string | undefined> {
     const workspaceDir = this.getCurrentWorkspaceDir()
     if (!workspaceDir)
