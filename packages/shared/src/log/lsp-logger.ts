@@ -5,12 +5,13 @@ import { LspReporter } from './lsp-reporter'
 
 export class LanguageServerLogger {
   private logger: ConsolaInstance
+  private debug: boolean = false
 
   constructor(consolaOptions: Partial<ConsolaOptions> = {}) {
     this.logger = createConsola({
       ...consolaOptions,
       reporters: [
-        new LspReporter(),
+        new LspReporter(this.debug),
         ...(consolaOptions.reporters || []),
       ]
     })
@@ -19,5 +20,14 @@ export class LanguageServerLogger {
 
   getConsola(): ConsolaInstance {
     return this.logger
+  }
+
+  setDebug(debug: boolean): this {
+    this.debug = debug
+    return this
+  }
+
+  getDebug(): boolean {
+    return this.debug
   }
 }

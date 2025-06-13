@@ -18,7 +18,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<LabsIn
   SdkManager.from(translator)
 
   try {
-    lsp = new EtsLanguageServer(context)
+    lsp = new EtsLanguageServer(context, translator)
 
     useCommand('ets.restartServer', () => {
       lsp?.restart().catch(e => handleLspError(e))
@@ -36,7 +36,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<LabsIn
     })
 
     // First start it will be return LabsInfo object for volar.js labs extension
-    return await lsp.start() as LabsInfo
+    const [labsInfo] = await lsp.start()
+    return labsInfo!
   }
   catch (error) {
     handleLspError(error)

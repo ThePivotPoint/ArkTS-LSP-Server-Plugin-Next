@@ -1,6 +1,6 @@
 @Entry
 @Component
-struct Index {
+struct Index2 {
   @State
   message: string = 'Hello World';
 

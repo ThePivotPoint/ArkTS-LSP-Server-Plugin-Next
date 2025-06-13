@@ -27,4 +27,6 @@ export interface EtsServerClientOptions {
   typescript: VolarClientOptions
   /** ETS server options. */
   ohos: OhosClientOptions
+  /** Debug mode. */
+  debug?: boolean
 }

@@ -1,4 +1,4 @@
-import type { EtsServerClientOptions, TypescriptLanguageFeatures } from '@arkts/shared'
+import { type EtsServerClientOptions, type TypescriptLanguageFeatures } from '@arkts/shared'
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClientOptions, ServerOptions } from '@volar/vscode/node'
 import * as serverProtocol from '@volar/language-server/protocol'
@@ -9,9 +9,10 @@ import { executeCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
 import { LanguageServerContext } from './context/server-context'
 import { SdkAnalyzer } from './sdk/sdk-analyzer'
+import { Translator } from './translate'
 
 export class EtsLanguageServer extends LanguageServerContext {
-  constructor(private readonly context: vscode.ExtensionContext) {
+  constructor(private readonly context: vscode.ExtensionContext, private readonly translator: Translator) {
     super()
   }
 
@@ -63,6 +64,7 @@ export class EtsLanguageServer extends LanguageServerContext {
           tsdk: tsdk!.tsdk,
         },
         ohos: await sdkAnalyzer.toOhosClientOptions(false, tsdk?.tsdk),
+        debug: vscode.workspace.getConfiguration('ets').get<boolean>('lspDebugMode'),
       } satisfies EtsServerClientOptions,
     }
   }
@@ -90,7 +92,7 @@ export class EtsLanguageServer extends LanguageServerContext {
    * @returns The labs info.
    * @throws {SdkAnalyzerException} If the SDK path have any no right, it will throw an error.
    */
-  async start(overrideClientOptions: LanguageClientOptions = {}): Promise<LabsInfo | undefined> {
+  async start(overrideClientOptions: LanguageClientOptions = {}): Promise<[LabsInfo | undefined, LanguageClientOptions]> {
     const [serverOptions, clientOptions] = await Promise.all([
       this.getServerOptions(),
       this.getClientOptions(),
@@ -99,7 +101,7 @@ export class EtsLanguageServer extends LanguageServerContext {
 
     if (this._client) {
       await this._client.start()
-      return
+      return [undefined, clientOptions]
     }
     this._client = new LanguageClient(
       'ets-language-server',
@@ -108,6 +110,7 @@ export class EtsLanguageServer extends LanguageServerContext {
       defu(overrideClientOptions, clientOptions),
     )
     await this._client.start()
+    this._client.onNotification('ets/configurationChanged', () => this.restart(overrideClientOptions))
     this.listenAllLocalPropertiesFile()
     // support for auto close tag
     activateAutoInsertion('ets', this._client)
@@ -118,7 +121,7 @@ export class EtsLanguageServer extends LanguageServerContext {
     // ref: https://twitter.com/johnsoncodehk/status/1656126976774791168
     const labsInfo = createLabsInfo(serverProtocol)
     labsInfo.addLanguageClient(this._client)
-    return labsInfo.extensionExports
+    return [labsInfo.extensionExports!, clientOptions]
   }
 
   /**
@@ -147,6 +150,14 @@ export class EtsLanguageServer extends LanguageServerContext {
     await executeCommand('typescript.restartTsServer')
     await this.stop()
     await this.start(overrideClientOptions)
-    vscode.window.showInformationMessage('ETS Language Server restarted!')
+    const reloadWindow = this.translator.t('ets.language-server.restart.reloadWindow.button')
+    const reloadWindowChoice = await vscode.window.showInformationMessage(
+      this.translator.t('ets.language-server.restart.reloadWindow'),
+      reloadWindow,
+    )
+    if (reloadWindowChoice === reloadWindow) {
+      await executeCommand('workbench.action.closeActiveEditor')
+      await executeCommand('workbench.action.reloadWindow')
+    }
   }
 }

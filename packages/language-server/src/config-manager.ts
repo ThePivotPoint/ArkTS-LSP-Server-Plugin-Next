@@ -3,6 +3,7 @@ import { loadTsdkByPath } from "@volar/language-server/node";
 import fs from "node:fs";
 import path from "node:path";
 import * as ets from 'ohos-typescript'
+import defu from 'defu'
 
 export class LanguageServerConfigManager {
   constructor(private readonly logger: LanguageServerLogger) {}
@@ -21,6 +22,12 @@ export class LanguageServerConfigManager {
     typescript: {
       tsdk: '',
     },
+    debug: false,
+  }
+
+  setDebug(debug: boolean): this {
+    this.logger.setDebug(debug)
+    return this
   }
 
   getConfiguration(): EtsServerClientOptions {
@@ -72,9 +79,16 @@ export class LanguageServerConfigManager {
     return this
   }
 
+  // Cache the compiler options of the ETS loader config, 
+  // avoid reading and parsing the file every time (performance)
+  private prevEtsLoaderConfigPath: string = ''
+  private cachedEtsLoaderConfigCompilerOptions: ets.CompilerOptions = {}
   getEtsLoaderConfigCompilerOptions(): ets.CompilerOptions {
     if (!this.config.ohos.etsLoaderConfigPath)
       return {}
+
+    if (this.prevEtsLoaderConfigPath === this.config.ohos.etsLoaderConfigPath)
+      return this.cachedEtsLoaderConfigCompilerOptions
 
     const etsLoaderConfig = fs.readFileSync(this.config.ohos.etsLoaderConfigPath, 'utf-8')
     const { options = {}, errors = [] } = ets.parseJsonConfigFileContent(
@@ -87,9 +101,14 @@ export class LanguageServerConfigManager {
       for (const error of errors)
         this.logger.getConsola().warn(`ETS loader config error: [${error.code}:${error.category}] ${error.messageText}`)
     } else {
-      this.logger.getConsola().info(`ETS loader config parsed successfully: ${JSON.stringify(options, null, 2)}`)
+      this.logger.getConsola().info(`ETS loader config parsed successfully, path: ${this.config.ohos.etsLoaderConfigPath}`)
+      
+      if (this.logger.getDebug())
+        this.logger.getConsola().debug(`ETS loader config parsed successfully: ${JSON.stringify(options, null, 2)}`)
     }
 
+    this.prevEtsLoaderConfigPath = this.config.ohos.etsLoaderConfigPath
+    this.cachedEtsLoaderConfigCompilerOptions = options
     return options
   }
 
@@ -99,10 +118,18 @@ export class LanguageServerConfigManager {
     return this
   }
 
+  getEtsLoaderPath(): string {
+    return this.config.ohos.etsLoaderPath || ''
+  }
+
   setBaseUrl(baseUrl: string): this {
     this.logger.getConsola().info(`ohos.baseUrl changed: new: ${baseUrl}, old: ${this.config.ohos.baseUrl}`)
     this.config.ohos.baseUrl = baseUrl
     return this
+  }
+
+  getBaseUrl(): string {
+    return this.config.ohos.baseUrl || ''
   }
 
   setLib(lib: string[]): this {
@@ -111,10 +138,8 @@ export class LanguageServerConfigManager {
     return this
   }
 
-  appendLib(lib: string): this {
-    this.logger.getConsola().info(`ohos.lib changed: new: ${lib}, old: ${this.config.ohos.lib}`)
-    this.config.ohos.lib.push(lib)
-    return this
+  getLib(): string[] {
+    return this.config.ohos.lib || []
   }
 
   setTypeRoots(typeRoots: string[]): this {
@@ -123,10 +148,8 @@ export class LanguageServerConfigManager {
     return this
   }
 
-  appendTypeRoot(typeRoot: string): this {
-    this.logger.getConsola().info(`ohos.typeRoots changed: new: ${typeRoot}, old: ${this.config.ohos.typeRoots}`)
-    this.config.ohos.typeRoots.push(typeRoot)
-    return this
+  getTypeRoots(): string[] {
+    return this.config.ohos.typeRoots || []
   }
 
   setPaths(paths: import('ohos-typescript').MapLike<string[]>): this {
@@ -135,10 +158,8 @@ export class LanguageServerConfigManager {
     return this
   }
 
-  appendPath(path: string, value: string[]): this {
-    this.logger.getConsola().info(`ohos.paths changed: new: ${path}, old: ${this.config.ohos.paths}`)
-    this.config.ohos.paths[path] = value
-    return this
+  getPaths(): import('ohos-typescript').MapLike<string[]> {
+    return this.config.ohos.paths || {}
   }
 
   setLocale(locale: string): this {
@@ -170,6 +191,24 @@ export class LanguageServerConfigManager {
       this.setTypeRoots(config.ohos.typeRoots)
     if (config.typescript.tsdk)
       this.setTypeScriptTsdk(config.typescript.tsdk)
+    if (config.debug !== undefined)
+      this.setDebug(config.debug)
     return this
+  }
+
+  getTsConfig(originalSettings: ets.CompilerOptions): ets.CompilerOptions {
+    return defu({
+      ...originalSettings as ets.CompilerOptions,
+      etsLoaderPath: this.getEtsLoaderPath(),
+      typeRoots: this.getTypeRoots(),
+      baseUrl: this.getBaseUrl(),
+      lib: this.getLib(),
+      paths: this.getPaths(),
+      experimentalDecorators: true,
+      emitDecoratorMetadata: true,
+      strict: true,
+      strictPropertyInitialization: false,
+      incremental: true,
+    } satisfies ets.CompilerOptions, this.getEtsLoaderConfigCompilerOptions())
   }
 }

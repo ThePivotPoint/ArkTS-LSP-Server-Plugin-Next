@@ -2,6 +2,8 @@ import { ConsolaOptions, ConsolaReporter, LogObject } from "consola";
 import kleur from 'kleur'
 
 export class LspReporter implements ConsolaReporter {
+  constructor(private readonly debug: boolean) {}
+
   private safeStringify<T>(value: T): string {
     try {
       return JSON.stringify(value)
@@ -43,6 +45,8 @@ export class LspReporter implements ConsolaReporter {
       case 'debug':
       case 'verbose':
       case 'trace':
+        if (!this.debug)
+          return
         console.log(kleur.gray(`[${logObj.type.toUpperCase()}] 🐛:${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
         break
       case 'box':

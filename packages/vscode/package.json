@@ -109,6 +109,11 @@
           "type": "string",
           "description": "%configuration.ets.baseSdkPath.description%",
           "default": "${os.homedir}/OpenHarmony"
+        },
+        "ets.lspDebugMode": {
+          "type": "boolean",
+          "description": "%configuration.ets.lspDebugMode.description%",
+          "default": false
         }
       }
     },

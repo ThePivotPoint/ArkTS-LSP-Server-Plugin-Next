@@ -7,7 +7,7 @@ import { AbstractWatcher } from '../abstract-watcher'
 
 export abstract class LanguageServerContext extends AbstractWatcher {
   /** Start the language server. */
-  abstract start(overrideClientOptions: LanguageClientOptions): Promise<LabsInfo | undefined>
+  abstract start(overrideClientOptions: LanguageClientOptions): Promise<[LabsInfo | undefined, LanguageClientOptions]>
   /** Stop the language server. */
   abstract stop(): Promise<void>
   /** Restart the language server. */
@@ -27,7 +27,12 @@ export abstract class LanguageServerContext extends AbstractWatcher {
     this.watcher.on('all', (event, path) => this.localPropertiesWatcher(event, path))
   }
 
+  private isFirstStart: boolean = true
   private async localPropertiesWatcher(event: string, path: string): Promise<void> {
+    if (this.isFirstStart) {
+      this.isFirstStart = false
+      return
+    }
     this.getConsola().warn(`${path} is ${event.toUpperCase()}, restarting ETS Language Server...`)
     await this.restart()
   }
