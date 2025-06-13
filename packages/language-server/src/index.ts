@@ -83,7 +83,7 @@ connection.onInitialize((params) => {
       createEmmetService(),
       ...createTypeScriptServices(ets as any),
       {
-        name: 'arkts-diagnostic',
+        name: 'ets-diagnostic',
 
         capabilities: {
           diagnosticProvider: {
@@ -99,7 +99,10 @@ connection.onInitialize((params) => {
           const languageService = ets.createLanguageService(context.project.typescript.languageServiceHost as ets.LanguageServiceHost)
 
           return {
-            provideDiagnostics(document) {
+            provideDiagnostics(document, token) {
+              if (token.isCancellationRequested)
+                return
+
               try {
                 // eslint-disable-next-line ts/ban-ts-comment
                 // @ts-expect-error
