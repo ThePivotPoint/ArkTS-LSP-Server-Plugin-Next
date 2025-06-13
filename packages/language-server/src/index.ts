@@ -8,6 +8,7 @@ import defu from 'defu'
 import * as ets from 'ohos-typescript'
 import { create as createEmmetService } from 'volar-service-emmet'
 import { create as createTypeScriptServices } from 'volar-service-typescript'
+import { URI } from 'vscode-uri'
 
 const connection = createConnection()
 const server = createServer(connection)
@@ -68,6 +69,7 @@ connection.onInitialize((params) => {
             emitDecoratorMetadata: true,
             strict: true,
             strictPropertyInitialization: false,
+            incremental: true,
           } satisfies ets.CompilerOptions, etsLoaderOptions)
 
           logger.getConsola().info(`ETS language server merged options: `)
@@ -80,6 +82,43 @@ connection.onInitialize((params) => {
     [
       createEmmetService(),
       ...createTypeScriptServices(ets as any),
+      {
+        name: 'arkts-diagnostic',
+
+        capabilities: {
+          diagnosticProvider: {
+            interFileDependencies: true,
+            workspaceDiagnostics: true,
+          },
+        },
+
+        create(context) {
+          if (!context.project.typescript?.languageServiceHost)
+            return {}
+
+          const languageService = ets.createLanguageService(context.project.typescript.languageServiceHost as ets.LanguageServiceHost)
+
+          return {
+            provideDiagnostics(document) {
+              try {
+                // eslint-disable-next-line ts/ban-ts-comment
+                // @ts-expect-error
+                const builderProgram = languageService.getBuilderProgram(/** withLinterProgram */ true)
+                const sourceFile = ets.createSourceFile(context.decodeEmbeddedDocumentUri(URI.parse(document.uri))?.[0].fsPath ?? 'index.ets', document.getText(), ets.ScriptTarget.Latest, true)
+                return [
+                  ...ets.ArkTSLinter_1_0.runArkTSLinter(builderProgram!, sourceFile, undefined, 'ArkTS_1_0'),
+                  ...ets.ArkTSLinter_1_1.runArkTSLinter(builderProgram!, sourceFile, undefined, 'ArkTS_1_1'),
+                ] as any[]
+              }
+              catch (error) {
+                logger.getConsola().error(`ArkTS Linter error: `)
+                console.error(error)
+                return []
+              }
+            },
+          }
+        },
+      },
     ],
   )
 })
