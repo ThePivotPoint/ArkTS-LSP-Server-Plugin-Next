@@ -160,6 +160,7 @@
     "esbuild": "catalog:build",
     "extract-zip": "catalog:prod",
     "fast-glob": "catalog:dev",
+    "json5": "catalog:prod",
     "kleur": "catalog:prod",
     "tar": "catalog:prod",
     "ts-macro": "catalog:dev",

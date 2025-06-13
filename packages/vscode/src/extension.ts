@@ -1,10 +1,10 @@
+import type { EtsServerClientOptions } from '@arkts/shared'
 import type { LabsInfo } from '@volar/vscode'
 import { useCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
 import { EtsLanguageServer } from './language-server'
 import { SdkManager } from './sdk/sdk-manager'
 import { Translator } from './translate'
-import type { EtsServerClientOptions } from '@arkts/shared'
 
 let lsp: EtsLanguageServer | undefined
 
@@ -31,7 +31,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<LabsIn
       const clientOptions = await lsp?.getClientOptions() || {}
       await lsp?.getCurrentLanguageClient()?.sendNotification('workspace/didChangeConfiguration', {
         settings: clientOptions.initializationOptions as EtsServerClientOptions,
-        configType: 'lspConfiguration'
+        configType: 'lspConfiguration',
       }).then(() => lsp?.getConsola().info(`ets configuration changed: ${JSON.stringify(vscode.workspace.getConfiguration().get('ets'), null, 2)}`))
     })
 

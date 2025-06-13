@@ -43,6 +43,7 @@ catalogs:
     vscode-html-languageservice: ^5.3.1
     vscode-nls: ^5.2.0
     vscode-uri: ^3.0.8
+    json5: ^2.2.3
   scripts:
     '@antfu/nip': ^0.1.0
     '@changesets/changelog-github': ^0.5.1
