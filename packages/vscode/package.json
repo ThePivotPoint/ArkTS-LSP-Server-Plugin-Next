@@ -117,6 +117,23 @@
         "name": "ets-typescript-plugin",
         "enableForWorkspaceTypeScriptVersions": true
       }
+    ],
+    "walkthroughs": [
+      {
+        "id": "ArkTS-Walkthrough",
+        "title": "%walkthroughs.ArkTS-Walkthrough.title%",
+        "description": "%walkthroughs.ArkTS-Walkthrough.description%",
+        "steps": [
+          {
+            "id": "ArkTS-Walkthrough-InstallSDK",
+            "title": "%walkthroughs.ArkTS-Walkthrough.steps.installOpenHarmonySDK%",
+            "description": "%walkthroughs.ArkTS-Walkthrough.steps.installOpenHarmonySDK.description%",
+            "media": {
+              "markdown": "%walkthroughs.ArkTS-Walkthrough.steps.installOpenHarmonySDK.media.markdown%"
+            }
+          }
+        ]
+      }
     ]
   },
   "scripts": {
