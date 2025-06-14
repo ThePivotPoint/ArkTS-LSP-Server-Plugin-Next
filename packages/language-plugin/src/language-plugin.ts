@@ -36,11 +36,17 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, options: ETSL
       else if (languageId === 'typescript') {
         const filePath = typeof uri === 'string' ? uri : uri.fsPath
         const isInSdkPath = filePath.startsWith(options.sdkPath)
+        // 不是ets环境那就说明是ts环境，ts环境 === typescript plugin环境；
+        // 如果当前文件位于open harmony sdk路径下，说明是内置的.d.ts声明文件，那就直接清空文件内容
+        // 这样vscode自带的ts服务器就会认为这个文件是空的，于是没有任何报错✨
         if (!isEts(tsOrEts) && isInSdkPath) {
           snapshot.getText = () => ''
           snapshot.getLength = () => 0
           snapshot.getChangeRange = () => undefined
         }
+        // 当前是ets环境的时候，ets环境 === language server环境；
+        // 如果当前文件不在open harmony sdk路径下，说明是用户自己写的.d.ts声明文件或者就是ts文件，那就直接清空文件内容
+        // 这样ets的lsp服务器就会认为这个文件是空的，于是没有任何报错✨
         if (isEts(tsOrEts) && !isInSdkPath) {
           snapshot.getText = () => ''
           snapshot.getLength = () => 0
