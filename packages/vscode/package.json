@@ -171,9 +171,10 @@
     "@arkts/language-server": "workspace:*",
     "@arkts/sdk-downloader": "catalog:prod",
     "@arkts/typescript-plugin": "workspace:*",
-    "@types/vscode": "catalog:dev",
+    "@types/vscode": "^1.82.0",
     "@volar/language-server": "catalog:prod",
     "@volar/vscode": "catalog:prod",
+    "@vscode/vsce": "catalog:scripts",
     "axios": "catalog:prod",
     "chokidar": "catalog:prod",
     "esbuild": "catalog:build",
@@ -183,7 +184,6 @@
     "json5": "catalog:prod",
     "kleur": "catalog:prod",
     "tar": "catalog:prod",
-    "ts-macro": "catalog:dev",
-    "vsce": "catalog:scripts"
+    "ts-macro": "catalog:dev"
   }
 }

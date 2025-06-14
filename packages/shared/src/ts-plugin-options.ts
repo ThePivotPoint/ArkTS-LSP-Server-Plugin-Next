@@ -1,6 +1,6 @@
 import type { EtsServerClientOptions } from './client-options'
 
-type GetAPI = (n: number) => {
+type GetAPI = (version: 0) => {
   configurePlugin: <PluginName extends keyof PluginOptions>(
     pluginName: PluginName,
     options: PluginOptions[PluginName],

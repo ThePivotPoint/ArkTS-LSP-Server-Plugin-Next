@@ -1,7 +1,6 @@
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClient } from '@volar/vscode/node'
 import type { LanguageClientOptions } from '@volar/vscode/node'
-import path from 'node:path'
 import * as vscode from 'vscode'
 import { AbstractWatcher } from '../abstract-watcher'
 
@@ -39,19 +38,20 @@ export abstract class LanguageServerContext extends AbstractWatcher {
 
   /** Get the path of the Ohos SDK from `local.properties` file. */
   protected async getOhosSdkPathFromLocalProperties(): Promise<string | undefined> {
-    const workspaceDir = this.getCurrentWorkspaceDir()
-    if (!workspaceDir)
-      return undefined
-    const localPropPath = vscode.Uri.joinPath(workspaceDir, 'local.properties')
-    const stat = await vscode.workspace.fs.stat(localPropPath)
-    if (stat.type !== vscode.FileType.File) {
-      await vscode.window.showErrorMessage(`${path.relative(workspaceDir.fsPath, localPropPath.fsPath)}文件不存在，请在项目根目录下创建一个。`)
-      return
-    }
+    try {
+      const workspaceDir = this.getCurrentWorkspaceDir()
+      if (!workspaceDir)
+        return undefined
+      const localPropPath = vscode.Uri.joinPath(workspaceDir, 'local.properties')
+      const stat = await vscode.workspace.fs.stat(localPropPath)
+      if (stat.type !== vscode.FileType.File)
+        return
 
-    const content = await vscode.workspace.fs.readFile(localPropPath)
-    const lines = content.toString().split('\n')
-    const sdkPath = lines.find(line => line.startsWith('sdk.dir'))
-    return sdkPath?.split('=')?.[1]?.trim()
+      const content = await vscode.workspace.fs.readFile(localPropPath)
+      const lines = content.toString().split('\n')
+      const sdkPath = lines.find(line => line.startsWith('sdk.dir'))
+      return sdkPath?.split('=')?.[1]?.trim()
+    }
+    catch {}
   }
 }

@@ -1,6 +1,6 @@
 @Entry
 @Component
-struct Index2 {
+export struct Index {
   @State
   message: string = 'Hello World';
 
@@ -10,6 +10,7 @@ struct Index2 {
         Text(this.message)
           .fontSize(50)
           .fontWeight(FontWeight.Bold)
+          .textAlign(TextAlign.Center)
       }
       .width('100%')
     }

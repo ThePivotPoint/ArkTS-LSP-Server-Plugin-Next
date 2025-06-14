@@ -1,6 +1,7 @@
-import { type EtsServerClientOptions, type TypescriptLanguageFeatures } from '@arkts/shared'
+import type { EtsServerClientOptions, TypescriptLanguageFeatures } from '@arkts/shared'
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClientOptions, ServerOptions } from '@volar/vscode/node'
+import type { Translator } from './translate'
 import * as serverProtocol from '@volar/language-server/protocol'
 import { activateAutoInsertion, createLabsInfo, getTsdk } from '@volar/vscode'
 import { LanguageClient, TransportKind } from '@volar/vscode/node'
@@ -9,7 +10,6 @@ import { executeCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
 import { LanguageServerContext } from './context/server-context'
 import { SdkAnalyzer } from './sdk/sdk-analyzer'
-import { Translator } from './translate'
 
 export class EtsLanguageServer extends LanguageServerContext {
   constructor(private readonly context: vscode.ExtensionContext, private readonly translator: Translator) {
@@ -58,7 +58,10 @@ export class EtsLanguageServer extends LanguageServerContext {
     const tsdk = await getTsdk(this.context)
 
     return {
-      documentSelector: [{ language: 'ets' }],
+      documentSelector: [
+        { language: 'ets' },
+        { language: 'typescript' }
+      ],
       initializationOptions: {
         typescript: {
           tsdk: tsdk!.tsdk,
@@ -142,7 +145,6 @@ export class EtsLanguageServer extends LanguageServerContext {
   /**
    * Restart the ETS Language Server.
    *
-   * @param context The extension context.
    * @param overrideClientOptions The override client options.
    * @throws {SdkAnalyzerException} If the SDK path have any no right, it will throw an error.
    */

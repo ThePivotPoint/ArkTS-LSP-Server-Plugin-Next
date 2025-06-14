@@ -1,7 +1,9 @@
-import type { ETSPluginOptions } from '@arkts/shared'
 import type * as ts from 'typescript'
 import { ETSLanguagePlugin } from '@arkts/language-plugin'
 import { createLanguageServicePlugin } from '@volar/typescript/lib/quickstart/createLanguageServicePlugin'
+
+/** Current configuration */
+let currentConfig: any = {}
 
 /**
  * ### 这个插件做了什么？
@@ -16,34 +18,31 @@ import { createLanguageServicePlugin } from '@volar/typescript/lib/quickstart/cr
  *
  * 点开一个`.ts`文件然后按 Ctrl + shift + P 输入`Typescript: Open TS Server Log`
  */
-const plugin: ts.server.PluginModuleFactory = createLanguageServicePlugin((_ts, info) => {
-  const settings = info.languageServiceHost.getCompilationSettings()
-  const configuration = info.config as ETSPluginOptions
-  const currentDirectory = info.languageServiceHost.getCurrentDirectory()
-  console.warn(`ETS typescript plugin loaded! currentDirectory: ${currentDirectory}, sdkPath: ${configuration?.lspOptions?.ohos?.sdkPath}`)
+const volarPlugin: ts.server.PluginModuleFactory = createLanguageServicePlugin((ts, info) => {
+  const sdkPath = currentConfig?.lspOptions?.ohos?.sdkPath
 
-  if (currentDirectory.startsWith(configuration?.lspOptions?.ohos?.sdkPath || '')) {
-    info.languageServiceHost.getCompilationSettings = () => {
-      return {
-        ...settings,
-        noCheck: !!currentDirectory.startsWith(configuration?.lspOptions?.ohos?.sdkPath || ''),
-        etsLoaderPath: configuration?.lspOptions?.ohos?.etsLoaderPath,
-        typeRoots: configuration?.lspOptions?.ohos?.typeRoots,
-        baseUrl: configuration?.lspOptions?.ohos?.baseUrl,
-        lib: configuration?.lspOptions?.ohos?.lib,
-        paths: configuration?.lspOptions?.ohos?.paths,
-        experimentalDecorators: true,
-        emitDecoratorMetadata: true,
-        strict: true,
-        strictPropertyInitialization: false,
-      }
-    }
-  }
+  console.warn(`ETS typescript plugin loaded! sdkPath: ${sdkPath}`)
+  console.warn(`Current config: ${JSON.stringify(info.config)}`)
 
   return {
-    languagePlugins: [ETSLanguagePlugin()],
+    languagePlugins: [ETSLanguagePlugin(ts, { sdkPath })],
   }
 })
+
+const plugin: ts.server.PluginModuleFactory = (mod) => {
+  const volarTSPlugin = volarPlugin(mod)
+
+  return {
+    create(createInfo) {
+      currentConfig = createInfo.config
+      return volarTSPlugin.create(createInfo)
+    },
+    getExternalFiles: volarTSPlugin.getExternalFiles,
+    onConfigurationChanged(config) {
+      currentConfig = config
+    },
+  }
+}
 
 // eslint-disable-next-line no-restricted-syntax
 export = plugin

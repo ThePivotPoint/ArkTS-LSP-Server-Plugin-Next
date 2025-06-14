@@ -14,7 +14,8 @@ const logger = new LanguageServerLogger()
 const lspConfiguration = new LanguageServerConfigManager(logger)
 
 server.configurations.onDidChange(async (e) => {
-  if (!e || !e.settings || !('configType' in e) || e.configType !== 'lspConfiguration') return
+  if (!e || !e.settings || !('configType' in e) || e.configType !== 'lspConfiguration')
+    return
   logger.getConsola().info(`ETS configuration changed: `)
   logger.getConsola().info(JSON.stringify(e, null, 2))
   lspConfiguration.setConfiguration(e.settings)
@@ -37,7 +38,7 @@ connection.onInitialize((params) => {
       typeAssert<EtsServerClientOptions>(params.initializationOptions)
 
       return {
-        languagePlugins: [ETSLanguagePlugin()],
+        languagePlugins: [ETSLanguagePlugin(ets, { sdkPath: params.initializationOptions.ohos.sdkPath ?? '' })],
         setup(options) {
           typeAssert<EtsServerClientOptions>(params.initializationOptions)
           if (!options.project || !options.project.typescript || !options.project.typescript.languageServiceHost)

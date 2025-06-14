@@ -17,12 +17,12 @@
   },
   "dependencies": {
     "@types/progress-stream": "catalog:dev",
-    "vue": "catalog:frontend",
-    "vite": "catalog:frontend",
     "@vitejs/plugin-vue": "catalog:frontend",
     "@vitejs/plugin-vue-jsx": "catalog:frontend",
+    "@vueuse/core": "catalog:frontend",
     "unocss": "catalog:frontend",
-    "@vueuse/core": "catalog:frontend"
+    "vite": "catalog:frontend",
+    "vue": "catalog:frontend"
   },
   "devDependencies": {
     "@antfu/eslint-config": "catalog:lint",
