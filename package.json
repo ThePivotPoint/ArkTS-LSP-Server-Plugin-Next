@@ -16,7 +16,13 @@
     "lint": "eslint && oxlint"
   },
   "dependencies": {
-    "@types/progress-stream": "catalog:dev"
+    "@types/progress-stream": "catalog:dev",
+    "vue": "catalog:frontend",
+    "vite": "catalog:frontend",
+    "@vitejs/plugin-vue": "catalog:frontend",
+    "@vitejs/plugin-vue-jsx": "catalog:frontend",
+    "unocss": "catalog:frontend",
+    "@vueuse/core": "catalog:frontend"
   },
   "devDependencies": {
     "@antfu/eslint-config": "catalog:lint",
@@ -25,6 +31,7 @@
     "@changesets/changelog-github": "catalog:scripts",
     "@changesets/cli": "catalog:scripts",
     "@release-it/bumper": "catalog:scripts",
+    "@types/hbs": "^4.0.5",
     "@types/lodash": "catalog:prod",
     "@types/node": "catalog:dev",
     "@types/unzipper": "catalog:prod",

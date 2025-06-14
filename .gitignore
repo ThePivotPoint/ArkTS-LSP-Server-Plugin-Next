@@ -1,5 +1,6 @@
 out
 dist
+packages/vscode/build
 node_modules
 *.tsbuildinfo
 *.vsix

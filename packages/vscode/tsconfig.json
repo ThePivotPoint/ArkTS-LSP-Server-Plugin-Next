@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "out"
   },
   "references": [
@@ -16,6 +15,7 @@
     }
   ],
   "include": [
-    "src"
+    "src",
+    "lib.global.d.ts"
   ]
 }

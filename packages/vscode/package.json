@@ -123,6 +123,24 @@
         "enableForWorkspaceTypeScriptVersions": true
       }
     ],
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "ets-hilog",
+          "title": "HiLog",
+          "icon": "$(debug-console)"
+        }
+      ]
+    },
+    "views": {
+      "ets-hilog": [
+        {
+          "id": "ets-hilog-view",
+          "name": "HiLog",
+          "type": "webview"
+        }
+      ]
+    },
     "walkthroughs": [
       {
         "id": "ArkTS-Walkthrough",
@@ -142,8 +160,9 @@
     ]
   },
   "scripts": {
-    "build": "node scripts/build -- --minify",
-    "watch": "npm run build -- --watch",
+    "build": "node scripts/build -- --minify && vite build",
+    "dev": "vite build --watch",
+    "watch": "node scripts/build -- --minify -- --watch",
     "pack": "npm run build && vsce package",
     "release": "npm run build && vsce publish --pre-release",
     "update": "vscode-ext-gen --output src/generated/meta.ts"
@@ -160,6 +179,7 @@
     "esbuild": "catalog:build",
     "extract-zip": "catalog:prod",
     "fast-glob": "catalog:dev",
+    "hbs": "catalog:prod",
     "json5": "catalog:prod",
     "kleur": "catalog:prod",
     "tar": "catalog:prod",
