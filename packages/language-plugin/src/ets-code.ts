@@ -1,15 +1,16 @@
 import type { CodeMapping, VirtualCode } from '@volar/language-core'
-import type { TsmLanguagePlugin } from 'ts-macro'
 import type * as ts from 'typescript'
-import { TsmVirtualCode } from 'ts-macro'
 
 export class EtsVirtualCode implements VirtualCode {
   id = 'root'
-  languageId = 'ets'
   mappings: CodeMapping[] = []
   embeddedCodes: VirtualCode[] = []
 
-  constructor(public snapshot: ts.IScriptSnapshot) {
+  constructor(
+    public filePath: string,
+    public snapshot: ts.IScriptSnapshot,
+    public languageId: string,
+  ) {
     this.mappings = [{
       sourceOffsets: [0],
       generatedOffsets: [0],
@@ -26,13 +27,28 @@ export class EtsVirtualCode implements VirtualCode {
   }
 }
 
-export class DtsVirtualCode extends TsmVirtualCode implements VirtualCode {
+export class TSIgnoreVirtualCode implements VirtualCode {
+  id = 'root'
+  mappings: CodeMapping[] = []
+  embeddedCodes: VirtualCode[] = []
+
   constructor(
     public filePath: string,
-    public ast: import('typescript').SourceFile,
+    public snapshot: ts.IScriptSnapshot,
     public languageId: string,
-    plugins: TsmLanguagePlugin[],
   ) {
-    super(filePath, ast, languageId, plugins)
+    this.mappings = [{
+      sourceOffsets: [0],
+      generatedOffsets: [0],
+      lengths: [snapshot.getLength()],
+      data: {
+        completion: false,
+        format: false,
+        navigation: false,
+        semantic: false,
+        structure: false,
+        verification: false,
+      },
+    }]
   }
 }

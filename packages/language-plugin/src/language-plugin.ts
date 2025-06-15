@@ -2,7 +2,7 @@ import type { LanguagePlugin } from '@volar/language-core'
 import type * as ets from 'ohos-typescript'
 import type * as ts from 'typescript'
 import type { URI } from 'vscode-uri'
-import { DtsVirtualCode, EtsVirtualCode } from './ets-code'
+import { EtsVirtualCode, TSIgnoreVirtualCode } from './ets-code'
 import '@volar/typescript'
 
 function isEts(tsOrEts: typeof ets | typeof ts): tsOrEts is typeof ets {
@@ -30,11 +30,12 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, options: ETSL
       }
     },
     createVirtualCode(uri, languageId, snapshot) {
+      const filePath = typeof uri === 'string' ? uri : uri.fsPath
+
       if (languageId === 'ets') {
-        return new EtsVirtualCode(snapshot)
+        return new EtsVirtualCode(filePath, snapshot, languageId)
       }
       else if (languageId === 'typescript') {
-        const filePath = typeof uri === 'string' ? uri : uri.fsPath
         const isInSdkPath = filePath.startsWith(options.sdkPath)
         // 不是ets环境那就说明是ts环境，ts环境 === typescript plugin环境；
         // 如果当前文件位于open harmony sdk路径下，说明是内置的.d.ts声明文件，那就直接清空文件内容
@@ -51,13 +52,8 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, options: ETSL
           snapshot.getText = () => ''
           snapshot.getLength = () => 0
           snapshot.getChangeRange = () => undefined
+          return new TSIgnoreVirtualCode(filePath, snapshot, languageId)
         }
-        return new DtsVirtualCode(
-          filePath,
-          tsOrEts.createSourceFile(filePath, snapshot.getText(0, snapshot.getLength()), tsOrEts.ScriptTarget.Latest as any) as any,
-          languageId,
-          [],
-        )
       }
     },
     typescript: getTypeScriptConfiguration(tsOrEts),
