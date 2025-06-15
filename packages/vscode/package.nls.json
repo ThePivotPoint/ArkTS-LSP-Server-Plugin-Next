@@ -48,5 +48,5 @@
   "walkthroughs.ArkTS-Walkthrough.description": "Help you setup OpenHarmony ArkTS development environment with your IDE.",
   "walkthroughs.ArkTS-Walkthrough.steps.installOpenHarmonySDK": "Install OpenHarmony SDK",
   "walkthroughs.ArkTS-Walkthrough.steps.installOpenHarmonySDK.description": "Install OpenHarmony SDK to support ArkTS development. \n[Install OpenHarmony SDK](command:ets.installSDK)",
-  "walkthroughs.ArkTS-Walkthrough.steps.installOpenHarmonySDK.media.markdown": "## Install OpenHarmony SDK\n\nTo develop ArkTS applications, you need to install the OpenHarmony SDK. Also you can specify the SDK path in the IDE settings."
+  "walkthroughs.ArkTS-Walkthrough.steps.installOpenHarmonySDK.media.markdown": "./assets/install-sdk.md"
 }

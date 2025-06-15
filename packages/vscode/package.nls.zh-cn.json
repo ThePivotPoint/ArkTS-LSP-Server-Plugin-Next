@@ -48,5 +48,5 @@
   "walkthroughs.ArkTS-Walkthrough.description": "帮助您设置 OpenHarmony ArkTS 开发环境。",
   "walkthroughs.ArkTS-Walkthrough.steps.installOpenHarmonySDK": "安装 OpenHarmony SDK",
   "walkthroughs.ArkTS-Walkthrough.steps.installOpenHarmonySDK.description": "安装 OpenHarmony SDK 以支持 ArkTS 开发。\n[安装 OpenHarmony SDK](command:ets.installSDK)",
-  "walkthroughs.ArkTS-Walkthrough.steps.installOpenHarmonySDK.media.markdown": "## 安装 OpenHarmony SDK\n\n要开发 ArkTS 应用程序，您需要安装 OpenHarmony SDK。您也可以在 IDE 设置中指定 SDK 路径。"
+  "walkthroughs.ArkTS-Walkthrough.steps.installOpenHarmonySDK.media.markdown": "./assets/install-sdk.zh-cn.md"
 }
