@@ -65,8 +65,8 @@ catalogs:
       version: 0.17.0
   prod:
     '@arkts/sdk-downloader':
-      specifier: ^0.1.16
-      version: 0.1.16
+      specifier: ^0.1.17
+      version: 0.1.17
     '@types/lodash':
       specifier: ^4.17.17
       version: 4.17.17
@@ -484,7 +484,7 @@ importers:
         version: link:../language-server
       '@arkts/sdk-downloader':
         specifier: catalog:prod
-        version: 0.1.16
+        version: 0.1.17
       '@arkts/typescript-plugin':
         specifier: workspace:*
         version: link:../typescript-plugin
@@ -600,8 +600,8 @@ packages:
   '@antfu/utils@8.1.1':
     resolution: {integrity: sha512-Mex9nXf9vR6AhcXmMrlz/HVgYYZpVGJ6YlPgwl7UnaFpnshXs6EK/oa5Gpf3CzENMjkvEx2tQtntGnb7UtSTOQ==}
 
-  '@arkts/sdk-downloader@0.1.16':
-    resolution: {integrity: sha512-Bbx64eRAadh8ozAzXRtGhAbuosSO8Duh9Kj01x8rcqW8uBiXA2pZgAO8Yld3XKfYagV/l+vdULTWPFY2WBE1zw==}
+  '@arkts/sdk-downloader@0.1.17':
+    resolution: {integrity: sha512-rqQwONvaXvkSt8h9lrbcZs12tlQRJ4ZZAb2CmilUN0VSoICKfZPU8dQn0a5d+CWMv1zjqDiUR+Rtq4OvgD1+xA==}
 
   '@azu/format-text@1.0.2':
     resolution: {integrity: sha512-Swi4N7Edy1Eqq82GxgEECXSSLyn6GOb5htRFPzBDdUkECGXtlf12ynO5oJSpWKPwCaUssOu7NfhDcCWpIC6Ywg==}
@@ -6118,7 +6118,7 @@ snapshots:
 
   '@antfu/utils@8.1.1': {}
 
-  '@arkts/sdk-downloader@0.1.16':
+  '@arkts/sdk-downloader@0.1.17':
     dependencies:
       alien-signals: 2.0.5
       fast-glob: 3.3.3
