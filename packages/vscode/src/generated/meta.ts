@@ -4,7 +4,7 @@
 // Meta info
 export const publisher = "NailyZero"
 export const name = "vscode-naily-ets"
-export const version = "2.0.0-alpha.1"
+export const version = "1.0.1"
 export const displayName = "Naily's ArkTS Support"
 export const description = "自用ArkTS扩展,支持代码跳转,欢迎PR! Naily's ArkTS Support."
 export const extensionId = `${publisher}.${name}`
@@ -37,17 +37,25 @@ export const commands = {
  */
 export type ConfigKey = 
   | "ets.sdkPath"
+  | "ets.baseSdkPath"
+  | "ets.lspDebugMode"
 
 export interface ConfigKeyTypeMap {
   "ets.sdkPath": string,
+  "ets.baseSdkPath": string,
+  "ets.lspDebugMode": boolean,
 }
 
 export interface ConfigShorthandMap {
   etsSdkPath: "ets.sdkPath",
+  etsBaseSdkPath: "ets.baseSdkPath",
+  etsLspDebugMode: "ets.lspDebugMode",
 }
 
 export interface ConfigShorthandTypeMap {
   etsSdkPath: string,
+  etsBaseSdkPath: string,
+  etsLspDebugMode: boolean,
 }
 
 export interface ConfigItem<T extends keyof ConfigKeyTypeMap> {
@@ -61,7 +69,7 @@ export interface ConfigItem<T extends keyof ConfigKeyTypeMap> {
  */
 export const configs = {
   /**
-   * The default OpenHarmony SDK path.
+   * %configuration.ets.sdkPath.description%
    * @key `ets.sdkPath`
    * @default `""`
    * @type `string`
@@ -70,6 +78,26 @@ export const configs = {
     key: "ets.sdkPath",
     default: "",
   } as ConfigItem<"ets.sdkPath">,
+  /**
+   * %configuration.ets.baseSdkPath.description%
+   * @key `ets.baseSdkPath`
+   * @default `"${os.homedir}/OpenHarmony"`
+   * @type `string`
+   */
+  etsBaseSdkPath: {
+    key: "ets.baseSdkPath",
+    default: "${os.homedir}/OpenHarmony",
+  } as ConfigItem<"ets.baseSdkPath">,
+  /**
+   * %configuration.ets.lspDebugMode.description%
+   * @key `ets.lspDebugMode`
+   * @default `false`
+   * @type `boolean`
+   */
+  etsLspDebugMode: {
+    key: "ets.lspDebugMode",
+    default: false,
+  } as ConfigItem<"ets.lspDebugMode">,
 }
 
 export interface ScopedConfigKeyTypeMap {
@@ -84,6 +112,8 @@ export const scopedConfigs = {
 export interface NestedConfigs {
   "ets": {
     "sdkPath": string,
+    "baseSdkPath": string,
+    "lspDebugMode": boolean,
   },
 }
 
