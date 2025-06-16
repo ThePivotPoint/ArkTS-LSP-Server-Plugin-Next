@@ -53,6 +53,10 @@ export class LanguageServerConfigManager {
     return this.tsdk
   }
 
+  getTsdkPath(): string {
+    return this.config.typescript.tsdk || ''
+  }
+
   setSdkPath(sdkPath: string): this {
     this.logger.getConsola().info(`ohos.sdkPath changed: new: ${sdkPath}, old: ${this.config.ohos.sdkPath}`)
     this.config.ohos.sdkPath = sdkPath

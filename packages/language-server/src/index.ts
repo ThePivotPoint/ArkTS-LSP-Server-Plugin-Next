@@ -40,7 +40,7 @@ connection.onInitialize((params) => {
       typeAssert<EtsServerClientOptions>(params.initializationOptions)
 
       return {
-        languagePlugins: [ETSLanguagePlugin(ets, { sdkPath: params.initializationOptions.ohos.sdkPath ?? '' })],
+        languagePlugins: [ETSLanguagePlugin(ets, { sdkPath: lspConfiguration.getSdkPath(), tsdk: lspConfiguration.getTsdkPath() })],
         setup(options) {
           typeAssert<EtsServerClientOptions>(params.initializationOptions)
           if (!options.project || !options.project.typescript || !options.project.typescript.languageServiceHost)

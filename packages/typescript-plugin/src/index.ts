@@ -25,7 +25,7 @@ const volarPlugin: ts.server.PluginModuleFactory = createLanguageServicePlugin((
   console.warn(`Current config: ${JSON.stringify(info.config)}`)
 
   return {
-    languagePlugins: [ETSLanguagePlugin(ts, { sdkPath })],
+    languagePlugins: [ETSLanguagePlugin(ts, { sdkPath, tsdk: currentConfig?.lspOptions?.typescript?.tsdk })],
   }
 })
 
