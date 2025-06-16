@@ -1,9 +1,9 @@
-import { EtsServerClientOptions, LanguageServerLogger } from "@arkts/shared";
-import { loadTsdkByPath } from "@volar/language-server/node";
-import fs from "node:fs";
-import path from "node:path";
-import * as ets from 'ohos-typescript'
+import type { EtsServerClientOptions, LanguageServerLogger } from '@arkts/shared'
+import fs from 'node:fs'
+import path from 'node:path'
+import { loadTsdkByPath } from '@volar/language-server/node'
 import defu from 'defu'
+import * as ets from 'ohos-typescript'
 
 export class LanguageServerConfigManager {
   constructor(private readonly logger: LanguageServerLogger) {}
@@ -49,7 +49,7 @@ export class LanguageServerConfigManager {
   getTypeScriptTsdk(force: boolean = false): ReturnType<typeof loadTsdkByPath> {
     if (this.tsdk && !force)
       return this.tsdk
-    this.tsdk = loadTsdkByPath(this.config.typescript.tsdk, this.locale)
+    this.tsdk = loadTsdkByPath(this.config.typescript.tsdk, this.getLocale())
     return this.tsdk
   }
 
@@ -57,6 +57,10 @@ export class LanguageServerConfigManager {
     this.logger.getConsola().info(`ohos.sdkPath changed: new: ${sdkPath}, old: ${this.config.ohos.sdkPath}`)
     this.config.ohos.sdkPath = sdkPath
     return this
+  }
+
+  getSdkPath(): string {
+    return this.config.ohos.sdkPath || ''
   }
 
   setEtsComponentPath(etsComponentPath: string): this {
@@ -79,7 +83,11 @@ export class LanguageServerConfigManager {
     return this
   }
 
-  // Cache the compiler options of the ETS loader config, 
+  getEtsLoaderConfigPath(): string {
+    return this.config.ohos.etsLoaderConfigPath || ''
+  }
+
+  // Cache the compiler options of the ETS loader config,
   // avoid reading and parsing the file every time (performance)
   private prevEtsLoaderConfigPath: string = ''
   private cachedEtsLoaderConfigCompilerOptions: ets.CompilerOptions = {}
@@ -91,8 +99,9 @@ export class LanguageServerConfigManager {
       return this.cachedEtsLoaderConfigCompilerOptions
 
     const etsLoaderConfig = fs.readFileSync(this.config.ohos.etsLoaderConfigPath, 'utf-8')
+    const parsedConfigFile = ets.parseConfigFileTextToJson(this.config.ohos.etsLoaderConfigPath, etsLoaderConfig)
     const { options = {}, errors = [] } = ets.parseJsonConfigFileContent(
-      ets.parseConfigFileTextToJson(this.config.ohos.etsLoaderConfigPath, etsLoaderConfig).config || {},
+      parsedConfigFile.config,
       ets.sys,
       path.dirname(this.config.ohos.etsLoaderConfigPath),
     )
@@ -100,9 +109,10 @@ export class LanguageServerConfigManager {
     if (errors.length > 0) {
       for (const error of errors)
         this.logger.getConsola().warn(`ETS loader config error: [${error.code}:${error.category}] ${error.messageText}`)
-    } else {
+    }
+    else {
       this.logger.getConsola().info(`ETS loader config parsed successfully, path: ${this.config.ohos.etsLoaderConfigPath}`)
-      
+
       if (this.logger.getDebug())
         this.logger.getConsola().debug(`ETS loader config parsed successfully: ${JSON.stringify(options, null, 2)}`)
     }
@@ -133,7 +143,7 @@ export class LanguageServerConfigManager {
   }
 
   setLib(lib: string[]): this {
-    this.logger.getConsola().info(`ohos.lib changed: new: ${lib}, old: ${this.config.ohos.lib}`)
+    this.logger.getConsola().debug(`ohos.lib changed: new: ${lib}, old: ${this.config.ohos.lib}`)
     this.config.ohos.lib = lib
     return this
   }
@@ -209,6 +219,10 @@ export class LanguageServerConfigManager {
       strict: true,
       strictPropertyInitialization: false,
       incremental: true,
+      moduleDetection: ets.ModuleDetectionKind.Force,
+      moduleResolution: ets.ModuleResolutionKind.NodeNext,
+      module: ets.ModuleKind.ESNext,
+      target: ets.ScriptTarget.ESNext,
     } satisfies ets.CompilerOptions, this.getEtsLoaderConfigCompilerOptions())
   }
 }

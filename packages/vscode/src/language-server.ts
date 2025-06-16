@@ -60,7 +60,7 @@ export class EtsLanguageServer extends LanguageServerContext {
     return {
       documentSelector: [
         { language: 'ets' },
-        { language: 'typescript' }
+        { language: 'typescript' },
       ],
       initializationOptions: {
         typescript: {

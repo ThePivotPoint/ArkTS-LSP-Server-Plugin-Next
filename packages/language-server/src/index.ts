@@ -29,6 +29,8 @@ function typeAssert<T>(_value: unknown): asserts _value is T {}
 
 connection.onInitialize((params) => {
   typeAssert<EtsServerClientOptions>(params.initializationOptions)
+  if (params.locale)
+    lspConfiguration.setLocale(params.locale)
   lspConfiguration.setConfiguration(params.initializationOptions)
   const tsdk = lspConfiguration.getTypeScriptTsdk()
 
@@ -44,7 +46,8 @@ connection.onInitialize((params) => {
           if (!options.project || !options.project.typescript || !options.project.typescript.languageServiceHost)
             return
 
-          const originalSettings = options.project.typescript?.languageServiceHost.getCompilationSettings() || {}
+          const originalSettings = options.project.typescript.languageServiceHost.getCompilationSettings() || {}
+          logger.getConsola().info(`Settings: ${JSON.stringify(lspConfiguration.getTsConfig(originalSettings as ets.CompilerOptions), null, 2)}`)
           options.project.typescript.languageServiceHost.getCompilationSettings = () => {
             return lspConfiguration.getTsConfig(originalSettings as ets.CompilerOptions) as any
           }
