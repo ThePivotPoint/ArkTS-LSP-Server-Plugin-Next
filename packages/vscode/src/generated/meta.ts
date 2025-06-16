@@ -4,7 +4,7 @@
 // Meta info
 export const publisher = "NailyZero"
 export const name = "vscode-naily-ets"
-export const version = "1.0.1"
+export const version = "1.0.3"
 export const displayName = "Naily's ArkTS Support"
 export const description = "自用ArkTS扩展,支持代码跳转,欢迎PR! Naily's ArkTS Support."
 export const extensionId = `${publisher}.${name}`
