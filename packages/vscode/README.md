@@ -31,6 +31,13 @@
 - 📦 1.x版本开始支持安装和管理`OpenHarmony SDK`，并且支持根据当前打开的项目自动探测`API版本`，发出弹窗提示`下载`或`切换`
 - 🆓 `$r`、`$rawfile` 补全，以及代码格式化正在计划支持的路上，欢迎PR👀
 
+## VSCode 文件图标包 🖼️
+
+推荐使用[Material Icon Theme](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme)，我已经给`Material Icon Theme`提交了PR，目前将`.ets`、`.d.ets`直接用上了`TypeScript官方的文件图标包`，升级到`v5.22.0`之后的版本都可用，这样至少好看一些了 👇
+
+![Material icon theme](./screenshots/icon-theme.png)
+
+PR地址: [https://github.com/material-extensions/vscode-material-icon-theme/pull/2966](https://github.com/material-extensions/vscode-material-icon-theme/pull/2966)
 
 ## 配置
 
