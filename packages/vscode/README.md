@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./assets/icon.png" width="100" />
+<img src="https://github.com/Groupguanfang/arkTS/blob/next-dev/packages/vscode/assets/icon.png?raw=true" width="100" />
 
 # Naily's ArkTS Support
 
