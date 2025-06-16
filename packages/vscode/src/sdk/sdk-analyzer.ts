@@ -148,8 +148,7 @@ export class SdkAnalyzer {
         ...fg.sync([
           vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ts').fsPath,
           vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ets').fsPath,
-          vscode.Uri.joinPath(etsLoaderPath, 'declarations', '**', '*.d.ts').fsPath,
-          vscode.Uri.joinPath(etsLoaderPath, 'declarations', '**', '*.d.ets').fsPath,
+          vscode.Uri.joinPath(etsLoaderPath, 'declarations', '**', 'global.d.ts').fsPath,
         ], { onlyFiles: true, absolute: true }),
       ].filter(Boolean) as string[],
       typeRoots: [
