@@ -77,6 +77,7 @@ export class SdkAnalyzer {
     const sdkPath = await this.getSdkUri(force)
     const etsComponentPath = await this.getEtsComponentFolder(force)
     const etsLoaderConfigPath = await this.getEtsLoaderConfigPath(force)
+    const etsLoaderPath = vscode.Uri.joinPath(sdkPath, 'ets', 'build-tools', 'ets-loader')
     const workspaceFolder = this.fileSystem.getCurrentWorkspaceDir()
 
     // Force load typescript default libs if tsdk is provided (For ArkTS)
@@ -147,6 +148,8 @@ export class SdkAnalyzer {
         ...fg.sync([
           vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ts').fsPath,
           vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ets').fsPath,
+          vscode.Uri.joinPath(etsLoaderPath, 'declarations', '**', '*.d.ts').fsPath,
+          vscode.Uri.joinPath(etsLoaderPath, 'declarations', '**', '*.d.ets').fsPath,
         ], { onlyFiles: true, absolute: true }),
       ].filter(Boolean) as string[],
       typeRoots: [
@@ -164,7 +167,7 @@ export class SdkAnalyzer {
         ].filter(Boolean) as string[],
         '@internal/full/*': ['./api/@internal/full/*'],
       },
-      etsLoaderPath: vscode.Uri.joinPath(sdkPath, 'ets', 'build-tools', 'ets-loader').fsPath,
+      etsLoaderPath: etsLoaderPath.fsPath,
     }
   }
 }
