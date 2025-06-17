@@ -49,8 +49,9 @@
     "prepublishOnly": "tsdown --tsconfig ./tsconfig.build.json",
     "release": "pnpm publish"
   },
-  "dependencies": {
+  "devDependencies": {
     "@arkts/language-plugin": "workspace:*",
+    "@arkts/shared": "workspace:*",
     "@volar/language-core": "catalog:prod",
     "@volar/language-server": "catalog:prod",
     "@volar/typescript": "catalog:prod",

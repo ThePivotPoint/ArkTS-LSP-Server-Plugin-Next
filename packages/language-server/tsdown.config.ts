@@ -7,6 +7,9 @@ export default defineConfig({
   sourcemap: true,
   dts: true,
   clean: true,
-  minify: true,
-  external: [],
+  inputOptions: {
+    checks: {
+      eval: false,
+    },
+  },
 })
