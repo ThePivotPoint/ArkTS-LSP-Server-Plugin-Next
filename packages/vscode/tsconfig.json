@@ -16,6 +16,6 @@
   ],
   "include": [
     "src",
-    "lib.global.d.ts"
+    "shims.d.ts"
   ]
 }
