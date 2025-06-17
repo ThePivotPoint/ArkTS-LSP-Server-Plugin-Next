@@ -1,1 +1,1 @@
-export { ETSLanguagePlugin } from './language-plugin'
+export { ETSLanguagePlugin, type ETSLanguagePluginOptions } from './language-plugin'

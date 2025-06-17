@@ -8,17 +8,6 @@
     "baseUrl": "./",
     "module": "Preserve",
     "moduleResolution": "bundler",
-    "paths": {
-      "@arkts/language-server": [
-        "packages/language-server/src"
-      ],
-      "@arkts/shared": [
-        "packages/shared/src"
-      ],
-      "@arkts/language-plugin": [
-        "packages/language-plugin/src"
-      ]
-    },
     "resolveJsonModule": true,
     "strict": true,
     "noUnusedLocals": true,
