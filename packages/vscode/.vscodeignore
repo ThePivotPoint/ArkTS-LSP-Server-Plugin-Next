@@ -1,5 +1,8 @@
-scripts
 src
 tsconfig.json
 tsconfig.tsbuildinfo
 dist/*.map
+*.config.ts
+*.vsix
+shims.d.ts
+hilog.html
