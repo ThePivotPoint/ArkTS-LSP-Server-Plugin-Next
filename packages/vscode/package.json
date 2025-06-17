@@ -176,7 +176,6 @@
     "@vscode/vsce": "catalog:scripts",
     "axios": "catalog:prod",
     "chokidar": "catalog:prod",
-    "esbuild": "catalog:build",
     "extract-zip": "catalog:prod",
     "fast-glob": "catalog:dev",
     "hbs": "catalog:prod",

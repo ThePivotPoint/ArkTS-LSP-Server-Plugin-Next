@@ -3,7 +3,6 @@ packages:
   - ohos-typescript
 catalogs:
   build:
-    esbuild: latest
     tsdown: ^0.12.6
   dev:
     '@types/node': latest
@@ -64,5 +63,4 @@ catalogs:
 
 onlyBuiltDependencies:
   - '@vscode/vsce-sign'
-  - esbuild
   - unrs-resolver
