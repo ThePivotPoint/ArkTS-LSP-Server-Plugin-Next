@@ -1,11 +1,11 @@
+import type { SdkVersion } from '@arkts/sdk-downloader'
 import type { Translator } from '../translate'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import * as json5 from 'json5'
 import * as vscode from 'vscode'
 import { SdkInstaller } from './sdk-installer'
-import { SdkVersion } from '@arkts/sdk-downloader'
-import * as json5 from 'json5'
 
 type IsInstalledVersion = keyof typeof SdkVersion extends `API${infer N}` ? N : never
 
@@ -95,10 +95,10 @@ export class SdkManager extends SdkInstaller {
         return ['API15', 15]
       else if (sdkVersion === 18)
         return ['API18', 18]
-    } catch (error) {
+    }
+    catch (error) {
       this.getConsola().error(error)
       this.getConsola().error(`Failed to parse build-profile.json5: ${buildProfileFilePath.fsPath}`)
-      return
     }
   }
 

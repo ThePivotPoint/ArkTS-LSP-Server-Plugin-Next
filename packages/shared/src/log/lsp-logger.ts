@@ -13,7 +13,7 @@ export class LanguageServerLogger {
       reporters: [
         new LspReporter(this.debug),
         ...(consolaOptions.reporters || []),
-      ]
+      ],
     })
     this.logger.info(`ETS Support language server version: ${version}`)
   }

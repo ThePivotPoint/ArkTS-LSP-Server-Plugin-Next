@@ -1,9 +1,9 @@
 import type { LanguagePlugin } from '@volar/language-core'
 import type * as ets from 'ohos-typescript'
+import type * as ts from 'typescript'
 import type { URI } from 'vscode-uri'
 import { EtsVirtualCode, TSIgnoreVirtualCode, TSInternalLibIgnoreVirtualCode } from './ets-code'
 import '@volar/typescript'
-import type * as ts from 'typescript'
 
 function isEts(tsOrEts: typeof ets | typeof ts): tsOrEts is typeof ets {
   return 'ETS' in tsOrEts.ScriptKind && tsOrEts.ScriptKind.ETS === 8
@@ -51,11 +51,14 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '
       }
     },
     typescript: {
+      // eslint-disable-next-line ts/ban-ts-comment
       // @ts-expect-error
-      extraFileExtensions: isEts(tsOrEts) ? [
-        { extension: 'ets', isMixedContent: false, scriptKind: 8 satisfies ets.ScriptKind.ETS },
-        { extension: 'd.ets', isMixedContent: false, scriptKind: 8 satisfies ets.ScriptKind.ETS },
-      ] : [],
+      extraFileExtensions: isEts(tsOrEts)
+        ? [
+            { extension: 'ets', isMixedContent: false, scriptKind: 8 satisfies ets.ScriptKind.ETS },
+            { extension: 'd.ets', isMixedContent: false, scriptKind: 8 satisfies ets.ScriptKind.ETS },
+          ]
+        : [],
       resolveHiddenExtensions: true,
       getServiceScript(root) {
         return {

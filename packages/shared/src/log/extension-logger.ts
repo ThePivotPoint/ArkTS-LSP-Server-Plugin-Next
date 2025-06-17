@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
 import { version } from '../../../vscode/package.json'
-import { LanguageServerLogger } from './lsp-logger'
 import { OutputChannelReporter } from './ext-reporter'
+import { LanguageServerLogger } from './lsp-logger'
 
 export abstract class ExtensionLogger extends LanguageServerLogger {
   private static outputChannel: vscode.OutputChannel

@@ -6,6 +6,7 @@ export default antfu({
     'ohos-typescript/**/*',
     'sample/**/*',
     'packages/declarations/ets/**/*',
+    'packages/vscode/src/generated/**/*',
   ],
   rules: {
     'ts/no-namespace': 'off',

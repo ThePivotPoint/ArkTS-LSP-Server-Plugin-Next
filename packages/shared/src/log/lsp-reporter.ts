@@ -1,4 +1,5 @@
-import { ConsolaOptions, ConsolaReporter, LogObject } from "consola";
+/* eslint-disable no-console */
+import type { ConsolaOptions, ConsolaReporter, LogObject } from 'consola'
 import kleur from 'kleur'
 
 export class LspReporter implements ConsolaReporter {
