@@ -9,7 +9,14 @@ function isEts(tsOrEts: typeof ets | typeof ts): tsOrEts is typeof ets {
   return 'ETS' in tsOrEts.ScriptKind && tsOrEts.ScriptKind.ETS === 8
 }
 
-export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '', tsdk = '' }: { sdkPath?: string, tsdk?: string }): LanguagePlugin<URI | string> {
+export interface ETSLanguagePluginOptions {
+  sdkPath?: string
+  tsdk?: string
+}
+
+export function ETSLanguagePlugin(tsOrEts: typeof ts, options?: ETSLanguagePluginOptions): LanguagePlugin<URI | string>
+export function ETSLanguagePlugin(tsOrEts: typeof ets, options?: ETSLanguagePluginOptions): LanguagePlugin<URI | string>
+export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '', tsdk = '' }: ETSLanguagePluginOptions = {}): LanguagePlugin<URI | string> {
   return {
     getLanguageId(uri) {
       const filePath = typeof uri === 'string' ? uri : uri.fsPath
