@@ -1,6 +1,6 @@
 import type { ConsolaInstance, ConsolaOptions } from 'consola'
 import { createConsola } from 'consola/basic'
-import { version } from '../../package.json'
+import { version } from '../../../language-server/package.json'
 import { LspReporter } from './lsp-reporter'
 
 export class LanguageServerLogger {

@@ -26,7 +26,7 @@ export class LanguageServerConfigManager {
   }
 
   setDebug(debug: boolean): this {
-    this.logger.setDebug(debug)
+    this.config.debug = debug
     return this
   }
 
@@ -117,6 +117,7 @@ export class LanguageServerConfigManager {
     else {
       this.logger.getConsola().info(`ETS loader config parsed successfully, path: ${this.config.ohos.etsLoaderConfigPath}`)
 
+      console.warn(Reflect.ownKeys(this.logger.constructor.prototype))
       if (this.logger.getDebug())
         this.logger.getConsola().debug(`ETS loader config parsed successfully: ${JSON.stringify(options, null, 2)}`)
     }
