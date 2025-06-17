@@ -160,9 +160,8 @@
     ]
   },
   "scripts": {
-    "build": "node scripts/build -- --minify && vite build",
-    "dev": "vite build --watch",
-    "watch": "node scripts/build -- --minify -- --watch",
+    "build": "tsdown",
+    "watch": "cross-env NODE_ENV=development tsdown",
     "pack": "npm run build && vsce package",
     "release": "npm run build && vsce publish --pre-release",
     "update": "vscode-ext-gen --output src/generated/meta.ts"

@@ -1,22 +1,53 @@
 import { createRequire } from 'node:module'
+import path from 'node:path'
 import process from 'node:process'
-import { defineConfig } from 'tsdown'
+import { defineConfig, logger } from 'tsdown'
 
 const require = createRequire(import.meta.url)
 const isDev = process.env.NODE_ENV === 'development'
 
+logger.info(`Current NODE_ENV: ${process.env.NODE_ENV}`)
+
 export default defineConfig({
   entry: {
-    client: './src/extension.ts',
-    server: '../language-server/src/index.ts',
+    'dist/client': './src/extension.ts',
+    'dist/server': '../language-server/src/index.ts',
+    'node_modules/ets-typescript-plugin/index': '../typescript-plugin/src/index.ts',
   },
   format: 'cjs',
   sourcemap: isDev,
-  minify: isDev,
-  define: { 'process.env.NODE_ENV': '"production"' },
-  external: ['vscode'],
+  external: ['vscode', '@aws-sdk/client-s3'],
   tsconfig: './tsconfig.json',
   platform: 'node',
+  clean: false,
+  minify: !isDev,
+  outDir: '.',
+  env: {
+    NODE_ENV: 'production',
+  },
+  inputOptions: {
+    checks: {
+      eval: false,
+    },
+  },
+  dts: false,
+  outputOptions: {
+    chunkFileNames: `dist/[name].js`,
+  },
+  onSuccess: 'vite build',
+  alias: {
+    '@arkts/shared': path.join(process.cwd(), '../shared/src/index.ts'),
+    '@arkts/shared/vscode': path.join(process.cwd(), '../shared/src/vscode.ts'),
+  },
+  watch: isDev
+    ? [
+        './src',
+        '../language-server/src',
+        '../typescript-plugin/src',
+        '../language-plugin/src',
+        '../shared/src',
+      ].map(p => path.join(process.cwd(), p))
+    : false,
   plugins: [
     {
       name: 'umd2esm',
