@@ -4,6 +4,9 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "isolatedDeclarations": true,
     "skipLibCheck": true
   },
   "include": ["src"]
