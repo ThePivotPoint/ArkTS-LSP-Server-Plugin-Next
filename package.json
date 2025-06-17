@@ -36,6 +36,7 @@
     "@types/node": "catalog:dev",
     "@types/unzipper": "catalog:prod",
     "consola": "catalog:prod",
+    "cross-env": "catalog:scripts",
     "eslint": "catalog:lint",
     "lodash": "catalog:prod",
     "oxlint": "catalog:lint",

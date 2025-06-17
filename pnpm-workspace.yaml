@@ -57,6 +57,7 @@ catalogs:
     '@changesets/cli': ^2.29.4
     '@release-it/bumper': ^7.0.5
     '@vscode/vsce': latest
+    cross-env: ^7.0.3
     pnpm: ^10.11.1
     simple-git-hooks: ^2.13.0
     tsx: ^4.19.4
