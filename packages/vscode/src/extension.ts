@@ -6,6 +6,7 @@ import { defineExtension, onDeactivate, useCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
 import { useCompiledWebview } from './hook/compiled-webview'
 import { EtsLanguageServer } from './language-server'
+import { ResourceProvider } from './res/resource-provider'
 import { SdkManager } from './sdk/sdk-manager'
 import { Translator } from './translate'
 
@@ -19,6 +20,7 @@ function handleLspError(e: any): void {
 export = defineExtension<Promise<LabsInfo>>(async (context) => {
   const translator = new Translator()
   SdkManager.from(translator)
+  ResourceProvider.from(context)
   useCompiledWebview(path.join(__dirname, '..', 'build', 'hilog.html'))
 
   try {
