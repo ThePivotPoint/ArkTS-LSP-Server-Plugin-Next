@@ -5,6 +5,7 @@ import { LanguageServerLogger } from './lsp-logger'
 
 export abstract class ExtensionLogger extends LanguageServerLogger {
   private static outputChannel: vscode.OutputChannel
+  private static extensionVersionIsLogged = false
 
   constructor() {
     const outputChannel = ExtensionLogger.outputChannel
@@ -16,7 +17,10 @@ export abstract class ExtensionLogger extends LanguageServerLogger {
       ],
     })
     ExtensionLogger.outputChannel = outputChannel
-    this.getConsola().info(`ETS Support Plugin version: ${version}`)
+    if (!ExtensionLogger.extensionVersionIsLogged) {
+      this.getConsola().info(`ETS Support Plugin version: ${version}`)
+      ExtensionLogger.extensionVersionIsLogged = true
+    }
   }
 
   getOutputChannel(): vscode.OutputChannel {

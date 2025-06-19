@@ -11,7 +11,7 @@ export interface ResourceMatcherResult {
 }
 
 export class ResourceMatcher {
-  public static readonly $rRegex = /\$r\s*\(\s*([`'"])([\s\S]*?)(?<!\\)\1(?:\s*,[\s\S]*?)?\s*\)/g
+  public static readonly $rRegex = /\$r\s*\(\s*([`'"])((?:[^`'"]|\\[`'"])*)\1[^)]*\)/g
 
   /**
    * 匹配 $r() 调用

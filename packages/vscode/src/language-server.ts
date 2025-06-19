@@ -13,7 +13,7 @@ import { SdkAnalyzer } from './sdk/sdk-analyzer'
 
 export class EtsLanguageServer extends LanguageServerContext {
   constructor(private readonly context: vscode.ExtensionContext, private readonly translator: Translator) {
-    super()
+    super(context)
   }
 
   /**
@@ -79,6 +79,7 @@ export class EtsLanguageServer extends LanguageServerContext {
     return this._client
   }
 
+  /** Configure the volar typescript plugin by `ClientOptions`. */
   async configureTypeScriptPlugin(clientOptions: LanguageClientOptions): Promise<void> {
     const typescriptLanguageFeatures = vscode.extensions.getExtension<TypescriptLanguageFeatures>('vscode.typescript-language-features')
     await typescriptLanguageFeatures?.activate()
@@ -102,8 +103,11 @@ export class EtsLanguageServer extends LanguageServerContext {
     ])
     await this.configureTypeScriptPlugin(clientOptions)
 
+    // If the lsp is already started, restart the lsp
     if (this._client) {
       await this._client.start()
+      this.getConsola().info('ETS Language Server restarted!')
+      vscode.window.setStatusBarMessage('ETS Language Server restarted!', 1000)
       return [undefined, clientOptions]
     }
     this._client = new LanguageClient(
@@ -113,6 +117,7 @@ export class EtsLanguageServer extends LanguageServerContext {
       defu(overrideClientOptions, clientOptions),
     )
     await this._client.start()
+    // When the lsp is sent ets/configurationChanged notification, restart the lsp
     this._client.onNotification('ets/configurationChanged', () => this.restart(overrideClientOptions))
     this.listenAllLocalPropertiesFile()
     // support for auto close tag

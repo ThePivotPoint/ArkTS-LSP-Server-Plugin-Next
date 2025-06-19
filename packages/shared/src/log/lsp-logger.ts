@@ -6,6 +6,7 @@ import { LspReporter } from './lsp-reporter'
 export class LanguageServerLogger {
   private logger: ConsolaInstance
   private debug: boolean = false
+  private static versionIsLogged = false
 
   constructor(consolaOptions: Partial<ConsolaOptions> = {}) {
     this.logger = createConsola({
@@ -15,7 +16,10 @@ export class LanguageServerLogger {
         ...(consolaOptions.reporters || []),
       ],
     })
-    this.logger.info(`ETS Support language server version: ${version}`)
+    if (!LanguageServerLogger.versionIsLogged) {
+      this.logger.info(`ETS Support language server version: ${version}`)
+      LanguageServerLogger.versionIsLogged = true
+    }
   }
 
   getConsola(): ConsolaInstance {

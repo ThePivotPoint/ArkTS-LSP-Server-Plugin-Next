@@ -1,11 +1,12 @@
+import type * as vscode from 'vscode'
 import type { URI } from 'vscode-uri'
 import fs from 'node:fs'
 import path from 'node:path'
 import { AbstractWatcher } from '../abstract-watcher'
 
 export class ResourceDetector extends AbstractWatcher {
-  constructor(private readonly filePath: URI | string) {
-    super()
+  constructor(private readonly filePath: URI | string, context: vscode.ExtensionContext) {
+    super(context)
   }
 
   /** Get file path. */

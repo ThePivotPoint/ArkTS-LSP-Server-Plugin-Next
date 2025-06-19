@@ -1,17 +1,17 @@
 import path from 'node:path'
+import { typeAssert } from '@arkts/shared'
 import * as vscode from 'vscode'
 import { FileSystem } from '../fs/file-system'
 import { ResourceFinder } from './resource-finder'
 import { ResourceMatcher } from './resource-matcher'
-import { typeAssert } from '@arkts/shared'
 
 export class ResourceProvider extends FileSystem implements vscode.DefinitionProvider, vscode.HoverProvider, vscode.CompletionItemProvider {
-  private constructor() {
+  private constructor(private readonly context: vscode.ExtensionContext) {
     super()
   }
 
   static from(context: vscode.ExtensionContext): ResourceProvider {
-    const resourceProvider = new ResourceProvider()
+    const resourceProvider = new ResourceProvider(context)
     context.subscriptions.push(
       vscode.languages.registerDefinitionProvider({ scheme: 'file', language: 'ets' }, resourceProvider),
     )
@@ -40,7 +40,7 @@ export class ResourceProvider extends FileSystem implements vscode.DefinitionPro
     const resourceMatcherResult = resourceMatcher.match(document, position)
     if (!resourceMatcherResult)
       return undefined
-    return new ResourceFinder(document.uri).findRelativeResource(resourceMatcherResult.content)
+    return new ResourceFinder(document.uri, this.context).findRelativeResource(resourceMatcherResult.content)
   }
 
   async provideHover(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Hover | undefined> {
@@ -48,7 +48,7 @@ export class ResourceProvider extends FileSystem implements vscode.DefinitionPro
     const resourceMatcherResult = resourceMatcher.match(document, position)
     if (!resourceMatcherResult)
       return undefined
-    const resourceFinder = new ResourceFinder(document.uri)
+    const resourceFinder = new ResourceFinder(document.uri, this.context)
     const resourceLocations = await resourceFinder.findRelativeResource(resourceMatcherResult.content)
     if (!resourceLocations)
       return undefined
@@ -78,8 +78,8 @@ export class ResourceProvider extends FileSystem implements vscode.DefinitionPro
 
     // 新增：如果已经完全匹配如 app.color、sys.media 等，则不再补全
     if (
-      this.firstLevel.includes(pathParts[0] as keyof typeof this.secondLevel) &&
-      this.secondLevel[pathParts[0] as keyof typeof this.secondLevel]?.includes(pathParts[1])
+      this.firstLevel.includes(pathParts[0] as keyof typeof this.secondLevel)
+      && this.secondLevel[pathParts[0] as keyof typeof this.secondLevel]?.includes(pathParts[1])
     ) {
       return []
     }
