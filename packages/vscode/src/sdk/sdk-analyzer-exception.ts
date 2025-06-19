@@ -1,8 +1,9 @@
+import type { Translator } from '../translate'
 import { FileSystemException } from '../fs/file-system-exception'
 
 export class SdkAnalyzerException extends FileSystemException {
-  constructor(public code: SdkAnalyzerException.Code, message?: string) {
-    super(code, message)
+  constructor(public code: SdkAnalyzerException.Code, public translator: Translator) {
+    super(code, translator.t(`sdk.error.${Object.keys(SdkAnalyzerException.Code)[Object.values(SdkAnalyzerException.Code).indexOf(code)]}`))
   }
 
   /**
@@ -11,8 +12,8 @@ export class SdkAnalyzerException extends FileSystemException {
    * @param {FileSystemException} error The `FileSystemException` to convert.
    * @returns {SdkAnalyzerException} The converted `SdkAnalyzerException`.
    */
-  static fromFileSystemException(error: FileSystemException): SdkAnalyzerException {
-    return new SdkAnalyzerException(error.code as SdkAnalyzerException.Code, error.message)
+  static fromFileSystemException(error: FileSystemException, translator: Translator): SdkAnalyzerException {
+    return new SdkAnalyzerException(error.code as SdkAnalyzerException.Code, translator)
   }
 }
 

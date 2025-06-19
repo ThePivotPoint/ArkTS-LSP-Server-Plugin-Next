@@ -1,3 +1,4 @@
+import type { Translator } from '../translate'
 import fs from 'node:fs'
 import { ExtensionLogger } from '@arkts/shared/vscode'
 import * as vscode from 'vscode'
@@ -5,6 +6,10 @@ import { SdkAnalyzer } from '../sdk/sdk-analyzer'
 import { FileSystemException } from './file-system-exception'
 
 export abstract class FileSystem extends ExtensionLogger {
+  constructor(protected readonly translator: Translator) {
+    super()
+  }
+
   /**
    * Get the current workspace directory.
    *
@@ -17,8 +22,14 @@ export abstract class FileSystem extends ExtensionLogger {
     return workspaceFolders[0].uri
   }
 
+  /**
+   * Create a `SdkAnalyzer` instance.
+   *
+   * @param sdkUri - The SDK path.
+   * @returns The `SdkAnalyzer` instance.
+   */
   createSdkAnalyzer(sdkUri: vscode.Uri): SdkAnalyzer {
-    return new SdkAnalyzer(sdkUri, this)
+    return new SdkAnalyzer(sdkUri, this, this.translator)
   }
 
   /**

@@ -1,5 +1,6 @@
 import type { OhosClientOptions } from '@arkts/shared'
 import type { FileSystem } from '../fs/file-system'
+import type { Translator } from '../translate'
 import path from 'node:path'
 import fg from 'fast-glob'
 import * as vscode from 'vscode'
@@ -9,6 +10,7 @@ export class SdkAnalyzer {
   constructor(
     private readonly sdkUri: vscode.Uri,
     private readonly fileSystem: FileSystem,
+    private readonly translator: Translator,
   ) {}
 
   private isSdkUriExists = false
@@ -23,7 +25,7 @@ export class SdkAnalyzer {
     await this.fileSystem
       .mustBeDirectory(this.sdkUri, SdkAnalyzerException.Code.SDKPathNotFound, SdkAnalyzerException.Code.SDKPathNotDirectory)
       .catch((error) => {
-        throw SdkAnalyzerException.fromFileSystemException(error)
+        throw SdkAnalyzerException.fromFileSystemException(error, this.translator)
       })
     this.isSdkUriExists = true
     return this.sdkUri
@@ -42,7 +44,7 @@ export class SdkAnalyzer {
     await this.fileSystem
       .mustBeDirectory(etsComponentUri, SdkAnalyzerException.Code.EtsComponentPathNotFound, SdkAnalyzerException.Code.EtsComponentPathNotDirectory)
       .catch((error) => {
-        throw SdkAnalyzerException.fromFileSystemException(error)
+        throw SdkAnalyzerException.fromFileSystemException(error, this.translator)
       })
     this._cachedEtsComponentFolder = etsComponentUri
     return etsComponentUri
@@ -61,7 +63,7 @@ export class SdkAnalyzer {
     await this.fileSystem
       .mustBeFile(etsLoaderConfigUri, SdkAnalyzerException.Code.EtsLoaderConfigPathNotFound, SdkAnalyzerException.Code.EtsLoaderConfigPathNotFile)
       .catch((error) => {
-        throw SdkAnalyzerException.fromFileSystemException(error)
+        throw SdkAnalyzerException.fromFileSystemException(error, this.translator)
       })
     this._cachedEtsLoaderConfigPath = etsLoaderConfigUri
     return etsLoaderConfigUri

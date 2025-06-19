@@ -43,7 +43,7 @@ export abstract class SdkInstaller extends Environment {
   abstract isInstalled(version: string): Promise<boolean | 'incomplete'>
 
   protected constructor(protected readonly translator: Translator) {
-    super()
+    super(translator)
     useCommand('ets.installSDK', async () => await this.selectSdkToInstall())
   }
 

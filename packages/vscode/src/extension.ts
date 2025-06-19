@@ -14,13 +14,13 @@ let lsp: EtsLanguageServer | undefined
 
 function handleLspError(e: any): void {
   lsp?.getConsola().error(e)
-  vscode.window.showErrorMessage(`Failed to restart ETS Language Server: ${e.code} ${e.message}`)
+  vscode.window.showErrorMessage(`${e.message} [${e.code}]`)
 }
 
 export = defineExtension<Promise<LabsInfo>>(async (context) => {
   const translator = new Translator()
   SdkManager.from(translator)
-  ResourceProvider.from(context)
+  ResourceProvider.from(context, translator)
   useCompiledWebview(path.join(__dirname, '..', 'build', 'hilog.html'))
 
   try {

@@ -1,9 +1,18 @@
 import type { FSWatcher } from 'chokidar'
 import type * as vscode from 'vscode'
+import type { Translator } from './translate'
 import { watch } from 'chokidar'
 import { FileSystem } from './fs/file-system'
 
 export abstract class AbstractWatcher extends FileSystem implements vscode.Disposable {
+  constructor(
+    protected readonly context: vscode.ExtensionContext,
+    protected readonly translator: Translator,
+  ) {
+    super(translator)
+    context.subscriptions.push(this)
+  }
+
   private _watcher: FSWatcher | undefined
   private static readonly watchers: FSWatcher[] = []
 
@@ -13,11 +22,6 @@ export abstract class AbstractWatcher extends FileSystem implements vscode.Dispo
       AbstractWatcher.watchers.push(this._watcher)
     }
     return this._watcher
-  }
-
-  constructor(context: vscode.ExtensionContext) {
-    super()
-    context.subscriptions.push(this)
   }
 
   async dispose(): Promise<void> {

@@ -1,7 +1,6 @@
 import type { EtsServerClientOptions, TypescriptLanguageFeatures } from '@arkts/shared'
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClientOptions, ServerOptions } from '@volar/vscode/node'
-import type { Translator } from './translate'
 import * as serverProtocol from '@volar/language-server/protocol'
 import { activateAutoInsertion, createLabsInfo, getTsdk } from '@volar/vscode'
 import { LanguageClient, TransportKind } from '@volar/vscode/node'
@@ -9,13 +8,8 @@ import defu from 'defu'
 import { executeCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
 import { LanguageServerContext } from './context/server-context'
-import { SdkAnalyzer } from './sdk/sdk-analyzer'
 
 export class EtsLanguageServer extends LanguageServerContext {
-  constructor(private readonly context: vscode.ExtensionContext, private readonly translator: Translator) {
-    super(context)
-  }
-
   /**
    * Get the server options for the ETS Language Server.
    *
@@ -51,10 +45,10 @@ export class EtsLanguageServer extends LanguageServerContext {
     const configSdkPath = vscode.workspace.getConfiguration('ets').get('sdkPath') as string | undefined
     const sdkPath = localSdkPath || configSdkPath
     if (!sdkPath) {
-      vscode.window.showErrorMessage(`OpenHarmony SDK path is not set in global IDE configuration and local workspace local.properties file, the ETS Language Server will not work properly.`)
-      throw new Error('sdk path is not set!')
+      vscode.window.showErrorMessage(this.translator.t('sdk.error.validSdkPath'))
+      throw new Error(this.translator.t('sdk.error.validSdkPath'))
     }
-    const sdkAnalyzer = new SdkAnalyzer(vscode.Uri.parse(sdkPath), this)
+    const sdkAnalyzer = this.createSdkAnalyzer(vscode.Uri.parse(sdkPath))
     const tsdk = await getTsdk(this.context)
 
     return {
