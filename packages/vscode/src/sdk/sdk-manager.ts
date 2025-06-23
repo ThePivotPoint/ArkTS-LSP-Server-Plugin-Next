@@ -3,7 +3,7 @@ import type { Translator } from '../translate'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import * as json5 from 'json5'
+import { parse as parseJson5 } from 'json5'
 import * as vscode from 'vscode'
 import { SdkInstaller } from './sdk-installer'
 
@@ -76,7 +76,7 @@ export class SdkManager extends SdkInstaller {
       return
 
     try {
-      const buildProfile = json5.parse(fs.readFileSync(buildProfileFilePath.fsPath, 'utf-8'))
+      const buildProfile = parseJson5(fs.readFileSync(buildProfileFilePath.fsPath, 'utf-8'))
       const sdkVersion = buildProfile?.app?.products?.[0]?.compileSdkVersion
       if (!sdkVersion || typeof sdkVersion !== 'number')
         return

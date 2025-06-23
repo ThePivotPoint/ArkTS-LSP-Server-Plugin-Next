@@ -46,6 +46,8 @@
   "sdk.error.EtsComponentPathNotDirectory": "OpenHarmony SDK 'ets/component' path must be a directory, please check the 'ets.sdkPath' in the IDE settings or the 'sdk.dir' in the local.properties file in the local workspace.",
   "sdk.error.EtsLoaderConfigPathNotFound": "OpenHarmony SDK 'ets/build-tools/ets-loader/tsconfig.json' path not found, please check the 'ets.sdkPath' in the IDE settings or the 'sdk.dir' in the local.properties file in the local workspace.",
   "sdk.error.EtsLoaderConfigPathNotFile": "OpenHarmony SDK 'ets/build-tools/ets-loader/tsconfig.json' path must be a file, please check the 'ets.sdkPath' in the IDE settings or the 'sdk.dir' in the local.properties file in the local workspace.",
+  "sdk.error.choiceSdkPathMasually": "Manually choose a OpenHarmony SDK path",
+  "sdk.error.downloadOrChoiceSdkPath": "Download or choose a OpenHarmony SDK path",
   "configuration.ets.sdkPath.description": "The default OpenHarmony SDK path.",
   "configuration.ets.baseSdkPath.description": "The default OpenHarmony SDK base path. All SDKs will be installed under this path. (You can use `${os.homedir}` to get the home directory)",
   "configuration.ets.lspDebugMode.description": "Enable ETS Language Server debug logging.",

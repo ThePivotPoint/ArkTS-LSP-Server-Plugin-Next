@@ -11,6 +11,8 @@ export abstract class LanguageServerContext extends AbstractWatcher {
   abstract stop(): Promise<void>
   /** Restart the language server. */
   abstract restart(): Promise<void>
+  /** Refresh the language server. */
+  abstract refresh(existingClientOptions?: LanguageClientOptions): Promise<void>
   /** Get the current language client. */
   abstract getCurrentLanguageClient(): LanguageClient | undefined
 
@@ -23,17 +25,17 @@ export abstract class LanguageServerContext extends AbstractWatcher {
       this.getConsola().info(`Listening ${vscode.Uri.joinPath(workspaceFolder.uri, 'local.properties').fsPath}`)
     }
 
-    this.watcher.on('all', (event, path) => this.localPropertiesWatcher(event, path))
+    this.watcher.on('all', (event, path) => this.onLocalPropertiesChanged(event, path))
   }
 
   private isFirstStart: boolean = true
-  private async localPropertiesWatcher(event: string, path: string): Promise<void> {
+  private async onLocalPropertiesChanged(event: string, path: string): Promise<void> {
     if (this.isFirstStart) {
       this.isFirstStart = false
       return
     }
-    this.getConsola().warn(`${path} is ${event.toUpperCase()}, restarting ETS Language Server...`)
-    await this.restart()
+    this.getConsola().warn(`${path} is ${event.toUpperCase()}, refreshing ETS Language Server...`)
+    this.refresh()
   }
 
   /** Get the path of the Ohos SDK from `local.properties` file. */
@@ -53,5 +55,19 @@ export abstract class LanguageServerContext extends AbstractWatcher {
       return sdkPath?.split('=')?.[1]?.trim()
     }
     catch {}
+  }
+
+  private _analyzedSdkPath: string | undefined
+
+  /** Get the path of the Ohos SDK from `local.properties` file or configuration. */
+  protected async getAnalyzedSdkPath(force: boolean = false): Promise<string | undefined> {
+    if (!force && this._analyzedSdkPath)
+      return this._analyzedSdkPath
+    const localSdkPath = await this.getOhosSdkPathFromLocalProperties()
+    const inspectedConfiguration = vscode.workspace.getConfiguration('ets').inspect<string>('sdkPath') || {} as ReturnType<ReturnType<typeof vscode.workspace.getConfiguration>['inspect']>
+    const sdkPath = localSdkPath || inspectedConfiguration?.workspaceFolderValue || inspectedConfiguration?.globalValue
+    this.getConsola().info(`Analyzed OHOS SDK path: ${sdkPath}`)
+    this._analyzedSdkPath = sdkPath as string | undefined
+    return this._analyzedSdkPath
   }
 }

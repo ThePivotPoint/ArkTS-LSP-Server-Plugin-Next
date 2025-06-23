@@ -1,4 +1,3 @@
 {
-  "ets.sdkPath": "/"
-  // "ets.sdkPath": "/Applications/DevEco-Studio 5.1.0.app/Contents/sdk/default/openharmony"
+  "ets.sdkPath": ""
 }

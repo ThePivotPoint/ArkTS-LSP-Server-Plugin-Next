@@ -8,12 +8,14 @@ export class LanguageServerLogger {
   private debug: boolean = false
   private static versionIsLogged = false
 
-  constructor(consolaOptions: Partial<ConsolaOptions> = {}) {
+  constructor(consolaOptions?: Partial<ConsolaOptions>);
+  constructor(prefix: string);
+  constructor(consolaOptions: Partial<ConsolaOptions> | string = {}) {
     this.logger = createConsola({
-      ...consolaOptions,
+      ...(typeof consolaOptions === 'string' ? {} : consolaOptions),
       reporters: [
-        new LspReporter(this.debug),
-        ...(consolaOptions.reporters || []),
+        new LspReporter(this.debug, typeof consolaOptions === 'string' ? consolaOptions : ''),
+        ...(typeof consolaOptions === 'string' ? [] : consolaOptions.reporters || []),
       ],
     })
     if (!LanguageServerLogger.versionIsLogged) {

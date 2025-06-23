@@ -36,7 +36,7 @@ export class Translator {
       })
   }
 
-  public t(key: string, options: TOptions = {}): string {
+  public t<TKey extends string>(key: TKey, options: TOptions = {}): string {
     const locale = vscode.env.language
     const localeFile = this.localeFiles.find(file => file.locale === locale)
     if (!localeFile)
