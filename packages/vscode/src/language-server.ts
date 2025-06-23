@@ -85,7 +85,7 @@ export class EtsLanguageServer extends LanguageServerContext {
    * @returns The server options.
    */
   private async getServerOptions(): Promise<ServerOptions> {
-    const serverModule = vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'lsp.js')
+    const serverModule = vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'server.js')
     const runOptions = { execArgv: [] as string[] }
     const debugOptions = { execArgv: ['--nolazy', `--inspect=${6009}`] }
 
