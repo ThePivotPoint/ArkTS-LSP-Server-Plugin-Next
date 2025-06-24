@@ -1,5 +1,6 @@
-import { type DocumentSymbol, type LanguageServicePlugin, SymbolKind } from '@volar/language-server'
-import * as ts from 'ohos-typescript'
+import { type DocumentSymbol, type LanguageServicePlugin, Range, SymbolKind } from '@volar/language-server'
+import type { TextDocument } from 'vscode-languageserver-textdocument'
+import * as ets from 'ohos-typescript'
 import { URI } from 'vscode-uri'
 
 export interface TSProvider {
@@ -7,32 +8,39 @@ export interface TSProvider {
 }
 
 /** @see https://github.com/microsoft/vscode/blob/5b34b12d958fbb656b624629a242e78b3b667cf0/extensions/html-language-features/server/src/modes/javascriptMode.ts#L547 */
-function convertSymbolKind(kind: ts.ScriptElementKind): SymbolKind {
+function convertSymbolKind(kind: ets.ScriptElementKind): SymbolKind {
   switch (kind) {
-    case ts.ScriptElementKind.moduleElement: return SymbolKind.Module
-    case ts.ScriptElementKind.classElement: return SymbolKind.Class
-    case ts.ScriptElementKind.enumElement: return SymbolKind.Enum
-    case ts.ScriptElementKind.enumMemberElement: return SymbolKind.EnumMember
-    case ts.ScriptElementKind.interfaceElement: return SymbolKind.Interface
-    case ts.ScriptElementKind.indexSignatureElement: return SymbolKind.Method
-    case ts.ScriptElementKind.callSignatureElement: return SymbolKind.Method
-    case ts.ScriptElementKind.memberFunctionElement: return SymbolKind.Method
-    case ts.ScriptElementKind.memberVariableElement: return SymbolKind.Property
-    case ts.ScriptElementKind.memberGetAccessorElement: return SymbolKind.Property
-    case ts.ScriptElementKind.memberSetAccessorElement: return SymbolKind.Property
-    case ts.ScriptElementKind.variableElement: return SymbolKind.Variable
-    case ts.ScriptElementKind.letElement: return SymbolKind.Variable
-    case ts.ScriptElementKind.constElement: return SymbolKind.Variable
-    case ts.ScriptElementKind.localVariableElement: return SymbolKind.Variable
-    case ts.ScriptElementKind.alias: return SymbolKind.Variable
-    case ts.ScriptElementKind.functionElement: return SymbolKind.Function
-    case ts.ScriptElementKind.localFunctionElement: return SymbolKind.Function
-    case ts.ScriptElementKind.constructSignatureElement: return SymbolKind.Constructor
-    case ts.ScriptElementKind.constructorImplementationElement: return SymbolKind.Constructor
-    case ts.ScriptElementKind.typeParameterElement: return SymbolKind.TypeParameter
-    case ts.ScriptElementKind.string: return SymbolKind.String
-    case ts.ScriptElementKind.structElement: return SymbolKind.Struct
+    case ets.ScriptElementKind.moduleElement: return SymbolKind.Module
+    case ets.ScriptElementKind.classElement: return SymbolKind.Class
+    case ets.ScriptElementKind.enumElement: return SymbolKind.Enum
+    case ets.ScriptElementKind.enumMemberElement: return SymbolKind.EnumMember
+    case ets.ScriptElementKind.interfaceElement: return SymbolKind.Interface
+    case ets.ScriptElementKind.indexSignatureElement: return SymbolKind.Method
+    case ets.ScriptElementKind.callSignatureElement: return SymbolKind.Method
+    case ets.ScriptElementKind.memberFunctionElement: return SymbolKind.Method
+    case ets.ScriptElementKind.memberVariableElement: return SymbolKind.Property
+    case ets.ScriptElementKind.memberGetAccessorElement: return SymbolKind.Property
+    case ets.ScriptElementKind.memberSetAccessorElement: return SymbolKind.Property
+    case ets.ScriptElementKind.variableElement: return SymbolKind.Variable
+    case ets.ScriptElementKind.letElement: return SymbolKind.Variable
+    case ets.ScriptElementKind.constElement: return SymbolKind.Variable
+    case ets.ScriptElementKind.localVariableElement: return SymbolKind.Variable
+    case ets.ScriptElementKind.alias: return SymbolKind.Variable
+    case ets.ScriptElementKind.functionElement: return SymbolKind.Function
+    case ets.ScriptElementKind.localFunctionElement: return SymbolKind.Function
+    case ets.ScriptElementKind.constructSignatureElement: return SymbolKind.Constructor
+    case ets.ScriptElementKind.constructorImplementationElement: return SymbolKind.Constructor
+    case ets.ScriptElementKind.typeParameterElement: return SymbolKind.TypeParameter
+    case ets.ScriptElementKind.string: return SymbolKind.String
+    case ets.ScriptElementKind.structElement: return SymbolKind.Struct
     default: return SymbolKind.Variable
+  }
+}
+
+function toRange(textSpan: ets.TextSpan, document: TextDocument): Range {
+  return {
+    start: document.positionAt(textSpan.start),
+    end: document.positionAt(textSpan.start + textSpan.length),
   }
 }
 
@@ -64,19 +72,25 @@ export function createETSDocumentSymbolService(): LanguageServicePlugin {
           const items: DocumentSymbol[] = []
           const navigationBarItems = languageService.getNavigationTree(documentUri.fsPath)
 
-          const getSymbol = (item: ts.NavigationTree, level: number = 0): DocumentSymbol => {
+          const getSymbol = (item: ets.NavigationTree): DocumentSymbol => {
+            if (!item.spans || item.spans.length === 0) {
+              return {
+                name: item.text.replace(/["'`]/g, ''),
+                kind: convertSymbolKind(item.kind),
+                range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
+                selectionRange: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
+                detail: item.kindModifiers,
+                children: (item.childItems || []).map(item => getSymbol(item)),
+              }
+            }
+
             return {
               name: item.text.replace(/["'`]/g, ''),
               kind: convertSymbolKind(item.kind),
-              range: {
-                start: document.positionAt(item.spans[0].start),
-                end: document.positionAt(item.spans[0].start + item.spans[0].length),
-              },
-              selectionRange: {
-                start: document.positionAt(item.spans[0].start),
-                end: document.positionAt(item.spans[0].start + item.spans[0].length),
-              },
-              children: (item.childItems || []).map(item => getSymbol(item, level + 1)),
+              range: toRange(item.spans[0], document),
+              selectionRange: toRange(item.spans[0], document),
+              detail: item.kindModifiers,
+              children: (item.childItems || []).map(item => getSymbol(item)),
             }
           }
 
