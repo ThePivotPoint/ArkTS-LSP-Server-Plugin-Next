@@ -114,6 +114,45 @@
           "type": "boolean",
           "description": "%configuration.ets.lspDebugMode.description%",
           "default": false
+        },
+        "ets.sdkList": {
+          "type": "object",
+          "description": "A list of installed OpenHarmony SDK paths. Keys should follow the pattern API[number] (e.g., API9, API10).",
+          "default": {},
+          "properties": {
+            "API10": {
+              "type": "string",
+              "description": "SDK path for API version 10"
+            },
+            "API11": {
+              "type": "string",
+              "description": "SDK path for API version 11"
+            },
+            "API12": {
+              "type": "string",
+              "description": "SDK path for API version 12"
+            },
+            "API13": {
+              "type": "string",
+              "description": "SDK path for API version 13"
+            },
+            "API14": {
+              "type": "string",
+              "description": "SDK path for API version 14"
+            },
+            "API15": {
+              "type": "string",
+              "description": "SDK path for API version 15"
+            },
+            "API18": {
+              "type": "string",
+              "description": "SDK path for API version 18"
+            }
+          },
+          "additionalProperties": {
+            "type": "string",
+            "description": "SDK path for the corresponding API version"
+          }
         }
       }
     },

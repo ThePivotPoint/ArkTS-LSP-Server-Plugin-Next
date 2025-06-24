@@ -6,11 +6,12 @@ import * as ets from 'ohos-typescript'
 import { create as createEmmetService } from 'volar-service-emmet'
 import { create as createTypeScriptServices } from 'volar-service-typescript'
 import { LanguageServerConfigManager } from './config-manager'
-import { createETSLinterDiagnostic } from './diagnostic'
+import { createETSLinterDiagnosticService } from './services/diagnostic.service'
+import { createETSDocumentSymbolService } from './services/symbol.service'
 
-let connection = createConnection()
+const connection = createConnection()
 const server = createServer(connection)
-const logger = new LanguageServerLogger("ETS Language Server")
+const logger = new LanguageServerLogger('ETS Language Server')
 const lspConfiguration = new LanguageServerConfigManager(logger)
 
 logger.getConsola().info(`ETS Language Server is running: (pid: ${process.pid})`)
@@ -40,8 +41,14 @@ connection.onInitialize((params) => {
     }),
     [
       createEmmetService(),
-      ...createTypeScriptServices(ets as any),
-      createETSLinterDiagnostic(ets, logger),
+      ...createTypeScriptServices(ets as any, {
+        isFormattingEnabled: () => true,
+        isSuggestionsEnabled: () => true,
+        isAutoClosingTagsEnabled: () => true,
+        isValidationEnabled: () => true,
+      }),
+      createETSLinterDiagnosticService(ets, logger),
+      createETSDocumentSymbolService(),
     ],
   )
 })

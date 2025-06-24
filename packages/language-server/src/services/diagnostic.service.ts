@@ -6,7 +6,7 @@ interface TSProvider {
   'typescript/languageServiceHost': () => import('ohos-typescript').LanguageServiceHost
 }
 
-export function createETSLinterDiagnostic(ets: typeof import('ohos-typescript'), logger: LanguageServerLogger): LanguageServicePlugin {
+export function createETSLinterDiagnosticService(ets: typeof import('ohos-typescript'), logger: LanguageServerLogger): LanguageServicePlugin {
   return {
     name: 'ets-diagnostic',
     capabilities: {
