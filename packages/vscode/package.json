@@ -202,7 +202,7 @@
     "build": "tsdown",
     "watch": "cross-env NODE_ENV=development tsdown",
     "pack": "npm run build && vsce package",
-    "release": "npm run build && vsce publish --pre-release",
+    "release": "npm run build && vsce publish --pre-release && ovsx publish --pre-release",
     "update": "vscode-ext-gen --output src/generated/meta.ts"
   },
   "devDependencies": {
@@ -220,6 +220,7 @@
     "hbs": "catalog:prod",
     "json5": "catalog:prod",
     "kleur": "catalog:prod",
+    "ovsx": "catalog:scripts",
     "tar": "catalog:prod",
     "ts-macro": "catalog:dev"
   }
