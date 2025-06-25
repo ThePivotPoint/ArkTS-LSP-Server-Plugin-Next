@@ -1,5 +1,6 @@
-import { type DocumentSymbol, type LanguageServicePlugin, Range, SymbolKind } from '@volar/language-server'
+import type { Range } from '@volar/language-server'
 import type { TextDocument } from 'vscode-languageserver-textdocument'
+import { type DocumentSymbol, type LanguageServicePlugin, SymbolKind } from '@volar/language-server'
 import * as ets from 'ohos-typescript'
 import { URI } from 'vscode-uri'
 
@@ -44,6 +45,28 @@ function toRange(textSpan: ets.TextSpan, document: TextDocument): Range {
   }
 }
 
+function getSymbolTree(item: ets.NavigationTree, document: TextDocument): DocumentSymbol {
+  if (item.spans.length === 0) {
+    return {
+      name: (item.text || '').replace(/["'`]/g, ''),
+      kind: convertSymbolKind(item.kind),
+      range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
+      selectionRange: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
+      detail: item.kindModifiers,
+      children: (item.childItems || []).map(item => getSymbolTree(item, document)),
+    }
+  }
+
+  return {
+    name: item.text.replace(/["'`]/g, ''),
+    kind: convertSymbolKind(item.kind),
+    range: toRange(item.spans[0], document),
+    selectionRange: toRange(item.spans[0], document),
+    detail: item.kindModifiers,
+    children: (item.childItems || []).map(item => getSymbolTree(item, document)),
+  }
+}
+
 export function createETSDocumentSymbolService(): LanguageServicePlugin {
   return {
     name: 'ets-navigation-tree',
@@ -71,30 +94,7 @@ export function createETSDocumentSymbolService(): LanguageServicePlugin {
 
           const items: DocumentSymbol[] = []
           const navigationBarItems = languageService.getNavigationTree(documentUri.fsPath)
-
-          const getSymbol = (item: ets.NavigationTree): DocumentSymbol => {
-            if (!item.spans || item.spans.length === 0) {
-              return {
-                name: item.text.replace(/["'`]/g, ''),
-                kind: convertSymbolKind(item.kind),
-                range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
-                selectionRange: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
-                detail: item.kindModifiers,
-                children: (item.childItems || []).map(item => getSymbol(item)),
-              }
-            }
-
-            return {
-              name: item.text.replace(/["'`]/g, ''),
-              kind: convertSymbolKind(item.kind),
-              range: toRange(item.spans[0], document),
-              selectionRange: toRange(item.spans[0], document),
-              detail: item.kindModifiers,
-              children: (item.childItems || []).map(item => getSymbol(item)),
-            }
-          }
-
-          navigationBarItems.childItems?.forEach(item => items.push(getSymbol(item)))
+          navigationBarItems.childItems?.forEach(item => items.push(getSymbolTree(item, document)))
           return items
         },
       }

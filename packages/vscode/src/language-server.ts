@@ -4,7 +4,7 @@ import type { LanguageClientOptions, ServerOptions } from '@volar/vscode/node'
 import type { ExtensionLogger } from 'packages/shared/out/vscode.mjs'
 import type { Translator } from './translate'
 import * as serverProtocol from '@volar/language-server/protocol'
-import { activateAutoInsertion, createLabsInfo, getTsdk } from '@volar/vscode'
+import { activateAutoInsertion, CloseAction, createLabsInfo, ErrorAction, getTsdk } from '@volar/vscode'
 import { LanguageClient, TransportKind } from '@volar/vscode/node'
 import defu from 'defu'
 import { executeCommand, useCommand } from 'reactive-vscode'
@@ -124,10 +124,28 @@ export class EtsLanguageServer extends LanguageServerContext {
         { language: 'typescript' },
       ],
       outputChannel: this.getOutputChannel(),
-      initializationOptions: {
-        typescript: {
-          tsdk: tsdk!.tsdk,
+      errorHandler: {
+        error: async (error, message, count) => {
+          this.getConsola().error(error)
+          this.getConsola().error(`Error message: ${message}`)
+          this.getConsola().error(`Error count: ${count}`)
+          return {
+            action: ErrorAction.Continue,
+            handled: true,
+            message: 'ETS Language Server error',
+          }
         },
+        closed: () => {
+          this.getConsola().info('ETS Language Server closed!')
+          return {
+            action: CloseAction.DoNotRestart,
+            handled: true,
+            message: 'ETS Language Server closed!',
+          }
+        },
+      },
+      initializationOptions: {
+        typescript: { tsdk: tsdk!.tsdk },
         ohos: await sdkAnalyzer.toOhosClientOptions(force, tsdk?.tsdk),
         debug: vscode.workspace.getConfiguration('ets').get<boolean>('lspDebugMode'),
       } satisfies EtsServerClientOptions,

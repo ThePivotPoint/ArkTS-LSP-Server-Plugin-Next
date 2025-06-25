@@ -13,8 +13,9 @@ export abstract class ExtensionLogger extends LanguageServerLogger {
       : vscode.window.createOutputChannel(`ETS Support Powered by Naily`, 'log')
     super({
       reporters: [
-        new OutputChannelReporter(outputChannel),
+        new OutputChannelReporter(outputChannel, 'Naily\'s ETS Support'),
       ],
+      prefix: 'Naily\'s ETS Support',
     })
     ExtensionLogger.outputChannel = outputChannel
     if (!ExtensionLogger.extensionVersionIsLogged) {

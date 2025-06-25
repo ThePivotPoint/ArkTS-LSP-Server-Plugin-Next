@@ -3,7 +3,7 @@ import type * as vscode from 'vscode'
 import kleur from 'kleur'
 
 export class OutputChannelReporter implements ConsolaReporter {
-  constructor(private outputChannel: vscode.OutputChannel) {}
+  constructor(private outputChannel: vscode.OutputChannel, private prefix: string) {}
 
   private safeStringify<T>(value: T): string {
     try {
@@ -25,31 +25,31 @@ export class OutputChannelReporter implements ConsolaReporter {
   log(logObj: LogObject, _ctx: { options: ConsolaOptions }): void {
     switch (logObj.type) {
       case 'log':
-        this.outputChannel.appendLine(kleur.gray(`[${logObj.type.toUpperCase()}] 📅:${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
+        this.outputChannel.appendLine(kleur.gray(`[${logObj.type.toUpperCase()}] 📅:${this.prefix ? ` <${this.prefix}>` : ''}${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
         break
       case 'warn':
-        this.outputChannel.appendLine(kleur.yellow(`[${logObj.type.toUpperCase()}] ⚠️:${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
+        this.outputChannel.appendLine(kleur.yellow(`[${logObj.type.toUpperCase()}] ⚠️:${this.prefix ? ` <${this.prefix}>` : ''}${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
         break
       case 'info':
-        this.outputChannel.appendLine(kleur.blue(`[${logObj.type.toUpperCase()}] 🔥:${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
+        this.outputChannel.appendLine(kleur.blue(`[${logObj.type.toUpperCase()}] 🔥:${this.prefix ? ` <${this.prefix}>` : ''}${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
         break
       case 'success':
       case 'ready':
       case 'start':
-        this.outputChannel.appendLine(kleur.green(`[${logObj.type.toUpperCase()}] ✅:${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
+        this.outputChannel.appendLine(kleur.green(`[${logObj.type.toUpperCase()}] ✅:${this.prefix ? ` <${this.prefix}>` : ''}${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
         break
       case 'fail':
       case 'fatal':
       case 'error':
-        this.outputChannel.appendLine(kleur.red(`[${logObj.type.toUpperCase()}] ❌:${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
+        this.outputChannel.appendLine(kleur.red(`[${logObj.type.toUpperCase()}] ❌:${this.prefix ? ` <${this.prefix}>` : ''}${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
         break
       case 'debug':
       case 'verbose':
       case 'trace':
-        this.outputChannel.appendLine(kleur.gray(`[${logObj.type.toUpperCase()}] 🐛:${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
+        this.outputChannel.appendLine(kleur.gray(`[${logObj.type.toUpperCase()}] 🐛:${this.prefix ? ` <${this.prefix}>` : ''}${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
         break
       case 'box':
-        this.outputChannel.appendLine(kleur.gray(`[${logObj.type.toUpperCase()}] 📦:${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
+        this.outputChannel.appendLine(kleur.gray(`[${logObj.type.toUpperCase()}] 📦:${this.prefix ? ` <${this.prefix}>` : ''}${logObj.tag} ${kleur.dim(logObj.date.toLocaleString())} ${this.toString(logObj)}`))
         break
     }
   }

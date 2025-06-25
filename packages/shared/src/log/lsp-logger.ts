@@ -3,18 +3,22 @@ import { createConsola } from 'consola/basic'
 import { version } from '../../../language-server/package.json'
 import { LspReporter } from './lsp-reporter'
 
+export interface LanguageServerLoggerOptions extends ConsolaOptions {
+  prefix?: string
+}
+
 export class LanguageServerLogger {
   private logger: ConsolaInstance
   private debug: boolean = false
   private static versionIsLogged = false
 
-  constructor(consolaOptions?: Partial<ConsolaOptions>);
-  constructor(prefix: string);
-  constructor(consolaOptions: Partial<ConsolaOptions> | string = {}) {
+  constructor(consolaOptions?: Partial<LanguageServerLoggerOptions>)
+  constructor(prefix: string)
+  constructor(consolaOptions: Partial<LanguageServerLoggerOptions> | string = {}) {
     this.logger = createConsola({
       ...(typeof consolaOptions === 'string' ? {} : consolaOptions),
       reporters: [
-        new LspReporter(this.debug, typeof consolaOptions === 'string' ? consolaOptions : ''),
+        new LspReporter(this.debug, typeof consolaOptions === 'string' ? consolaOptions : (consolaOptions.prefix ?? '')),
         ...(typeof consolaOptions === 'string' ? [] : consolaOptions.reporters || []),
       ],
     })

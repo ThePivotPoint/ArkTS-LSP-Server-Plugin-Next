@@ -13,7 +13,7 @@ export function useCompiledWebview(htmlPath: MaybeRefOrGetter<string>, options: 
   watch(() => htmlPath, () => loadHtml(toValue(htmlPath)))
 
   function loadHtml(htmlPath: string): void {
-    let content = fs.readFileSync(htmlPath, 'utf-8')
+    const content = fs.readFileSync(htmlPath, 'utf-8')
     html.value = content.replace(/<script type="module" crossorigin src="([^"]+)"><\/script>/g, (_, src) => {
       return `<script type="module" crossorigin src="https://file+.vscode-resource.vscode-cdn.net${vscode.Uri.joinPath(extensionContext.value!.extensionUri, 'build', src).fsPath}"></script>`
     }).replace(/<link rel="stylesheet" crossorigin href="([^"]+)"/g, (_, src) => {
