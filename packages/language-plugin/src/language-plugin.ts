@@ -2,7 +2,8 @@ import type { LanguagePlugin } from '@volar/language-core'
 import type * as ets from 'ohos-typescript'
 import type * as ts from 'typescript'
 import type { URI } from 'vscode-uri'
-import { EtsVirtualCode, TSIgnoreVirtualCode, TSInternalLibIgnoreVirtualCode } from './ets-code'
+import { createEmptyVirtualCode, createVirtualCode } from './ets-code'
+import { createLazyGetter } from './utils'
 import '@volar/typescript'
 
 function isEts(tsOrEts: typeof ets | typeof ts): tsOrEts is typeof ets {
@@ -28,34 +29,43 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '
     },
     createVirtualCode(uri, languageId, snapshot) {
       const filePath = typeof uri === 'string' ? uri : uri.fsPath
+      const getFullVitrualCode = createLazyGetter(() => (
+        createVirtualCode(snapshot, languageId, {
+          completion: true,
+          format: true,
+          navigation: true,
+          semantic: true,
+          structure: true,
+          verification: true,
+        })
+      ))
       if (languageId === 'ets' && filePath.endsWith('.ets'))
-        return new EtsVirtualCode(snapshot)
+        return getFullVitrualCode()
 
       const isInSdkPath = filePath.startsWith(sdkPath)
       const isInTsdkPath = filePath.startsWith(tsdk)
       const isDTS = filePath.endsWith('.d.ts')
       const isDETS = filePath.endsWith('.d.ets')
+      const getEmptyVirtualCode = createLazyGetter(() => (
+        createEmptyVirtualCode(snapshot, languageId, {
+          completion: false,
+          format: false,
+          navigation: false,
+          semantic: false,
+          structure: false,
+          verification: false,
+        })
+      ))
 
       // TS Plugin mode
-      if (!isEts(tsOrEts) && (isDTS || isDETS) && isInSdkPath) {
-        snapshot.getText = () => ''
-        snapshot.getLength = () => 0
-        snapshot.getChangeRange = () => undefined
-        return
-      }
-
+      if (!isEts(tsOrEts) && (isDTS || isDETS) && isInSdkPath)
+        return getEmptyVirtualCode()
       // ETS Server mode
-      if (isEts(tsOrEts) && !(isDTS || isDETS) && !isInSdkPath) {
-        snapshot.getText = () => ''
-        snapshot.getLength = () => 0
-        snapshot.getChangeRange = () => undefined
-        return new TSIgnoreVirtualCode(filePath, snapshot, languageId)
-      }
-
+      if (isEts(tsOrEts) && !(isDTS || isDETS) && !isInSdkPath)
+        return getEmptyVirtualCode()
       // Proxy ts internal lib files, such as `lib.d.ts`, `lib.es2020.d.ts`, etc.
-      if (isEts(tsOrEts) && (isDTS || isDETS) && isInTsdkPath) {
-        return new TSInternalLibIgnoreVirtualCode(filePath, snapshot, languageId)
-      }
+      if (isEts(tsOrEts) && (isDTS || isDETS) && isInTsdkPath)
+        return getFullVitrualCode()
     },
     typescript: {
       // eslint-disable-next-line ts/ban-ts-comment
