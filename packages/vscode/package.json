@@ -222,6 +222,7 @@
     "kleur": "catalog:prod",
     "ovsx": "catalog:scripts",
     "tar": "catalog:prod",
-    "ts-macro": "catalog:dev"
+    "ts-macro": "catalog:dev",
+    "unioc": "^0.0.16"
   }
 }

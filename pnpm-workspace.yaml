@@ -4,6 +4,7 @@ packages:
 catalogs:
   build:
     tsdown: ^0.12.6
+    unplugin-swc: ^1.5.5
   dev:
     '@types/node': latest
     '@types/progress-stream': ^2.0.5
@@ -61,7 +62,9 @@ catalogs:
     pnpm: ^10.11.1
     simple-git-hooks: ^2.13.0
     tsx: ^4.19.4
-
+  polyfill:
+    reflect-metadata: ^0.2.2
 onlyBuiltDependencies:
+  - '@swc/core'
   - '@vscode/vsce-sign'
   - unrs-resolver

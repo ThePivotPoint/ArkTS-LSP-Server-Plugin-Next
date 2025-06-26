@@ -4,17 +4,15 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { parse as parseJson5 } from 'json5'
+import { Service } from 'unioc'
 import * as vscode from 'vscode'
 import { SdkInstaller } from './sdk-installer'
 
 type IsInstalledVersion = keyof typeof SdkVersion extends `API${infer N}` ? N : never
 
+@Service
 export class SdkManager extends SdkInstaller {
-  public static from(translator: Translator): SdkManager {
-    return new SdkManager(translator)
-  }
-
-  private constructor(protected readonly translator: Translator) {
+  constructor(protected readonly translator: Translator) {
     super(translator)
     this.guessOhosSdkVersion()
   }

@@ -2,6 +2,7 @@ import { createRequire } from 'node:module'
 import path from 'node:path'
 import process from 'node:process'
 import { defineConfig, logger } from 'tsdown'
+import swc from 'unplugin-swc'
 
 const require = createRequire(import.meta.url)
 const isDev = process.env.NODE_ENV === 'development'
@@ -16,7 +17,7 @@ export default defineConfig({
   },
   format: 'cjs',
   sourcemap: isDev,
-  external: ['vscode', '@aws-sdk/client-s3'],
+  external: ['vscode', '@aws-sdk/client-s3', 'reflect-metadata'],
   tsconfig: './tsconfig.json',
   platform: 'node',
   clean: false,
@@ -73,5 +74,21 @@ export default defineConfig({
         },
       },
     },
+
+    swc.rolldown({
+      jsc: {
+        parser: {
+          syntax: 'typescript',
+          tsx: true,
+          decorators: true,
+        },
+
+        transform: {
+          legacyDecorator: true,
+          decoratorMetadata: true,
+          decoratorVersion: '2021-12',
+        },
+      },
+    }),
   ],
 })

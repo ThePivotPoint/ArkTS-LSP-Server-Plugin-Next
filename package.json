@@ -20,7 +20,9 @@
     "@vitejs/plugin-vue": "catalog:frontend",
     "@vitejs/plugin-vue-jsx": "catalog:frontend",
     "@vueuse/core": "catalog:frontend",
+    "reflect-metadata": "catalog:polyfill",
     "unocss": "catalog:frontend",
+    "unplugin-swc": "catalog:build",
     "vite": "catalog:frontend",
     "vue": "catalog:frontend"
   },

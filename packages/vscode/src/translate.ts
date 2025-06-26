@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import get from 'lodash/get'
+import { Service } from 'unioc'
 import * as vscode from 'vscode'
 
 export interface LocaleFile {
@@ -14,6 +15,7 @@ export interface TOptions {
 
 export type TFn = (key: string, options: TOptions) => string
 
+@Service
 export class Translator {
   private localeFolder = path.join(__dirname, '..')
   private localeFiles: LocaleFile[] = []

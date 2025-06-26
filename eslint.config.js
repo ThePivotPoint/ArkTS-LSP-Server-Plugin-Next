@@ -11,4 +11,10 @@ export default antfu({
   rules: {
     'ts/no-namespace': 'off',
   },
+  typescript: {
+    parserOptions: {
+      experimentalDecorators: true,
+      emitDecoratorMetadata: true,
+    },
+  },
 })

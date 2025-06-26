@@ -1,15 +1,13 @@
-import type { Translator } from '../translate'
 import fs from 'node:fs'
 import { ExtensionLogger } from '@arkts/shared/vscode'
+import { Autowired, Service } from 'unioc'
 import * as vscode from 'vscode'
 import { SdkAnalyzer } from '../sdk/sdk-analyzer'
+import { Translator } from '../translate'
 import { FileSystemException } from './file-system-exception'
 
-export abstract class FileSystem extends ExtensionLogger {
-  constructor(protected readonly translator: Translator) {
-    super()
-  }
-
+@Service
+export class FileSystem extends ExtensionLogger {
   /**
    * Get the current workspace directory.
    *
@@ -25,6 +23,9 @@ export abstract class FileSystem extends ExtensionLogger {
       return undefined
     return workspaceFolder.uri
   }
+
+  @Autowired(Translator)
+  protected readonly translator!: Translator
 
   /**
    * Create a `SdkAnalyzer` instance.

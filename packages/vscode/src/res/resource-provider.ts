@@ -1,40 +1,27 @@
-import type { Translator } from '../translate'
 import path from 'node:path'
 import { typeAssert } from '@arkts/shared'
+import { Autowired, Service } from 'unioc'
+import { CompletionItemProvider, DefinitionProvider, ExtensionContext, HoverProvider } from 'unioc/vscode'
 import * as vscode from 'vscode'
+import { AbstractWatcher } from '../abstract-watcher'
 import { FileSystem } from '../fs/file-system'
+import { Translator } from '../translate'
 import { ResourceFinder } from './resource-finder'
 import { ResourceMatcher } from './resource-matcher'
 
+@Service
+@HoverProvider({ scheme: 'file', language: 'ets' })
+@DefinitionProvider({ scheme: 'file', language: 'ets' })
+@CompletionItemProvider({ scheme: 'file', language: 'ets' }, '.', '\'', '"', '`')
 export class ResourceProvider extends FileSystem implements vscode.DefinitionProvider, vscode.HoverProvider, vscode.CompletionItemProvider {
-  private constructor(
-    protected readonly context: vscode.ExtensionContext,
-    protected readonly translator: Translator,
-  ) {
-    super(translator)
-  }
+  @Autowired(ExtensionContext)
+  protected readonly context: vscode.ExtensionContext
 
-  static from(context: vscode.ExtensionContext, translator: Translator): ResourceProvider {
-    const resourceProvider = new ResourceProvider(context, translator)
-    context.subscriptions.push(
-      vscode.languages.registerDefinitionProvider({ scheme: 'file', language: 'ets' }, resourceProvider),
-    )
-    context.subscriptions.push(
-      vscode.languages.registerHoverProvider({ scheme: 'file', language: 'ets' }, resourceProvider),
-    )
-    context.subscriptions.push(
-      vscode.languages.registerCompletionItemProvider(
-        { scheme: 'file', language: 'ets' },
-        resourceProvider,
-        '.',
-        '\'',
-        '"',
-        '`',
-        '.',
-      ),
-    )
-    return resourceProvider
-  }
+  @Autowired
+  protected readonly translator: Translator
+
+  @Autowired
+  protected readonly watcher: AbstractWatcher
 
   async provideDefinition(
     document: vscode.TextDocument,
@@ -44,7 +31,7 @@ export class ResourceProvider extends FileSystem implements vscode.DefinitionPro
     const resourceMatcherResult = resourceMatcher.match(document, position)
     if (!resourceMatcherResult)
       return undefined
-    return new ResourceFinder(document.uri, this.context, this.translator).findRelativeResource(resourceMatcherResult.content)
+    return new ResourceFinder(document.uri, this.context, this.translator, this.watcher).findRelativeResource(resourceMatcherResult.content)
   }
 
   async provideHover(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Hover | undefined> {
@@ -52,7 +39,7 @@ export class ResourceProvider extends FileSystem implements vscode.DefinitionPro
     const resourceMatcherResult = resourceMatcher.match(document, position)
     if (!resourceMatcherResult)
       return undefined
-    const resourceFinder = new ResourceFinder(document.uri, this.context, this.translator)
+    const resourceFinder = new ResourceFinder(document.uri, this.context, this.translator, this.watcher)
     const resourceLocations = await resourceFinder.findRelativeResource(resourceMatcherResult.content)
     if (!resourceLocations)
       return undefined
