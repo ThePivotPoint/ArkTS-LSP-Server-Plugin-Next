@@ -1,9 +1,11 @@
-import type { Translator } from '../translate'
+import { Translator } from '../translate'
 import path from 'node:path'
 import { createDownloader, DownloadError, getSdkUrl, getSdkUrls, SdkVersion as SdkVersionEnum } from '@arkts/sdk-downloader'
-import { useCommand } from 'reactive-vscode'
+import { Autowired, Service } from 'unioc'
+import { Command } from 'unioc/vscode'
 import * as vscode from 'vscode'
 import { Environment } from '../environment'
+import { SdkManager } from './sdk-manager'
 
 interface SdkQuickPickItem extends vscode.QuickPickItem {
   /** Current install status of the SDK. */
@@ -12,45 +14,19 @@ interface SdkQuickPickItem extends vscode.QuickPickItem {
   version: keyof typeof SdkVersionEnum
 }
 
-export abstract class SdkInstaller extends Environment {
-  /**
-   * Set the path to the OpenHarmony SDK.
-   *
-   * @param sdkFolderPath - The path to the OpenHarmony SDK.
-   */
-  abstract setOhosSdkPath(sdkFolderPath: string): Promise<void>
+@Service
+@Command('ets.installSDK')
+export class SdkInstaller extends Environment implements Command {
+  @Autowired
+  protected readonly translator: Translator
 
-  /**
-   * Get the base path of the OpenHarmony SDK.
-   *
-   * @returns The base path of the OpenHarmony SDK.
-   */
-  abstract getOhosSdkBasePath(): Promise<string>
-
-  /**
-   * Get the path of the OpenHarmony SDK.
-   *
-   * @returns The path of the OpenHarmony SDK.
-   */
-  abstract getOhosSdkPath(): Promise<string | undefined>
-
-  /**
-   * Check if the SDK is installed.
-   *
-   * @param version - The version of the SDK.
-   * @returns `true` if the SDK is installed, `false` if the SDK is not installed, `'incomplete'` if the SDK is installed but is incomplete.
-   */
-  abstract isInstalled(version: string): Promise<boolean | 'incomplete'>
-
-  protected constructor(protected readonly translator: Translator) {
-    super(translator)
-    useCommand('ets.installSDK', async () => await this.selectSdkToInstall())
-  }
+  @Autowired
+  protected readonly sdkManager: SdkManager
 
   private async buildQuickPickItem(urls: ReturnType<typeof getSdkUrls>): Promise<SdkQuickPickItem[]> {
     return (await Promise.all(Object.entries(urls).map(async ([openHarmonyVersion]) => {
       const apiVersion = Object.keys(SdkVersionEnum).find(key => SdkVersionEnum[key as keyof typeof SdkVersionEnum] === openHarmonyVersion) as keyof typeof SdkVersionEnum
-      const installStatus = await this.isInstalled(apiVersion.toString().split('API')[1])
+      const installStatus = await this.sdkManager.isInstalled(apiVersion.toString().split('API')[1])
       const installStatusTranslation = installStatus === 'incomplete' ? this.translator.t('sdk.install.incomplete') : installStatus ? this.translator.t('sdk.install.installed') : this.translator.t('sdk.install.notInstalled')
 
       return {
@@ -63,7 +39,7 @@ export abstract class SdkInstaller extends Environment {
     }))).filter(Boolean) as SdkQuickPickItem[]
   }
 
-  private async selectSdkToInstall(): Promise<void> {
+  async onExecuteCommand(): Promise<void> {
     const urls = getSdkUrls()
     const quickPickItems = await this.buildQuickPickItem(urls)
     const versionChoice = await vscode.window.showQuickPick(quickPickItems, {
@@ -104,7 +80,7 @@ export abstract class SdkInstaller extends Environment {
       return
 
     if (choice?.label === choiceSwitch) {
-      await this.setOhosSdkPath(path.join(await this.getOhosSdkBasePath(), versionChoice.version.split('API')[1]))
+      await this.sdkManager.setOhosSdkPath(path.join(await this.sdkManager.getOhosSdkBasePath!(), versionChoice.version.split('API')[1]))
       vscode.window.showInformationMessage(this.translator.t('sdk.install.switchOrReinstall.switch.success', { args: [versionChoice.version] }))
     }
     else if (choice?.label === choiceReinstall) {
@@ -120,7 +96,7 @@ export abstract class SdkInstaller extends Environment {
    * @param version - The version of the SDK.
    */
   async installSdk(version: keyof typeof SdkVersionEnum): Promise<void> {
-    const baseSdkPath = await this.getOhosSdkBasePath()
+    const baseSdkPath = await this.sdkManager.getOhosSdkBasePath()
     const url = getSdkUrl(SdkVersionEnum[version], this.getArch(), this.getOS())
     if (!url)
       throw new Error('Current SDK version is not supported by the current platform.')
@@ -227,7 +203,7 @@ export abstract class SdkInstaller extends Environment {
     })
 
     // Step 5: Check the install status of the SDK
-    const installStatus = await this.isInstalled(apiNumberVersion)
+    const installStatus = await this.sdkManager.isInstalled(apiNumberVersion)
     if (installStatus === 'incomplete') {
       await vscode.window.showWarningMessage(this.translator.t('sdk.install.mayBeIncomplete', { args: [version] }))
       return
@@ -250,7 +226,7 @@ export abstract class SdkInstaller extends Environment {
       isSwitchToNewSdkNo,
     )
     if (isSwitchToNewSdk === isSwitchToNewSdkYes) {
-      await this.setOhosSdkPath(path.join(baseSdkPath, apiNumberVersion))
+      await this.sdkManager.setOhosSdkPath(path.join(baseSdkPath, apiNumberVersion))
       vscode.window.showInformationMessage(this.translator.t('sdk.install.isSwitchToNewSdk.success', { args: [version] }))
     }
     else {

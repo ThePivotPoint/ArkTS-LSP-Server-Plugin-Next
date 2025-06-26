@@ -7,9 +7,9 @@ import { extensionContext } from 'reactive-vscode'
 import { CommandPlugin, DisposablePlugin, LanguageProviderPlugin, VSCodeBootstrap } from 'unioc/vscode'
 import { useCompiledWebview } from './hook/compiled-webview'
 import { EtsLanguageServer } from './language-server'
-import { SdkManager } from './sdk/sdk-manager'
 import { Translator } from './translate'
 import './res/resource-provider'
+import { SdkVersionGuesser } from './sdk/sdk-guesser'
 
 class ArkTSExtension extends VSCodeBootstrap<Promise<LabsInfo>> {
   beforeInitialize(context: ExtensionContext): Promise<void> | void {
@@ -21,10 +21,11 @@ class ArkTSExtension extends VSCodeBootstrap<Promise<LabsInfo>> {
 
   async onActivate(context: ExtensionContext): Promise<LabsInfo> {
     const translator = await this.getGlobalContainer().findOne<Translator>(Translator)?.resolve()
-    const sdkManager = await this.getGlobalContainer().findOne<SdkManager>(SdkManager)?.resolve()
     const languageServer = await this.getGlobalContainer().findOne<EtsLanguageServer>(EtsLanguageServer)?.resolve()
+    const sdkVersionGuesser = await this.getGlobalContainer().findOne<SdkVersionGuesser>(SdkVersionGuesser)?.resolve()
+    sdkVersionGuesser?.guessOhosSdkVersion()
     useCompiledWebview(path.resolve(context.extensionPath, 'build', 'hilog.html'))
-    return EtsLanguageServer.from(translator!, sdkManager!, languageServer!)
+    return EtsLanguageServer.from(translator!, sdkVersionGuesser!, languageServer!)
   }
 }
 
