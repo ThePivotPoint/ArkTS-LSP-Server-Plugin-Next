@@ -1,9 +1,7 @@
 import fs from 'node:fs'
 import { ExtensionLogger } from '@arkts/shared/vscode'
-import { Autowired, Service } from 'unioc'
+import { Service } from 'unioc'
 import * as vscode from 'vscode'
-import { SdkAnalyzer } from '../sdk/sdk-analyzer'
-import { Translator } from '../translate'
 import { FileSystemException } from './file-system-exception'
 
 @Service
@@ -22,19 +20,6 @@ export class FileSystem extends ExtensionLogger {
     if (!workspaceFolder)
       return undefined
     return workspaceFolder.uri
-  }
-
-  @Autowired(Translator)
-  protected readonly translator!: Translator
-
-  /**
-   * Create a `SdkAnalyzer` instance.
-   *
-   * @param sdkUri - The SDK path.
-   * @returns The `SdkAnalyzer` instance.
-   */
-  createSdkAnalyzer(sdkUri: vscode.Uri): SdkAnalyzer {
-    return new SdkAnalyzer(sdkUri, this, this.translator)
   }
 
   /**

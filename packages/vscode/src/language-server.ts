@@ -8,9 +8,10 @@ import { activateAutoInsertion, CloseAction, createLabsInfo, ErrorAction, getTsd
 import { LanguageClient, TransportKind } from '@volar/vscode/node'
 import defu from 'defu'
 import { executeCommand, useCommand } from 'reactive-vscode'
-import { Service } from 'unioc'
+import { Autowired, Service } from 'unioc'
 import * as vscode from 'vscode'
 import { LanguageServerContext } from './context/server-context'
+import { SdkAnalyzer } from './sdk/sdk-analyzer'
 
 @Service
 export class EtsLanguageServer extends LanguageServerContext {
@@ -81,6 +82,9 @@ export class EtsLanguageServer extends LanguageServerContext {
     return await this.startLanguageServer(translator, languageServer)
   }
 
+  @Autowired
+  protected readonly translator: Translator
+
   /**
    * Get the server options for the ETS Language Server.
    *
@@ -117,7 +121,7 @@ export class EtsLanguageServer extends LanguageServerContext {
       vscode.window.showErrorMessage(this.translator.t('sdk.error.validSdkPath'))
       throw new Error(this.translator.t('sdk.error.validSdkPath'))
     }
-    const sdkAnalyzer = this.createSdkAnalyzer(vscode.Uri.parse(sdkPath))
+    const sdkAnalyzer = new SdkAnalyzer(vscode.Uri.parse(sdkPath), this, this.translator)
     const tsdk = await getTsdk(this.context)
 
     return {
