@@ -1,28 +1,45 @@
 import type { EtsServerClientOptions, TypescriptLanguageFeatures } from '@arkts/shared'
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClientOptions, ServerOptions } from '@volar/vscode/node'
-import type { ExtensionLogger } from 'packages/shared/out/vscode.mjs'
 import type { Translator } from './translate'
 import * as serverProtocol from '@volar/language-server/protocol'
 import { activateAutoInsertion, CloseAction, createLabsInfo, ErrorAction, getTsdk } from '@volar/vscode'
 import { LanguageClient, TransportKind } from '@volar/vscode/node'
 import defu from 'defu'
-import { executeCommand, useCommand } from 'reactive-vscode'
-import { Autowired, Service } from 'unioc'
+import { executeCommand } from 'reactive-vscode'
+import { Autowired } from 'unioc'
+import { Command, IOnActivate } from 'unioc/vscode'
 import * as vscode from 'vscode'
 import { LanguageServerContext } from './context/server-context'
 import { SdkAnalyzer } from './sdk/sdk-analyzer'
 
-@Service
-export class EtsLanguageServer extends LanguageServerContext {
-  private static errorToDetail(error: unknown): string {
+@Command('ets.restartServer')
+export class EtsLanguageServer extends LanguageServerContext implements Command, IOnActivate {
+  onExecuteCommand(): void {
+    this.restart().catch(e => this.handleLspError(e, this.translator))
+  }
+
+  onActivate(): void {
+    vscode.workspace.onDidChangeConfiguration(async (e) => {
+      if (!e.affectsConfiguration('ets'))
+        return
+      if (!EtsLanguageServer._lsp) {
+        this.getConsola().info(`[underwrite] sdk path changed, start language server...`)
+        await this.startLanguageServer(this.translator, this)
+        return
+      }
+      EtsLanguageServer._lsp.refresh()
+    })
+  }
+
+  private errorToDetail(error: unknown): string {
     if (error instanceof Error || (error && typeof error === 'object' && 'message' in error))
       return `${error.message} ${'code' in error ? `[${error.code}]` : ''}`
     return `${typeof error === 'string' || typeof error === 'number' || typeof error === 'boolean' ? error : JSON.stringify(error)}`
   }
 
-  private static async handleLspError(error: unknown, translator: Translator): Promise<void> {
-    this._lsp?.getConsola().error(error)
+  private async handleLspError(error: unknown, translator: Translator): Promise<void> {
+    EtsLanguageServer._lsp?.getConsola().error(error)
     const choiceSdkPath = translator.t('sdk.error.choiceSdkPathMasually')
     const downloadOrChoiceSdkPath = translator.t('sdk.error.downloadOrChoiceSdkPath')
     const result = await vscode.window.showWarningMessage('OpenHarmony SDK Warning', {
@@ -51,35 +68,23 @@ export class EtsLanguageServer extends LanguageServerContext {
 
   private static _lsp: EtsLanguageServer | undefined
 
-  private static async startLanguageServer(translator: Translator, languageServer: EtsLanguageServer): Promise<LabsInfo> {
+  private async startLanguageServer(translator: Translator, languageServer: EtsLanguageServer): Promise<LabsInfo> {
     try {
-      this._lsp = languageServer
+      EtsLanguageServer._lsp = languageServer
 
       // First start it will be return LabsInfo object for volar.js labs extension
-      const [labsInfo] = await this._lsp.start(undefined, true)
+      const [labsInfo] = await EtsLanguageServer._lsp.start(undefined, true)
       return labsInfo!
     }
     catch (error) {
       this.handleLspError(error, translator)
-      this._lsp = undefined
+      EtsLanguageServer._lsp = undefined
       throw error
     }
   }
 
-  public static async from(translator: Translator, logger: ExtensionLogger, languageServer: EtsLanguageServer): Promise<LabsInfo> {
-    vscode.workspace.onDidChangeConfiguration(async (e) => {
-      if (!e.affectsConfiguration('ets'))
-        return
-      if (!this._lsp) {
-        logger.getConsola().info(`[underwrite] sdk path changed, start language server...`)
-        await this.startLanguageServer(translator, languageServer)
-        return
-      }
-      this._lsp.refresh()
-    })
-
-    useCommand('ets.restartServer', () => this._lsp?.restart().catch(e => this.handleLspError(e, translator)))
-    return await this.startLanguageServer(translator, languageServer)
+  run(): Promise<LabsInfo> {
+    return this.startLanguageServer(this.translator, this)
   }
 
   @Autowired

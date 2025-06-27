@@ -16,8 +16,7 @@ export class SdkManager extends Environment {
    * @param sdkFolderPath - The path to the OpenHarmony SDK.
    */
   async setOhosSdkPath(sdkFolderPath: string): Promise<void> {
-    await vscode.workspace.getConfiguration('ets')
-      .update('sdkPath', sdkFolderPath, vscode.ConfigurationTarget.Global)
+    await vscode.workspace.getConfiguration('ets').update('sdkPath', sdkFolderPath, vscode.ConfigurationTarget.Global)
   }
 
   /**
@@ -41,8 +40,7 @@ export class SdkManager extends Environment {
    * @returns The path of the OpenHarmony SDK.
    */
   async getOhosSdkPath(): Promise<string | undefined> {
-    return vscode.workspace.getConfiguration('ets')
-      .get('sdkPath') as string | undefined
+    return vscode.workspace.getConfiguration('ets').get('sdkPath') as string | undefined
   }
 
   /**

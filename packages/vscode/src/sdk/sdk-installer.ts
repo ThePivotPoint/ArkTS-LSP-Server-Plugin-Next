@@ -1,10 +1,10 @@
-import { Translator } from '../translate'
 import path from 'node:path'
 import { createDownloader, DownloadError, getSdkUrl, getSdkUrls, SdkVersion as SdkVersionEnum } from '@arkts/sdk-downloader'
-import { Autowired, Service } from 'unioc'
+import { Autowired } from 'unioc'
 import { Command } from 'unioc/vscode'
 import * as vscode from 'vscode'
 import { Environment } from '../environment'
+import { Translator } from '../translate'
 import { SdkManager } from './sdk-manager'
 
 interface SdkQuickPickItem extends vscode.QuickPickItem {
@@ -14,7 +14,6 @@ interface SdkQuickPickItem extends vscode.QuickPickItem {
   version: keyof typeof SdkVersionEnum
 }
 
-@Service
 @Command('ets.installSDK')
 export class SdkInstaller extends Environment implements Command {
   @Autowired

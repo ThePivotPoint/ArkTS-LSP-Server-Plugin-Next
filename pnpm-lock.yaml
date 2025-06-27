@@ -553,8 +553,8 @@ importers:
         specifier: catalog:dev
         version: 0.1.32
       unioc:
-        specifier: ^0.0.17
-        version: 0.0.17(@types/connect@3.4.38)(@types/koa@2.15.0)(class-transformer@0.5.1)(esbuild@0.25.5)(reflect-metadata@0.2.2)(rolldown-vite@6.3.19(@types/node@24.0.1)(esbuild@0.25.5)(jiti@2.4.2)(tsx@4.19.4)(yaml@2.8.0))
+        specifier: ^0.0.18
+        version: 0.0.18(@types/connect@3.4.38)(@types/koa@2.15.0)(class-transformer@0.5.1)(esbuild@0.25.5)(reflect-metadata@0.2.2)(rolldown-vite@6.3.19(@types/node@24.0.1)(esbuild@0.25.5)(jiti@2.4.2)(tsx@4.19.4)(yaml@2.8.0))
 
 packages:
 
@@ -2343,8 +2343,11 @@ packages:
   '@unioc/shared@0.0.7':
     resolution: {integrity: sha512-fgIYVLfhvIVWAdsPax4JsOUvMKh5WctsPiY50gsgbKzv/DMbQT7daOhFGY8kIgdyJ1roiqVHoZpmYq+aNuTSmA==}
 
-  '@unioc/vscode@0.1.10':
-    resolution: {integrity: sha512-78nrjrXZMvDU+ANvxfJnS1Da0ObwAnxgfSTGdTlIhs3FJrKhKsuTjvwjPyoRfCweIMuuPe/1dZpDRg2eM9E/Lw==}
+  '@unioc/signals@0.1.4':
+    resolution: {integrity: sha512-aqmHMFmuScBfUaDU7VnKtdIkVRJ1WICCEyZZDoE3BkH+qGJPsErtmkn1LaboiU0SeL3rMM1aQ9BkG85i57hemA==}
+
+  '@unioc/vscode@0.1.11':
+    resolution: {integrity: sha512-FKWxo/wsvjk+AR2WtjuFG91WKOyTozGaioTSuhzH0t9HnhzXJOJcKsXz5TKgWlrgcWoBWTNRx0PSZ5z+U7rynA==}
 
   '@unioc/web-bun@0.0.10':
     resolution: {integrity: sha512-TmsQhDxtnc+AY9jY+RV2F0QgTSHrCKr7NpIc4EDwdnv3UamCvudJ4AL9Tqu439H55Il5WHG/SulkpjfA4Q5erg==}
@@ -6436,8 +6439,8 @@ packages:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
     engines: {node: '>=18'}
 
-  unioc@0.0.17:
-    resolution: {integrity: sha512-Bb3NYSk/DAuIwHnnOGptvKqAQ/99ex6jW8LWKIoYIYizkPCc+l/QR8585jT67+wZPTFUeQkrjJhggCx1LlvW+Q==}
+  unioc@0.0.18:
+    resolution: {integrity: sha512-PX0NNM8Wb/9wULRmwBhdKrK9G+mroGzzT+61/69AqiLFLWI8D1SHrlLz/5gZbb/NIYNVWY2L+soFFC0aWHbmVg==}
 
   unist-util-is@6.0.0:
     resolution: {integrity: sha512-2qCTHimwdxLfz+YzdGfkqNlH0tLi9xjTnHddPmJwtIG9MGsdbutfTc4P+haPD7l7Cjxf/WZj+we5qfVPvvxfYw==}
@@ -8788,7 +8791,13 @@ snapshots:
 
   '@unioc/shared@0.0.7': {}
 
-  '@unioc/vscode@0.1.10':
+  '@unioc/signals@0.1.4':
+    dependencies:
+      '@unioc/core': 0.0.9
+      '@unioc/decorator': 0.0.7
+      alien-signals: 2.0.5
+
+  '@unioc/vscode@0.1.11':
     dependencies:
       '@types/vscode': 1.101.0
       '@unioc/core': 0.0.9
@@ -13563,7 +13572,7 @@ snapshots:
 
   unicorn-magic@0.3.0: {}
 
-  unioc@0.0.17(@types/connect@3.4.38)(@types/koa@2.15.0)(class-transformer@0.5.1)(esbuild@0.25.5)(reflect-metadata@0.2.2)(rolldown-vite@6.3.19(@types/node@24.0.1)(esbuild@0.25.5)(jiti@2.4.2)(tsx@4.19.4)(yaml@2.8.0)):
+  unioc@0.0.18(@types/connect@3.4.38)(@types/koa@2.15.0)(class-transformer@0.5.1)(esbuild@0.25.5)(reflect-metadata@0.2.2)(rolldown-vite@6.3.19(@types/node@24.0.1)(esbuild@0.25.5)(jiti@2.4.2)(tsx@4.19.4)(yaml@2.8.0)):
     dependencies:
       '@unioc/adapter-midway': 0.0.10(@types/connect@3.4.38)(@types/koa@2.15.0)
       '@unioc/adapter-nestjs': 0.2.3(@types/connect@3.4.38)(@types/koa@2.15.0)(@unioc/web-express@0.0.10(@types/connect@3.4.38)(@types/koa@2.15.0))(class-transformer@0.5.1)(reflect-metadata@0.2.2)
@@ -13573,7 +13582,8 @@ snapshots:
       '@unioc/meta': 0.0.7
       '@unioc/reflector': 0.0.7(esbuild@0.25.5)(rolldown-vite@6.3.19(@types/node@24.0.1)(esbuild@0.25.5)(jiti@2.4.2)(tsx@4.19.4)(yaml@2.8.0))
       '@unioc/shared': 0.0.7
-      '@unioc/vscode': 0.1.10
+      '@unioc/signals': 0.1.4
+      '@unioc/vscode': 0.1.11
       '@unioc/web': 0.1.4(@types/connect@3.4.38)(@types/koa@2.15.0)
       '@unioc/web-bun': 0.0.10(@types/connect@3.4.38)(@types/koa@2.15.0)
       '@unioc/web-express': 0.0.10(@types/connect@3.4.38)(@types/koa@2.15.0)

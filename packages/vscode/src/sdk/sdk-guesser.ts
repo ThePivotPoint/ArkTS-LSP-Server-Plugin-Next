@@ -1,16 +1,17 @@
-import { Autowired, Service } from "unioc";
-import { Environment } from "../environment";
 import type { SdkVersion } from '@arkts/sdk-downloader'
-import { SdkManager } from "./sdk-manager";
-import path from "node:path";
-import fs from "node:fs";
-import * as vscode from 'vscode'
-import { Translator } from "../translate";
-import { SdkInstaller } from "./sdk-installer";
+import fs from 'node:fs'
+import path from 'node:path'
 import { parse as parseJson5 } from 'json5'
+import { Autowired, Service } from 'unioc'
+import { IOnActivate } from 'unioc/vscode'
+import * as vscode from 'vscode'
+import { Environment } from '../environment'
+import { Translator } from '../translate'
+import { SdkInstaller } from './sdk-installer'
+import { SdkManager } from './sdk-manager'
 
 @Service
-export class SdkVersionGuesser extends Environment {
+export class SdkVersionGuesser extends Environment implements IOnActivate {
   @Autowired
   protected readonly sdkManager: SdkManager
 
@@ -20,8 +21,8 @@ export class SdkVersionGuesser extends Environment {
   @Autowired
   protected readonly translator: Translator
 
-  constructor() {
-    super()
+  onActivate(): void {
+    this.guessOhosSdkVersion()
   }
 
   async guessOhosSdkVersion(): Promise<keyof typeof SdkVersion | undefined> {
