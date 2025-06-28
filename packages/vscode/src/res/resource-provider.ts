@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { typeAssert } from '@arkts/shared'
-import { Autowired, Service } from 'unioc'
+import { Autowired } from 'unioc'
 import { CompletionItemProvider, DefinitionProvider, ExtensionContext, HoverProvider } from 'unioc/vscode'
 import * as vscode from 'vscode'
 import { AbstractWatcher } from '../abstract-watcher'
@@ -9,11 +9,10 @@ import { Translator } from '../translate'
 import { ResourceFinder } from './resource-finder'
 import { ResourceMatcher } from './resource-matcher'
 
-@Service
 @HoverProvider({ scheme: 'file', language: 'ets' })
 @DefinitionProvider({ scheme: 'file', language: 'ets' })
 @CompletionItemProvider({ scheme: 'file', language: 'ets' }, '.', '\'', '"', '`')
-export class ResourceProvider extends FileSystem implements vscode.DefinitionProvider, vscode.HoverProvider, vscode.CompletionItemProvider {
+export class ResourceProvider extends FileSystem implements DefinitionProvider, HoverProvider, CompletionItemProvider {
   @Autowired(ExtensionContext)
   protected readonly context: vscode.ExtensionContext
 
