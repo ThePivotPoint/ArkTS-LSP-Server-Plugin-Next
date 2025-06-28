@@ -16,12 +16,17 @@ const lspConfiguration = new LanguageServerConfigManager(logger)
 
 logger.getConsola().info(`ETS Language Server is running: (pid: ${process.pid})`)
 
-connection.onInitialize((params) => {
+connection.onRequest('ets/waitForEtsConfigurationChangedRequested', (e) => {
+  logger.getConsola().info(`waitForEtsConfigurationChangedRequested: ${JSON.stringify(e)}`)
+  lspConfiguration.setConfiguration(e)
+})
+
+connection.onInitialize(async (params) => {
   if (params.locale)
     lspConfiguration.setLocale(params.locale)
-  lspConfiguration.setConfiguration(params.initializationOptions)
-  const tsdk = lspConfiguration.getTypeScriptTsdk()
+  lspConfiguration.setConfiguration({ typescript: params.initializationOptions?.typescript })
 
+  const tsdk = lspConfiguration.getTypeScriptTsdk()
   return server.initialize(
     params,
     createTypeScriptProject(ets as any, tsdk.diagnosticMessages, () => {

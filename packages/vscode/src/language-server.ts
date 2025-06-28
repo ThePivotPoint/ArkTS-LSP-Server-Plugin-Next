@@ -1,35 +1,58 @@
 import type { EtsServerClientOptions, TypescriptLanguageFeatures } from '@arkts/shared'
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClientOptions, ServerOptions } from '@volar/vscode/node'
-import type { Translator } from './translate'
 import * as serverProtocol from '@volar/language-server/protocol'
-import { activateAutoInsertion, CloseAction, createLabsInfo, ErrorAction, getTsdk } from '@volar/vscode'
+import { activateAutoInsertion, createLabsInfo, getTsdk } from '@volar/vscode'
 import { LanguageClient, TransportKind } from '@volar/vscode/node'
 import defu from 'defu'
 import { executeCommand } from 'reactive-vscode'
 import { Autowired } from 'unioc'
-import { Command, IOnActivate } from 'unioc/vscode'
+import { Command, Disposable, ExtensionContext, WatchConfiguration } from 'unioc/vscode'
 import * as vscode from 'vscode'
 import { LanguageServerContext } from './context/server-context'
 import { SdkAnalyzer } from './sdk/sdk-analyzer'
+import { Translator } from './translate'
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      clearTimeout(timer)
+      resolve()
+    }, ms)
+  })
+}
+
+@Disposable
 @Command('ets.restartServer')
-export class EtsLanguageServer extends LanguageServerContext implements Command, IOnActivate {
+export class EtsLanguageServer extends LanguageServerContext implements Command, Disposable {
+  @Autowired
+  protected readonly translator: Translator
+
+  @Autowired(ExtensionContext)
+  protected readonly context: ExtensionContext
+
   onExecuteCommand(): void {
-    this.restart().catch(e => this.handleLspError(e, this.translator))
+    this.restart().catch(e => this.handleLspError(e))
   }
 
-  onActivate(): void {
-    vscode.workspace.onDidChangeConfiguration(async (e) => {
-      if (!e.affectsConfiguration('ets'))
-        return
-      if (!EtsLanguageServer._lsp) {
-        this.getConsola().info(`[underwrite] sdk path changed, start language server...`)
-        await this.startLanguageServer(this.translator, this)
-        return
-      }
-      EtsLanguageServer._lsp.refresh()
-    })
+  @WatchConfiguration()
+  async onConfigurationChanged(e: vscode.ConfigurationChangeEvent): Promise<unknown> {
+    if (!e.affectsConfiguration('ets'))
+      return
+    if (!this.getCurrentLanguageClient()?.isRunning()) {
+      this.getConsola().info(`[underwrite] sdk path changed, start language server...`)
+      return await this.run()
+    }
+
+    try {
+      await sleep(1000)
+      await this.restart(undefined, true).catch(e => this.handleLspError(e))
+      const clientOptions = await this.getClientOptions(true)
+      await this.getCurrentLanguageClient()?.sendRequest('ets/configurationChanged', clientOptions.initializationOptions)
+    }
+    catch (error) {
+      this.handleLspError(error)
+    }
   }
 
   private errorToDetail(error: unknown): string {
@@ -38,10 +61,10 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
     return `${typeof error === 'string' || typeof error === 'number' || typeof error === 'boolean' ? error : JSON.stringify(error)}`
   }
 
-  private async handleLspError(error: unknown, translator: Translator): Promise<void> {
-    EtsLanguageServer._lsp?.getConsola().error(error)
-    const choiceSdkPath = translator.t('sdk.error.choiceSdkPathMasually')
-    const downloadOrChoiceSdkPath = translator.t('sdk.error.downloadOrChoiceSdkPath')
+  private async handleLspError(error: unknown): Promise<void> {
+    this.getConsola().error(error)
+    const choiceSdkPath = this.translator.t('sdk.error.choiceSdkPathMasually')
+    const downloadOrChoiceSdkPath = this.translator.t('sdk.error.downloadOrChoiceSdkPath')
     const result = await vscode.window.showWarningMessage('OpenHarmony SDK Warning', {
       modal: true,
       detail: this.errorToDetail(error),
@@ -52,10 +75,10 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
         canSelectFiles: false,
         canSelectFolders: true,
         canSelectMany: false,
-        title: translator.t('sdk.error.choiceSdkPathMasually'),
+        title: this.translator.t('sdk.error.choiceSdkPathMasually'),
       }) || []
       if (!sdkPath) {
-        vscode.window.showErrorMessage(translator.t('sdk.error.validSdkPath'))
+        vscode.window.showErrorMessage(this.translator.t('sdk.error.validSdkPath'))
       }
       else {
         vscode.workspace.getConfiguration().update('ets.sdkPath', sdkPath.fsPath, vscode.ConfigurationTarget.Global)
@@ -66,29 +89,17 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
     }
   }
 
-  private static _lsp: EtsLanguageServer | undefined
-
-  private async startLanguageServer(translator: Translator, languageServer: EtsLanguageServer): Promise<LabsInfo> {
+  async run(): Promise<LabsInfo | undefined> {
     try {
-      EtsLanguageServer._lsp = languageServer
-
       // First start it will be return LabsInfo object for volar.js labs extension
-      const [labsInfo] = await EtsLanguageServer._lsp.start(undefined, true)
+      const [labsInfo] = await this.start(undefined, true)
       return labsInfo!
     }
     catch (error) {
-      this.handleLspError(error, translator)
-      EtsLanguageServer._lsp = undefined
-      throw error
+      this.handleLspError(error)
+      return undefined
     }
   }
-
-  run(): Promise<LabsInfo> {
-    return this.startLanguageServer(this.translator, this)
-  }
-
-  @Autowired
-  protected readonly translator: Translator
 
   /**
    * Get the server options for the ETS Language Server.
@@ -135,26 +146,6 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
         { language: 'typescript' },
       ],
       outputChannel: this.getOutputChannel(),
-      errorHandler: {
-        error: async (error, message, count) => {
-          this.getConsola().error(error)
-          this.getConsola().error(`Error message: ${message}`)
-          this.getConsola().error(`Error count: ${count}`)
-          return {
-            action: ErrorAction.Continue,
-            handled: true,
-            message: 'ETS Language Server error',
-          }
-        },
-        closed: () => {
-          this.getConsola().info('ETS Language Server closed!')
-          return {
-            action: CloseAction.DoNotRestart,
-            handled: true,
-            message: 'ETS Language Server closed!',
-          }
-        },
-      },
       initializationOptions: {
         typescript: { tsdk: tsdk!.tsdk },
         ohos: await sdkAnalyzer.toOhosClientOptions(force, tsdk?.tsdk),
@@ -171,7 +162,7 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
   }
 
   /** Configure the volar typescript plugin by `ClientOptions`. */
-  async configureTypeScriptPlugin(clientOptions: LanguageClientOptions): Promise<void> {
+  private async configureTypeScriptPlugin(clientOptions: LanguageClientOptions): Promise<void> {
     const typescriptLanguageFeatures = vscode.extensions.getExtension<TypescriptLanguageFeatures>('vscode.typescript-language-features')
     await typescriptLanguageFeatures?.activate()
     typescriptLanguageFeatures?.exports.getAPI?.(0)?.configurePlugin?.('ets-typescript-plugin', {
@@ -194,20 +185,24 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
     ])
     await this.configureTypeScriptPlugin(clientOptions)
 
-    // If the lsp is already started, restart the lsp
+    // If the lsp is already created, just restart the lsp
     if (this._client) {
-      await this._client.start()
+      this._client.start()
+      this._client.sendRequest('ets/waitForEtsConfigurationChangedRequested', clientOptions.initializationOptions)
       this.getConsola().info('ETS Language Server restarted!')
       vscode.window.setStatusBarMessage('ETS Language Server restarted!', 1000)
       return [undefined, clientOptions]
     }
+
+    // If the lsp is not created, create a new one
     this._client = new LanguageClient(
       'ets-language-server',
       'ETS Language Server',
       serverOptions,
       defu(overrideClientOptions, clientOptions),
     )
-    await this._client.start()
+    this._client.start()
+    this._client.sendRequest('ets/waitForEtsConfigurationChangedRequested', clientOptions.initializationOptions)
     this.listenAllLocalPropertiesFile()
     // support for auto close tag
     activateAutoInsertion('ets', this._client)
@@ -230,7 +225,6 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
     if (this._client) {
       await this._client.stop()
       this.watcher.removeAllListeners()
-      this._client.outputChannel.clear()
       this.getConsola().info('ETS Language Server stopped!')
       vscode.window.setStatusBarMessage('ETS Language Server stopped!', 1000)
     }
@@ -242,10 +236,10 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
    * @param overrideClientOptions The override client options.
    * @throws {SdkAnalyzerException} If the SDK path have any no right, it will throw an error.
    */
-  async restart(overrideClientOptions: LanguageClientOptions = {}): Promise<void> {
+  async restart(overrideClientOptions: LanguageClientOptions = {}, force: boolean = false): Promise<void> {
     await executeCommand('typescript.restartTsServer')
     await this.stop()
-    await this.start(overrideClientOptions)
+    await this.start(overrideClientOptions, force)
     const reloadWindow = this.translator.t('ets.language-server.restart.reloadWindow.button')
     const reloadWindowChoice = await vscode.window.showInformationMessage(
       this.translator.t('ets.language-server.restart.reloadWindow'),
@@ -255,13 +249,5 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
       await executeCommand('workbench.action.closeActiveEditor')
       await executeCommand('workbench.action.reloadWindow')
     }
-  }
-
-  async refresh(existingClientOptions?: LanguageClientOptions): Promise<void> {
-    const clientOptions = existingClientOptions || await this.getClientOptions(true) || {}
-    await this.getCurrentLanguageClient()?.sendNotification('workspace/didChangeConfiguration', {
-      settings: clientOptions.initializationOptions as EtsServerClientOptions,
-      configType: 'lspConfiguration',
-    })
   }
 }

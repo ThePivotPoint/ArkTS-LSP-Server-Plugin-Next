@@ -11,8 +11,6 @@ export abstract class LanguageServerContext extends AbstractWatcher {
   abstract stop(): Promise<void>
   /** Restart the language server. */
   abstract restart(): Promise<void>
-  /** Refresh the language server. */
-  abstract refresh(existingClientOptions?: LanguageClientOptions): Promise<void>
   /** Get the current language client. */
   abstract getCurrentLanguageClient(): LanguageClient | undefined
 
@@ -34,8 +32,8 @@ export abstract class LanguageServerContext extends AbstractWatcher {
       this.isFirstStart = false
       return
     }
-    this.getConsola().warn(`${path} is ${event.toUpperCase()}, refreshing ETS Language Server...`)
-    this.refresh()
+    this.getConsola().warn(`${path} is ${event.toUpperCase()}, restarting ETS Language Server...`)
+    this.restart()
   }
 
   /** Get the path of the Ohos SDK from `local.properties` file. */

@@ -1,19 +1,10 @@
 import type { FSWatcher } from 'chokidar'
-import type * as vscode from 'vscode'
-import type { Translator } from './translate'
 import { watch } from 'chokidar'
-import { Autowired } from 'unioc'
-import { Disposable, ExtensionContext } from 'unioc/vscode'
+import { Disposable } from 'unioc/vscode'
 import { FileSystem } from './fs/file-system'
 
 @Disposable
 export class AbstractWatcher extends FileSystem implements Disposable {
-  @Autowired(ExtensionContext)
-  protected readonly context: vscode.ExtensionContext
-
-  @Autowired
-  protected readonly translator: Translator
-
   private _watcher: FSWatcher | undefined
   private static readonly watchers: FSWatcher[] = []
 

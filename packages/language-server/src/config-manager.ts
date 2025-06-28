@@ -23,6 +23,7 @@ export class LanguageServerConfigManager {
       tsdk: '',
     },
     debug: false,
+    waitForEtsConfigurationChangedRequested: false,
   }
 
   setDebug(debug: boolean): this {
@@ -185,24 +186,24 @@ export class LanguageServerConfigManager {
     return this.locale
   }
 
-  setConfiguration(config: EtsServerClientOptions): this {
-    if (config.ohos.baseUrl)
+  setConfiguration(config: Partial<EtsServerClientOptions> = {}): this {
+    if (config.ohos?.baseUrl)
       this.setBaseUrl(config.ohos.baseUrl)
-    if (config.ohos.etsComponentPath)
+    if (config.ohos?.etsComponentPath)
       this.setEtsComponentPath(config.ohos.etsComponentPath)
-    if (config.ohos.etsLoaderConfigPath)
+    if (config.ohos?.etsLoaderConfigPath)
       this.setEtsLoaderConfigPath(config.ohos.etsLoaderConfigPath)
-    if (config.ohos.etsLoaderPath)
+    if (config.ohos?.etsLoaderPath)
       this.setEtsLoaderPath(config.ohos.etsLoaderPath)
-    if (config.ohos.lib)
+    if (config.ohos?.lib)
       this.setLib(config.ohos.lib)
-    if (config.ohos.paths)
+    if (config.ohos?.paths)
       this.setPaths(config.ohos.paths)
-    if (config.ohos.sdkPath)
+    if (config.ohos?.sdkPath)
       this.setSdkPath(config.ohos.sdkPath)
-    if (config.ohos.typeRoots)
+    if (config.ohos?.typeRoots)
       this.setTypeRoots(config.ohos.typeRoots)
-    if (config.typescript.tsdk)
+    if (config.typescript?.tsdk)
       this.setTypeScriptTsdk(config.typescript.tsdk)
     if (config.debug !== undefined)
       this.setDebug(config.debug)

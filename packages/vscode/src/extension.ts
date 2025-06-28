@@ -4,7 +4,7 @@ import type { LabsInfo } from '@volar/vscode'
 import type { ExtensionContext } from 'vscode'
 import path from 'node:path'
 import { extensionContext } from 'reactive-vscode'
-import { CommandPlugin, DisposablePlugin, LanguageProviderPlugin, VSCodeBootstrap } from 'unioc/vscode'
+import { CommandPlugin, DisposablePlugin, LanguageProviderPlugin, VSCodeBootstrap, WatchConfigurationPlugin } from 'unioc/vscode'
 import { useCompiledWebview } from './hook/compiled-webview'
 import { EtsLanguageServer } from './language-server'
 import './res/resource-provider'
@@ -15,12 +15,14 @@ class ArkTSExtension extends VSCodeBootstrap<Promise<LabsInfo | undefined>> {
     this.use(CommandPlugin)
     this.use(LanguageProviderPlugin)
     this.use(DisposablePlugin)
+    this.use(WatchConfigurationPlugin)
     extensionContext.value = context
   }
 
   async onActivate(context: ExtensionContext): Promise<LabsInfo | undefined> {
     useCompiledWebview(path.resolve(context.extensionPath, 'build', 'hilog.html'))
-    return (await this.getGlobalContainer().findOne<EtsLanguageServer>(EtsLanguageServer)?.resolve())?.run()
+    const etsLanguageServer = await this.getGlobalContainer().findOne<EtsLanguageServer>(EtsLanguageServer)?.resolve()
+    return etsLanguageServer?.run()
   }
 }
 
