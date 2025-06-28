@@ -1,0 +1,245 @@
+{
+  "properties": {
+    "compilerOptions": {
+      "properties": {
+        "ets": {
+          "type": "object",
+          "description": "OpenHarmony ETS (ArkTS) configuration.",
+          "properties": {
+            "render": {
+              "type": "object",
+              "description": "Rendering configuration for ETS components",
+              "properties": {
+                "method": {
+                  "type": "array",
+                  "description": "Render methods",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "decorator": {
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "description": "Render decorators",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "string",
+                      "description": "Render decorator"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "method",
+                "decorator"
+              ]
+            },
+            "components": {
+              "type": "array",
+              "description": "List of available components",
+              "items": {
+                "type": "string"
+              }
+            },
+            "libs": {
+              "type": "array",
+              "description": "List of available libraries",
+              "items": {
+                "type": "string"
+              }
+            },
+            "extend": {
+              "type": "object",
+              "description": "Extension configuration",
+              "properties": {
+                "decorator": {
+                  "type": "array",
+                  "description": "Extension decorators",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "components": {
+                  "type": "array",
+                  "description": "Extended components",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Component name"
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "Component type"
+                      },
+                      "instance": {
+                        "type": "string",
+                        "description": "Component instance"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "type",
+                      "instance"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "decorator",
+                "components"
+              ]
+            },
+            "styles": {
+              "type": "object",
+              "description": "Style configuration",
+              "properties": {
+                "decorator": {
+                  "type": "string",
+                  "description": "Style decorator"
+                },
+                "component": {
+                  "type": "object",
+                  "description": "Style component configuration",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Component name"
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "Component type"
+                    },
+                    "instance": {
+                      "type": "string",
+                      "description": "Component instance"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type",
+                    "instance"
+                  ]
+                },
+                "property": {
+                  "type": "string",
+                  "description": "Style property"
+                }
+              },
+              "required": [
+                "decorator",
+                "component",
+                "property"
+              ]
+            },
+            "concurrent": {
+              "type": "object",
+              "description": "Concurrent configuration",
+              "properties": {
+                "decorator": {
+                  "type": "string",
+                  "description": "Concurrent decorator"
+                }
+              },
+              "required": [
+                "decorator"
+              ]
+            },
+            "customComponent": {
+              "type": "string",
+              "description": "Custom component configuration"
+            },
+            "propertyDecorators": {
+              "type": "array",
+              "description": "Property decorators configuration",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Decorator name"
+                  },
+                  "needInitialization": {
+                    "type": "boolean",
+                    "description": "Whether initialization is needed"
+                  }
+                },
+                "required": [
+                  "name",
+                  "needInitialization"
+                ]
+              }
+            },
+            "emitDecorators": {
+              "type": "array",
+              "description": "Emit decorators configuration",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Decorator name"
+                  },
+                  "emitParameters": {
+                    "type": "boolean",
+                    "description": "Whether to emit parameters"
+                  }
+                },
+                "required": [
+                  "name",
+                  "emitParameters"
+                ]
+              }
+            },
+            "syntaxComponents": {
+              "type": "object",
+              "description": "Syntax components configuration",
+              "properties": {
+                "paramsUICallback": {
+                  "type": "array",
+                  "description": "Parameters UI callback configuration",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "attrUICallback": {
+                  "type": "array",
+                  "description": "Attribute UI callback configuration",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Callback name"
+                      },
+                      "attributes": {
+                        "type": "array",
+                        "description": "Attributes list",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "attributes"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "paramsUICallback",
+                "attrUICallback"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
