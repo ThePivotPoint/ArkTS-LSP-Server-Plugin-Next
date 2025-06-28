@@ -2,19 +2,19 @@
 // @see https://github.com/antfu/vscode-ext-gen
 
 // Meta info
-export const publisher = 'NailyZero'
-export const name = 'vscode-naily-ets'
-export const version = '1.0.3'
-export const displayName = 'Naily\'s ArkTS Support'
-export const description = '自用ArkTS扩展,支持代码跳转,欢迎PR! Naily\'s ArkTS Support.'
+export const publisher = "NailyZero"
+export const name = "vscode-naily-ets"
+export const version = "1.0.10"
+export const displayName = "Naily's ArkTS Support"
+export const description = "自用ArkTS扩展,支持代码跳转,欢迎PR! Naily's ArkTS Support."
 export const extensionId = `${publisher}.${name}`
 
 /**
  * Type union of all commands
  */
-export type CommandKey =
-  | 'ets.restartServer'
-  | 'ets.installSDK'
+export type CommandKey = 
+  | "ets.restartServer"
+  | "ets.installSDK"
 
 /**
  * Commands map registed by `NailyZero.vscode-naily-ets`
@@ -24,44 +24,49 @@ export const commands = {
    * %command.restartServer%
    * @value `ets.restartServer`
    */
-  etsRestartServer: 'ets.restartServer',
+  etsRestartServer: "ets.restartServer",
   /**
    * %command.installSDK%
    * @value `ets.installSDK`
    */
-  etsInstallSDK: 'ets.installSDK',
+  etsInstallSDK: "ets.installSDK",
 } satisfies Record<string, CommandKey>
 
 /**
  * Type union of all configs
  */
-export type ConfigKey =
-  | 'ets.sdkPath'
-  | 'ets.baseSdkPath'
-  | 'ets.lspDebugMode'
+export type ConfigKey = 
+  | "ets.sdkPath"
+  | "ets.baseSdkPath"
+  | "ets.lspDebugMode"
+  | "ets.sdkList"
 
 export interface ConfigKeyTypeMap {
-  'ets.sdkPath': string
-  'ets.baseSdkPath': string
-  'ets.lspDebugMode': boolean
+  "ets.sdkPath": string,
+  "ets.baseSdkPath": string,
+  "ets.lspDebugMode": boolean,
+  "ets.sdkList": { 'API10'?: string; 'API11'?: string; 'API12'?: string; 'API13'?: string; 'API14'?: string; 'API15'?: string; 'API18'?: string },
 }
 
 export interface ConfigShorthandMap {
-  etsSdkPath: 'ets.sdkPath'
-  etsBaseSdkPath: 'ets.baseSdkPath'
-  etsLspDebugMode: 'ets.lspDebugMode'
+  etsSdkPath: "ets.sdkPath",
+  etsBaseSdkPath: "ets.baseSdkPath",
+  etsLspDebugMode: "ets.lspDebugMode",
+  etsSdkList: "ets.sdkList",
 }
 
 export interface ConfigShorthandTypeMap {
-  etsSdkPath: string
-  etsBaseSdkPath: string
-  etsLspDebugMode: boolean
+  etsSdkPath: string,
+  etsBaseSdkPath: string,
+  etsLspDebugMode: boolean,
+  etsSdkList: { 'API10'?: string; 'API11'?: string; 'API12'?: string; 'API13'?: string; 'API14'?: string; 'API15'?: string; 'API18'?: string },
 }
 
 export interface ConfigItem<T extends keyof ConfigKeyTypeMap> {
-  key: T
-  default: ConfigKeyTypeMap[T]
+  key: T,
+  default: ConfigKeyTypeMap[T],
 }
+
 
 /**
  * Configs map registered by `NailyZero.vscode-naily-ets`
@@ -74,9 +79,9 @@ export const configs = {
    * @type `string`
    */
   etsSdkPath: {
-    key: 'ets.sdkPath',
-    default: '',
-  } as ConfigItem<'ets.sdkPath'>,
+    key: "ets.sdkPath",
+    default: "",
+  } as ConfigItem<"ets.sdkPath">,
   /**
    * %configuration.ets.baseSdkPath.description%
    * @key `ets.baseSdkPath`
@@ -84,9 +89,9 @@ export const configs = {
    * @type `string`
    */
   etsBaseSdkPath: {
-    key: 'ets.baseSdkPath',
-    default: '${os.homedir}/OpenHarmony',
-  } as ConfigItem<'ets.baseSdkPath'>,
+    key: "ets.baseSdkPath",
+    default: "${os.homedir}/OpenHarmony",
+  } as ConfigItem<"ets.baseSdkPath">,
   /**
    * %configuration.ets.lspDebugMode.description%
    * @key `ets.lspDebugMode`
@@ -94,27 +99,39 @@ export const configs = {
    * @type `boolean`
    */
   etsLspDebugMode: {
-    key: 'ets.lspDebugMode',
+    key: "ets.lspDebugMode",
     default: false,
-  } as ConfigItem<'ets.lspDebugMode'>,
+  } as ConfigItem<"ets.lspDebugMode">,
+  /**
+   * A list of installed OpenHarmony SDK paths. Keys should follow the pattern API[number] (e.g., API9, API10).
+   * @key `ets.sdkList`
+   * @default `{}`
+   * @type `object`
+   */
+  etsSdkList: {
+    key: "ets.sdkList",
+    default: {},
+  } as ConfigItem<"ets.sdkList">,
 }
 
 export interface ScopedConfigKeyTypeMap {
 }
 
 export const scopedConfigs = {
-  scope: 'vscode-naily-ets',
+  scope: "vscode-naily-ets",
   defaults: {
   } satisfies ScopedConfigKeyTypeMap,
 }
 
 export interface NestedConfigs {
-  ets: {
-    sdkPath: string
-    baseSdkPath: string
-    lspDebugMode: boolean
-  }
+  "ets": {
+    "sdkPath": string,
+    "baseSdkPath": string,
+    "lspDebugMode": boolean,
+    "sdkList": { 'API10'?: string; 'API11'?: string; 'API12'?: string; 'API13'?: string; 'API14'?: string; 'API15'?: string; 'API18'?: string },
+  },
 }
 
 export interface NestedScopedConfigs {
 }
+

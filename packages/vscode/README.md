@@ -43,11 +43,12 @@ PR地址: [https://github.com/material-extensions/vscode-material-icon-theme/pul
 
 <!-- configs -->
 
-| Key                | Description                                  | Type      | Default                       |
-| ------------------ | -------------------------------------------- | --------- | ----------------------------- |
-| `ets.sdkPath`      | %configuration.ets.sdkPath.description%      | `string`  | `""`                          |
-| `ets.baseSdkPath`  | %configuration.ets.baseSdkPath.description%  | `string`  | `"${os.homedir}/OpenHarmony"` |
-| `ets.lspDebugMode` | %configuration.ets.lspDebugMode.description% | `boolean` | `false`                       |
+| Key                | Description                                                                                                | Type      | Default                       |
+| ------------------ | ---------------------------------------------------------------------------------------------------------- | --------- | ----------------------------- |
+| `ets.sdkPath`      | %configuration.ets.sdkPath.description%                                                                    | `string`  | `""`                          |
+| `ets.baseSdkPath`  | %configuration.ets.baseSdkPath.description%                                                                | `string`  | `"${os.homedir}/OpenHarmony"` |
+| `ets.lspDebugMode` | %configuration.ets.lspDebugMode.description%                                                               | `boolean` | `false`                       |
+| `ets.sdkList`      | A list of installed OpenHarmony SDK paths. Keys should follow the pattern API[number] (e.g., API9, API10). | `object`  | `{}`                          |
 
 <!-- configs -->
 

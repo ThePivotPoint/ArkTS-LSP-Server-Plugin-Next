@@ -20,7 +20,7 @@ export class AbstractWatcher extends FileSystem implements Disposable {
     await Promise.all(AbstractWatcher.watchers.map(watcher => watcher.close()))
   }
 
-  protected async [Symbol.asyncDispose](): Promise<void> {
+  async [Symbol.asyncDispose](): Promise<void> {
     await this.dispose()
   }
 }
