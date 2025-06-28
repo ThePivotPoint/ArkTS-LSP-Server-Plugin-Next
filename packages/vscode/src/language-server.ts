@@ -41,21 +41,21 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
       return
     if (!this.getCurrentLanguageClient()?.isRunning()) {
       this.getConsola().info(`[underwrite] sdk path changed, start language server...`)
-      return await this.run()
+      return this.run()
     }
 
     try {
-      await sleep(1000)
+      await sleep(100)
       await this.restart(undefined, true).catch(e => this.handleLspError(e))
       const clientOptions = await this.getClientOptions(true)
-      await this.getCurrentLanguageClient()?.sendRequest('ets/configurationChanged', clientOptions.initializationOptions)
+      this.getCurrentLanguageClient()?.sendRequest('ets/configurationChanged', clientOptions.initializationOptions)
     }
     catch (error) {
       this.handleLspError(error)
     }
   }
 
-  private errorToDetail(error: unknown): string {
+  private errorToString(error: unknown): string {
     if (error instanceof Error || (error && typeof error === 'object' && 'message' in error))
       return `${error.message} ${'code' in error ? `[${error.code}]` : ''}`
     return `${typeof error === 'string' || typeof error === 'number' || typeof error === 'boolean' ? error : JSON.stringify(error)}`
@@ -65,10 +65,13 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
     this.getConsola().error(error)
     const choiceSdkPath = this.translator.t('sdk.error.choiceSdkPathMasually')
     const downloadOrChoiceSdkPath = this.translator.t('sdk.error.downloadOrChoiceSdkPath')
-    const result = await vscode.window.showWarningMessage('OpenHarmony SDK Warning', {
-      modal: true,
-      detail: this.errorToDetail(error),
-    }, choiceSdkPath, downloadOrChoiceSdkPath)
+    const detail = this.errorToString(error)
+    const result = await vscode.window.showWarningMessage(
+      'OpenHarmony SDK Warning',
+      { modal: true, detail },
+      choiceSdkPath,
+      downloadOrChoiceSdkPath,
+    );
 
     if (result === choiceSdkPath) {
       const [sdkPath] = await vscode.window.showOpenDialog({

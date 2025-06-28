@@ -9,6 +9,7 @@ import { useCompiledWebview } from './hook/compiled-webview'
 import { EtsLanguageServer } from './language-server'
 import './res/resource-provider'
 import './sdk/sdk-guesser'
+import type { IClassWrapper } from 'unioc'
 
 class ArkTSExtension extends VSCodeBootstrap<Promise<LabsInfo | undefined>> {
   beforeInitialize(context: ExtensionContext): Promise<void> | void {
@@ -21,8 +22,12 @@ class ArkTSExtension extends VSCodeBootstrap<Promise<LabsInfo | undefined>> {
 
   async onActivate(context: ExtensionContext): Promise<LabsInfo | undefined> {
     useCompiledWebview(path.resolve(context.extensionPath, 'build', 'hilog.html'))
-    const etsLanguageServer = await this.getGlobalContainer().findOne<EtsLanguageServer>(EtsLanguageServer)?.resolve()
-    return etsLanguageServer?.run()
+    const runResult = await (this.getGlobalContainer()
+      .findOne(EtsLanguageServer) as IClassWrapper<typeof EtsLanguageServer> | undefined)
+      ?.getClassExecutor()
+      .execute({ methodName: 'run', arguments: [] })
+    if (runResult?.type === 'result')
+      return await runResult.value
   }
 }
 
