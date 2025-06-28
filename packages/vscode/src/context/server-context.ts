@@ -1,6 +1,7 @@
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClient } from '@volar/vscode/node'
 import type { LanguageClientOptions } from '@volar/vscode/node'
+import type { TypescriptLanguageFeatures } from 'packages/shared/out/index.mjs'
 import * as vscode from 'vscode'
 import { AbstractWatcher } from '../abstract-watcher'
 
@@ -67,5 +68,15 @@ export abstract class LanguageServerContext extends AbstractWatcher {
     this.getConsola().info(`Analyzed OHOS SDK path: ${sdkPath}`)
     this._analyzedSdkPath = sdkPath as string | undefined
     return this._analyzedSdkPath
+  }
+
+  /** Configure the volar typescript plugin by `ClientOptions`. */
+  protected async configureTypeScriptPlugin(clientOptions: LanguageClientOptions): Promise<void> {
+    const typescriptLanguageFeatures = vscode.extensions.getExtension<TypescriptLanguageFeatures>('vscode.typescript-language-features')
+    await typescriptLanguageFeatures?.activate()
+    typescriptLanguageFeatures?.exports.getAPI?.(0)?.configurePlugin?.('ets-typescript-plugin', {
+      workspaceFolder: this.getCurrentWorkspaceDir()?.fsPath,
+      lspOptions: clientOptions.initializationOptions,
+    })
   }
 }

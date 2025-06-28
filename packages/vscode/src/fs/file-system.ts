@@ -15,11 +15,7 @@ export class FileSystem extends ExtensionLogger {
     const workspaceFolders = vscode.workspace.workspaceFolders
     if (!workspaceFolders)
       return undefined
-    const workspaceName = vscode.workspace.name
-    const workspaceFolder = workspaceFolders.find(folder => folder.name === workspaceName)
-    if (!workspaceFolder)
-      return undefined
-    return workspaceFolder.uri
+    return workspaceFolders[0]?.uri
   }
 
   /**

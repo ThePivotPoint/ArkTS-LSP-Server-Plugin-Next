@@ -1,4 +1,4 @@
-import type { EtsServerClientOptions, TypescriptLanguageFeatures } from '@arkts/shared'
+import type { EtsServerClientOptions } from '@arkts/shared'
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClientOptions, ServerOptions } from '@volar/vscode/node'
 import * as serverProtocol from '@volar/language-server/protocol'
@@ -12,15 +12,7 @@ import * as vscode from 'vscode'
 import { LanguageServerContext } from './context/server-context'
 import { SdkAnalyzer } from './sdk/sdk-analyzer'
 import { Translator } from './translate'
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    const timer = setTimeout(() => {
-      clearTimeout(timer)
-      resolve()
-    }, ms)
-  })
-}
+import { sleep } from './utils'
 
 @Disposable
 @Command('ets.restartServer')
@@ -45,10 +37,9 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
     }
 
     try {
+      // Wait the workspace/configurationChanged event send, then restart the language server
       await sleep(100)
       await this.restart(undefined, true).catch(e => this.handleLspError(e))
-      const clientOptions = await this.getClientOptions(true)
-      this.getCurrentLanguageClient()?.sendRequest('ets/configurationChanged', clientOptions.initializationOptions)
     }
     catch (error) {
       this.handleLspError(error)
@@ -71,7 +62,7 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
       { modal: true, detail },
       choiceSdkPath,
       downloadOrChoiceSdkPath,
-    );
+    )
 
     if (result === choiceSdkPath) {
       const [sdkPath] = await vscode.window.showOpenDialog({
@@ -162,16 +153,6 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
 
   getCurrentLanguageClient(): LanguageClient | undefined {
     return this._client
-  }
-
-  /** Configure the volar typescript plugin by `ClientOptions`. */
-  private async configureTypeScriptPlugin(clientOptions: LanguageClientOptions): Promise<void> {
-    const typescriptLanguageFeatures = vscode.extensions.getExtension<TypescriptLanguageFeatures>('vscode.typescript-language-features')
-    await typescriptLanguageFeatures?.activate()
-    typescriptLanguageFeatures?.exports.getAPI?.(0)?.configurePlugin?.('ets-typescript-plugin', {
-      workspaceFolder: this.getCurrentWorkspaceDir()?.fsPath,
-      lspOptions: clientOptions.initializationOptions,
-    })
   }
 
   /**
