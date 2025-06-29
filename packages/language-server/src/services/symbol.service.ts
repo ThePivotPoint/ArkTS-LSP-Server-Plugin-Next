@@ -1,5 +1,6 @@
 import type { Range } from '@volar/language-server'
 import type { TextDocument } from 'vscode-languageserver-textdocument'
+import { typeAssert } from '@arkts/shared'
 import { type DocumentSymbol, type LanguageServicePlugin, SymbolKind } from '@volar/language-server'
 import * as ets from 'ohos-typescript'
 import { URI } from 'vscode-uri'
@@ -45,26 +46,44 @@ function toRange(textSpan: ets.TextSpan, document: TextDocument): Range {
   }
 }
 
-function getSymbolTree(item: ets.NavigationTree, document: TextDocument): DocumentSymbol {
+function deepRemoveFalsyValue(documentSymbol: DocumentSymbol): DocumentSymbol | undefined {
+  for (const key in documentSymbol) {
+    typeAssert<keyof typeof documentSymbol>(key)
+    if (key === 'name' && !documentSymbol[key])
+      return undefined
+  }
+
+  return {
+    ...documentSymbol,
+    children: documentSymbol.children?.map(child => deepRemoveFalsyValue(child))
+      .filter(child => child !== undefined) || [],
+  }
+}
+
+function getSymbolTree(item: ets.NavigationTree, document: TextDocument): DocumentSymbol | undefined {
   if (item.spans.length === 0) {
-    return {
+    return deepRemoveFalsyValue({
       name: (item.text || '').replace(/["'`]/g, ''),
       kind: convertSymbolKind(item.kind),
       range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
       selectionRange: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
       detail: item.kindModifiers,
-      children: (item.childItems || []).map(item => getSymbolTree(item, document)),
-    }
+      children: (item.childItems || [])
+        .map(item => getSymbolTree(item, document))
+        .filter(child => child !== undefined),
+    })
   }
 
-  return {
+  return deepRemoveFalsyValue({
     name: item.text.replace(/["'`]/g, ''),
     kind: convertSymbolKind(item.kind),
     range: toRange(item.spans[0], document),
     selectionRange: toRange(item.spans[0], document),
     detail: item.kindModifiers,
-    children: (item.childItems || []).map(item => getSymbolTree(item, document)),
-  }
+    children: (item.childItems || [])
+      .map(item => getSymbolTree(item, document))
+      .filter(child => child !== undefined),
+  })
 }
 
 export function createETSDocumentSymbolService(): LanguageServicePlugin {
@@ -92,10 +111,9 @@ export function createETSDocumentSymbolService(): LanguageServicePlugin {
           if (!documentUri.fsPath.endsWith('.ets'))
             return []
 
-          const items: DocumentSymbol[] = []
           const navigationBarItems = languageService.getNavigationTree(documentUri.fsPath)
-          navigationBarItems.childItems?.forEach(item => items.push(getSymbolTree(item, document)))
-          return items
+          return navigationBarItems.childItems?.map(item => getSymbolTree(item, document))
+            .filter(item => item !== undefined) || []
         },
       }
     },
