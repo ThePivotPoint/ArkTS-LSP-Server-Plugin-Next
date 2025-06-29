@@ -29,7 +29,7 @@
   - `resources/element/`下所有的`color.json`等的kv值配置
   - `main_pages.json5`
 - 📦 1.x版本开始支持安装和管理`OpenHarmony SDK`，并且支持根据当前打开的项目自动探测`API版本`，发出弹窗提示`下载`或`切换`
-- ✨ 1.x版本开始支持`.ets`文件的代码格式化
+- ✨ 1.x版本开始支持`.ets`文件的`代码格式化`和`大纲`展示功能
 - 🆓 `$r`，`$rawfile` 补全、代码格式化、`hilog`日志等功能正在计划支持的路上，欢迎PR👀
 
 ## VSCode 文件图标包 🖼️
