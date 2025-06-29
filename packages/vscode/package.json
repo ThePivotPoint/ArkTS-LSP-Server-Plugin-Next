@@ -61,16 +61,16 @@
         "fileMatch": "code-linter.json5",
         "url": "./schemas/code-linter.schema.json"
       },
-			{
+      {
         "fileMatch": [
-					"tsconfig.json",
-					"tsconfig.*.json",
-					"tsconfig-*.json",
-					"jsconfig.json",
-					"jsconfig.*.json",
-					"jsconfig-*.json"
-				],
-				"url": "./schemas/ets-tsconfig.schema.json"
+          "tsconfig.json",
+          "tsconfig.*.json",
+          "tsconfig-*.json",
+          "jsconfig.json",
+          "jsconfig.*.json",
+          "jsconfig-*.json"
+        ],
+        "url": "./schemas/ets-tsconfig.schema.json"
       }
     ],
     "languages": [

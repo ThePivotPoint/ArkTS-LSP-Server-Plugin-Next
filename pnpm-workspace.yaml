@@ -25,6 +25,8 @@ catalogs:
     '@antfu/eslint-config': latest
     eslint: latest
     oxlint: ^0.17.0
+  polyfill:
+    reflect-metadata: ^0.2.2
   prod:
     '@arkts/sdk-downloader': ^0.1.20
     '@types/lodash': ^4.17.17
@@ -62,8 +64,6 @@ catalogs:
     pnpm: ^10.11.1
     simple-git-hooks: ^2.13.0
     tsx: ^4.19.4
-  polyfill:
-    reflect-metadata: ^0.2.2
 onlyBuiltDependencies:
   - '@swc/core'
   - '@vscode/vsce-sign'

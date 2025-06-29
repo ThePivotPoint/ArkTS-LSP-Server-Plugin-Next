@@ -24,7 +24,7 @@ class ArkTSExtension extends VSCodeBootstrap<Promise<LabsInfo | undefined>> {
     useCompiledWebview(path.resolve(context.extensionPath, 'build', 'hilog.html'))
     const globalContainer = this.getGlobalContainer()
     const languageServer = globalContainer.findOne(EtsLanguageServer) as IClassWrapper<typeof EtsLanguageServer> | undefined
-    const runResult = await languageServer?.getClassExecutor().execute({ 
+    const runResult = await languageServer?.getClassExecutor().execute({
       methodName: 'run',
       arguments: [],
     })
