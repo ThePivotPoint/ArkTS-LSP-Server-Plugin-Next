@@ -13,6 +13,7 @@ export default defineConfig({
   entry: {
     'dist/client': './src/extension.ts',
     'dist/server': '../language-server/src/index.ts',
+    'dist/proxy-server': '../language-server/src/proxy-server.ts',
     'node_modules/ets-typescript-plugin/index': '../typescript-plugin/src/index.ts',
   },
   format: 'cjs',

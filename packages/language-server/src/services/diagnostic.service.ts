@@ -16,9 +16,6 @@ export function createETSLinterDiagnosticService(ets: typeof import('ohos-typesc
       },
     },
     create(context) {
-      if (!context.project.typescript?.languageServiceHost)
-        return {}
-
       const languageServiceHost = context.inject<TSProvider>('typescript/languageServiceHost')
       if (!languageServiceHost)
         return {}

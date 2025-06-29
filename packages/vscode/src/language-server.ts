@@ -7,7 +7,7 @@ import { LanguageClient, TransportKind } from '@volar/vscode/node'
 import defu from 'defu'
 import { executeCommand } from 'reactive-vscode'
 import { Autowired } from 'unioc'
-import { Command, Disposable, ExtensionContext, WatchConfiguration } from 'unioc/vscode'
+import { Command, Disposable, ExtensionContext, IOnActivate, WatchConfiguration } from 'unioc/vscode'
 import * as vscode from 'vscode'
 import { LanguageServerContext } from './context/server-context'
 import { SdkAnalyzer } from './sdk/sdk-analyzer'
@@ -16,7 +16,7 @@ import { sleep } from './utils'
 
 @Disposable
 @Command('ets.restartServer')
-export class EtsLanguageServer extends LanguageServerContext implements Command, Disposable {
+export class EtsLanguageServer extends LanguageServerContext implements Command, Disposable, vscode.DocumentFormattingEditProvider, IOnActivate {
   @Autowired
   protected readonly translator: Translator
 
@@ -25,6 +25,22 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
 
   onExecuteCommand(): void {
     this.restart().catch(e => this.handleLspError(e))
+  }
+
+  onActivate(context: vscode.ExtensionContext): void {
+    context.subscriptions.push(
+      vscode.languages.registerDocumentFormattingEditProvider(
+        { scheme: 'file', language: 'ets' },
+        this,
+      ),
+    )
+  }
+
+  async provideDocumentFormattingEdits(textDocument: vscode.TextDocument, options: vscode.FormattingOptions): Promise<vscode.TextEdit[]> {
+    return await this.getCurrentLanguageClient()?.sendRequest('ets/formatDocument', {
+      textDocument,
+      options,
+    }) || []
   }
 
   @WatchConfiguration()
@@ -221,6 +237,7 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
    * @throws {SdkAnalyzerException} If the SDK path have any no right, it will throw an error.
    */
   async restart(overrideClientOptions: LanguageClientOptions = {}, force: boolean = false): Promise<void> {
+    this.getConsola().info(`======================= Restarting ETS Language Server =======================`)
     await executeCommand('typescript.restartTsServer')
     await this.stop()
     await this.start(overrideClientOptions, force)
