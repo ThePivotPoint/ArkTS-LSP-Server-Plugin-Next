@@ -28,7 +28,8 @@ export class Translator {
     this.localeFiles = fs.readdirSync(this.localeFolder)
       .filter(file => file.endsWith('.json') && file.startsWith('package.nls'))
       .map((fileName) => {
-        const fileLocale = fileName.replace('package.nls.', '').replace('.json', '')
+        const match = fileName.match(/^package\.nls(?:\.([^.]+))?\.json$/)
+        const fileLocale = (match?.[1] || 'en').toLowerCase()
         const fileContent = JSON.parse(fs.readFileSync(path.join(this.localeFolder, fileName), 'utf-8'))
 
         return {
@@ -39,8 +40,9 @@ export class Translator {
   }
 
   public t<TKey extends string>(key: TKey, options: TOptions = {}): string {
-    const locale = vscode.env.language
-    const localeFile = this.localeFiles.find(file => file.locale === locale)
+    const locale = vscode.env.language.toLowerCase()
+    // Try to match the current locale; if not found, fall back to default English locale
+    const localeFile = this.localeFiles.find(file => file.locale === locale) ?? this.localeFiles.find(file => file.locale === 'en')
     if (!localeFile)
       return key
     const value = get(localeFile.content, key)
