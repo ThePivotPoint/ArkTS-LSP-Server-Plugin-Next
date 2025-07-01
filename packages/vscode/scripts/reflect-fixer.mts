@@ -2,8 +2,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import MagicString from 'magic-string'
 import { parseAndWalk } from 'oxc-walker'
+import { fileURLToPath } from "node:url";
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname)
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const distFilePath = path.join(__dirname, '../dist/client.js')
 const content = fs.readFileSync(distFilePath, 'utf-8')
