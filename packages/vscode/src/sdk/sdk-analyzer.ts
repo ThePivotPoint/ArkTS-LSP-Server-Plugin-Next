@@ -148,9 +148,9 @@ export class SdkAnalyzer {
         // '/Users/naily/OpenHarmony/10/lib.decorators.legacy.d.ts',
         // '/Users/naily/OpenHarmony/10/lib.es5.d.ts',
         ...fg.sync([
-          vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ts').fsPath,
-          vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ets').fsPath,
-          vscode.Uri.joinPath(etsLoaderPath, 'declarations', '**', 'global.d.ts').fsPath,
+          fg.convertPathToPattern(vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ts').fsPath),
+          fg.convertPathToPattern(vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ets').fsPath),
+          fg.convertPathToPattern(vscode.Uri.joinPath(etsLoaderPath, 'declarations', '**', 'global.d.ts').fsPath),
         ], { onlyFiles: true, absolute: true }),
       ].filter(Boolean) as string[],
       typeRoots: [
