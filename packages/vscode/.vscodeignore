@@ -6,3 +6,4 @@ dist/*.map
 *.vsix
 shims.d.ts
 hilog.html
+scripts/

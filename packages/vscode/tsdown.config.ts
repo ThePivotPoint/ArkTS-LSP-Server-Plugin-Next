@@ -18,11 +18,15 @@ export default defineConfig({
   },
   format: 'cjs',
   sourcemap: isDev,
-  external: ['vscode', '@aws-sdk/client-s3', 'reflect-metadata'],
+  external: ['vscode', '@aws-sdk/client-s3'],
   tsconfig: './tsconfig.json',
   platform: 'node',
   clean: false,
-  minify: !isDev,
+  minify: {
+    mangle: false,
+    compress: !isDev,
+    removeWhitespace: !isDev,
+  },
   outDir: '.',
   env: {
     NODE_ENV: 'production',
@@ -36,7 +40,7 @@ export default defineConfig({
   outputOptions: {
     chunkFileNames: `dist/[name].js`,
   },
-  onSuccess: 'vite build',
+  onSuccess: 'vite build && tsx ./scripts/reflect-fixer.mts',
   alias: {
     '@arkts/shared': path.join(process.cwd(), '../shared/src/index.ts'),
     '@arkts/shared/vscode': path.join(process.cwd(), '../shared/src/vscode.ts'),
@@ -45,6 +49,7 @@ export default defineConfig({
   watch: isDev
     ? [
         './src',
+        './scripts',
         '../language-server/src',
         '../typescript-plugin/src',
         '../language-plugin/src',
