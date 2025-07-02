@@ -33,17 +33,17 @@
     "@changesets/changelog-github": "catalog:scripts",
     "@changesets/cli": "catalog:scripts",
     "@release-it/bumper": "catalog:scripts",
-    "@types/hbs": "^4.0.5",
     "@types/lodash": "catalog:prod",
     "@types/node": "catalog:dev",
     "@types/unzipper": "catalog:prod",
     "consola": "catalog:prod",
     "cross-env": "catalog:scripts",
+    "defu": "catalog:prod",
     "eslint": "catalog:lint",
     "lodash": "catalog:prod",
     "magic-string": "^0.30.17",
-    "oxc-parser": "^0.75.0",
-    "oxc-walker": "^0.3.0",
+    "oxc-parser": "catalog:scripts",
+    "oxc-walker": "catalog:scripts",
     "oxlint": "catalog:lint",
     "pnpm": "catalog:scripts",
     "reactive-vscode": "catalog:dev",
@@ -54,6 +54,7 @@
     "typescript": "catalog:prod",
     "unzipper": "catalog:prod",
     "vscode-ext-gen": "catalog:dev",
+    "vscode-languageserver-textdocument": "catalog:prod",
     "vscode-nls": "catalog:prod"
   }
 }

@@ -228,7 +228,6 @@
     "chokidar": "catalog:prod",
     "extract-zip": "catalog:prod",
     "fast-glob": "catalog:dev",
-    "hbs": "catalog:prod",
     "json5": "catalog:prod",
     "kleur": "catalog:prod",
     "ovsx": "catalog:scripts",
