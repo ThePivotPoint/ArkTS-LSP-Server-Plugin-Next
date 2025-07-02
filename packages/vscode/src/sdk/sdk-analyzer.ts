@@ -2,6 +2,7 @@ import type { OhosClientOptions } from '@arkts/shared'
 import type { FileSystem } from '../fs/file-system'
 import type { Translator } from '../translate'
 import path from 'node:path'
+import process from 'node:process'
 import fg from 'fast-glob'
 import * as vscode from 'vscode'
 import { SdkAnalyzerException } from './sdk-analyzer-exception'
@@ -139,19 +140,26 @@ export class SdkAnalyzer {
       'lib.es2020.string.d.ts',
       'lib.es2020.symbol.wellknown.d.ts',
     ]
+
+    const declarationsLib = process.platform === 'win32'
+      ? [
+          fg.convertPathToPattern(vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ts').fsPath),
+          fg.convertPathToPattern(vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ets').fsPath),
+          fg.convertPathToPattern(vscode.Uri.joinPath(etsLoaderPath, 'declarations', '**', 'global.d.ts').fsPath),
+        ]
+      : [
+          vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ts').fsPath,
+          vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ets').fsPath,
+          vscode.Uri.joinPath(etsLoaderPath, 'declarations', '**', 'global.d.ts').fsPath,
+        ]
+
     return {
       sdkPath: sdkPath.fsPath,
       etsComponentPath: etsComponentPath.fsPath,
       etsLoaderConfigPath: etsLoaderConfigPath.fsPath,
       lib: [
         ...(tsdk ? typescriptDefaultLibs.map(lib => path.join(tsdk, lib)) : []),
-        // '/Users/naily/OpenHarmony/10/lib.decorators.legacy.d.ts',
-        // '/Users/naily/OpenHarmony/10/lib.es5.d.ts',
-        ...fg.sync([
-          vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ts').fsPath,
-          vscode.Uri.joinPath(etsComponentPath, '**', '*.d.ets').fsPath,
-          vscode.Uri.joinPath(etsLoaderPath, 'declarations', '**', 'global.d.ts').fsPath,
-        ], { onlyFiles: true, absolute: true }),
+        ...fg.sync(declarationsLib, { onlyFiles: true, absolute: true }),
       ].filter(Boolean) as string[],
       typeRoots: [
         workspaceFolder ? vscode.Uri.joinPath(workspaceFolder, 'node_modules', '@types').fsPath : undefined,
