@@ -223,6 +223,7 @@
     "@types/vscode": "^1.82.0",
     "@volar/language-server": "catalog:prod",
     "@volar/vscode": "catalog:prod",
+    "@vscode/l10n": "catalog:prod",
     "@vscode/vsce": "catalog:scripts",
     "axios": "catalog:prod",
     "chokidar": "catalog:prod",

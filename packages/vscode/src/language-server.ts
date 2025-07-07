@@ -27,7 +27,11 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
     this.restart().catch(e => this.handleLspError(e))
   }
 
-  onActivate(context: vscode.ExtensionContext): void {
+  constructor() {
+    super()
+  }
+
+  async onActivate(context: vscode.ExtensionContext): Promise<void> {
     context.subscriptions.push(
       vscode.languages.registerDocumentFormattingEditProvider(
         { scheme: 'file', language: 'ets' },

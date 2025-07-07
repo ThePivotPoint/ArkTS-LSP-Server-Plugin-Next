@@ -89,6 +89,9 @@ catalogs:
     '@volar/vscode':
       specifier: ~2.4.0
       version: 2.4.14
+    '@vscode/l10n':
+      specifier: ^0.0.18
+      version: 0.0.18
     axios:
       specifier: ^1.9.0
       version: 1.9.0
@@ -540,6 +543,9 @@ importers:
       '@volar/vscode':
         specifier: catalog:prod
         version: 2.4.14
+      '@vscode/l10n':
+        specifier: catalog:prod
+        version: 0.0.18
       '@vscode/vsce':
         specifier: catalog:scripts
         version: 3.6.0
