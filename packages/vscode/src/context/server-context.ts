@@ -1,6 +1,5 @@
 import type { LabsInfo } from '@volar/vscode'
-import type { LanguageClient } from '@volar/vscode/node'
-import type { LanguageClientOptions } from '@volar/vscode/node'
+import type { LanguageClient, LanguageClientOptions } from '@volar/vscode/node'
 import type { TypescriptLanguageFeatures } from 'packages/shared/out/index.mjs'
 import * as vscode from 'vscode'
 import { AbstractWatcher } from '../abstract-watcher'

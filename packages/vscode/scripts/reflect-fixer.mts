@@ -1,8 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import MagicString from 'magic-string'
 import { parseAndWalk } from 'oxc-walker'
-import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

@@ -22,7 +22,6 @@ export class Translator implements IOnActivate {
         ? vscode.Uri.joinPath(context.extensionUri, 'package.nls.json').toString()
         : vscode.Uri.joinPath(context.extensionUri, `package.nls.${vscode.env.language}.json`).toString(),
     })
-    console.warn(`sdk.install.success: ${l10n.t('sdk.install.success')}`)
   }
 
   public t<TKey extends string>(key: TKey, options: TOptions = {}): string {
