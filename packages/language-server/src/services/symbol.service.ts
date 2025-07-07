@@ -1,7 +1,7 @@
-import type { Range } from '@volar/language-server'
+import type { DocumentSymbol, LanguageServicePlugin, Range } from '@volar/language-server'
 import type { TextDocument } from 'vscode-languageserver-textdocument'
 import { typeAssert } from '@arkts/shared'
-import { type DocumentSymbol, type LanguageServicePlugin, SymbolKind } from '@volar/language-server'
+import { SymbolKind } from '@volar/language-server'
 import * as ets from 'ohos-typescript'
 import { URI } from 'vscode-uri'
 
@@ -105,12 +105,7 @@ export function createETSDocumentSymbolService(): LanguageServicePlugin {
           const decodeDocumentUri = context.decodeEmbeddedDocumentUri(URI.parse(document.uri))
           if (!decodeDocumentUri)
             return []
-          const documentUri = decodeDocumentUri[0]
-
-          // Ignore non-ets files
-          if (!documentUri.fsPath.endsWith('.ets'))
-            return []
-
+          const [documentUri] = decodeDocumentUri
           const navigationBarItems = languageService.getNavigationTree(documentUri.fsPath)
           return navigationBarItems.childItems?.map(item => getSymbolTree(item, document))
             .filter(item => item !== undefined) || []
