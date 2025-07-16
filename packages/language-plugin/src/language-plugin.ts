@@ -18,6 +18,9 @@ export interface ETSLanguagePluginOptions {
 export function ETSLanguagePlugin(tsOrEts: typeof ts, options?: ETSLanguagePluginOptions): LanguagePlugin<URI | string>
 export function ETSLanguagePlugin(tsOrEts: typeof ets, options?: ETSLanguagePluginOptions): LanguagePlugin<URI | string>
 export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '', tsdk = '' }: ETSLanguagePluginOptions = {}): LanguagePlugin<URI | string> {
+  const isETSServerMode = isEts(tsOrEts)
+  const isTSPluginMode = !isETSServerMode
+
   return {
     getLanguageId(uri) {
       const filePath = typeof uri === 'string' ? uri : uri.fsPath
@@ -29,8 +32,14 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '
     },
     createVirtualCode(uri, languageId, snapshot) {
       const filePath = typeof uri === 'string' ? uri : uri.fsPath
-      const getFullVitrualCode = createLazyGetter(() => (
-        createVirtualCode(snapshot, languageId, {
+      const isInSdkPath = filePath.startsWith(sdkPath)
+      const isInTsdkPath = filePath.startsWith(tsdk)
+      const isDTS = filePath.endsWith('.d.ts')
+      const isDETS = filePath.endsWith('.d.ets')
+
+      const getFullVitrualCode = createLazyGetter(() => {
+        console.warn(`ETS: processes ${filePath} to full getFullVitrualCode`)
+        return createVirtualCode(snapshot, languageId, {
           completion: true,
           format: true,
           navigation: true,
@@ -38,16 +47,11 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '
           structure: true,
           verification: true,
         })
-      ))
-      if (languageId === 'ets' && filePath.endsWith('.ets'))
-        return getFullVitrualCode()
+      })
 
-      const isInSdkPath = filePath.startsWith(sdkPath)
-      const isInTsdkPath = filePath.startsWith(tsdk)
-      const isDTS = filePath.endsWith('.d.ts')
-      const isDETS = filePath.endsWith('.d.ets')
-      const getEmptyVirtualCode = createLazyGetter(() => (
-        createEmptyVirtualCode(snapshot, languageId, {
+      const getEmptyVirtualCode = createLazyGetter(() => {
+        console.warn(`ETS: processes ${filePath} to empty getEmptyVirtualCode, isInSdkPath: ${isInSdkPath}, isInTsdkPath: ${isInTsdkPath}, isDTS: ${isDTS}, isDETS: ${isDETS}`)
+        return createEmptyVirtualCode(snapshot, languageId, {
           completion: false,
           format: false,
           navigation: false,
@@ -55,22 +59,24 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '
           structure: false,
           verification: false,
         })
-      ))
+      })
 
+      if (languageId === 'ets' && filePath.endsWith('.ets'))
+        return getFullVitrualCode()
       // TS Plugin mode
-      if (!isEts(tsOrEts) && (isDTS || isDETS) && isInSdkPath)
+      if (isTSPluginMode && (isDTS || isDETS) && isInSdkPath)
         return getEmptyVirtualCode()
       // ETS Server mode
-      if (isEts(tsOrEts) && !(isDTS || isDETS) && !isInSdkPath)
+      if (isETSServerMode && !(isDTS || isDETS) && !isInSdkPath)
         return getEmptyVirtualCode()
       // Proxy ts internal lib files, such as `lib.d.ts`, `lib.es2020.d.ts`, etc.
-      if (isEts(tsOrEts) && (isDTS || isDETS) && isInTsdkPath)
+      if (isETSServerMode && (isDTS || isDETS) && isInTsdkPath)
         return getFullVitrualCode()
     },
     typescript: {
       // eslint-disable-next-line ts/ban-ts-comment
       // @ts-expect-error
-      extraFileExtensions: isEts(tsOrEts)
+      extraFileExtensions: isETSServerMode
         ? [
             { extension: 'ets', isMixedContent: false, scriptKind: 8 satisfies ets.ScriptKind.ETS },
             { extension: 'd.ets', isMixedContent: false, scriptKind: 8 satisfies ets.ScriptKind.ETS },

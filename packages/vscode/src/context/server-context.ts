@@ -1,6 +1,7 @@
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClient, LanguageClientOptions } from '@volar/vscode/node'
 import type { TypescriptLanguageFeatures } from 'packages/shared/out/index.mjs'
+import { executeCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
 import { AbstractWatcher } from '../abstract-watcher'
 
@@ -72,6 +73,9 @@ export abstract class LanguageServerContext extends AbstractWatcher {
   /** Configure the volar typescript plugin by `ClientOptions`. */
   protected async configureTypeScriptPlugin(clientOptions: LanguageClientOptions): Promise<void> {
     const typescriptLanguageFeatures = vscode.extensions.getExtension<TypescriptLanguageFeatures>('vscode.typescript-language-features')
+    if (typescriptLanguageFeatures?.isActive) {
+      executeCommand('typescript.restartTsServer')
+    }
     await typescriptLanguageFeatures?.activate()
     typescriptLanguageFeatures?.exports.getAPI?.(0)?.configurePlugin?.('ets-typescript-plugin', {
       workspaceFolder: this.getCurrentWorkspaceDir()?.fsPath,
