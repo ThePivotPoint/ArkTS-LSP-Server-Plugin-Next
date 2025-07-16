@@ -71,4 +71,7 @@ catalogs:
 onlyBuiltDependencies:
   - '@swc/core'
   - '@vscode/vsce-sign'
+  - esbuild
+  - keytar
+  - simple-git-hooks
   - unrs-resolver
