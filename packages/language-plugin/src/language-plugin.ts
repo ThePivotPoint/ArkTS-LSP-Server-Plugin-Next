@@ -37,9 +37,8 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '
       const isDTS = filePath.endsWith('.d.ts')
       const isDETS = filePath.endsWith('.d.ets')
 
-      const getFullVitrualCode = createLazyGetter(() => {
-        console.warn(`ETS: processes ${filePath} to full getFullVitrualCode`)
-        return createVirtualCode(snapshot, languageId, {
+      const getFullVitrualCode = createLazyGetter(() => (
+        createVirtualCode(snapshot, languageId, {
           completion: true,
           format: true,
           navigation: true,
@@ -47,10 +46,27 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '
           structure: true,
           verification: true,
         })
-      })
+      ))
 
-      const getEmptyVirtualCode = createLazyGetter(() => {
-        console.warn(`ETS: processes ${filePath} to empty getEmptyVirtualCode, isInSdkPath: ${isInSdkPath}, isInTsdkPath: ${isInTsdkPath}, isDTS: ${isDTS}, isDETS: ${isDETS}`)
+      const getDisabledVirtualCode = createLazyGetter(() => (
+        createVirtualCode(snapshot, languageId, {
+          completion: false,
+          format: false,
+          navigation: false,
+          semantic: false,
+          structure: false,
+          verification: false,
+        })
+      ))
+
+      // ets files
+      if (languageId === 'ets' && filePath.endsWith('.ets'))
+        return getFullVitrualCode()
+      // ETS Server mode
+      if (isETSServerMode && !(isDTS || isDETS) && !isInSdkPath)
+        return getDisabledVirtualCode()
+      // TS Plugin mode
+      if (isTSPluginMode && (isDTS || isDETS) && isInSdkPath) {
         return createEmptyVirtualCode(snapshot, languageId, {
           completion: false,
           format: false,
@@ -59,19 +75,10 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '
           structure: false,
           verification: false,
         })
-      })
-
-      if (languageId === 'ets' && filePath.endsWith('.ets'))
-        return getFullVitrualCode()
-      // TS Plugin mode
-      if (isTSPluginMode && (isDTS || isDETS) && isInSdkPath)
-        return getEmptyVirtualCode()
-      // ETS Server mode
-      if (isETSServerMode && !(isDTS || isDETS) && !isInSdkPath)
-        return getEmptyVirtualCode()
+      }
       // Proxy ts internal lib files, such as `lib.d.ts`, `lib.es2020.d.ts`, etc.
       if (isETSServerMode && (isDTS || isDETS) && isInTsdkPath)
-        return getFullVitrualCode()
+        return getDisabledVirtualCode()
     },
     typescript: {
       // eslint-disable-next-line ts/ban-ts-comment
