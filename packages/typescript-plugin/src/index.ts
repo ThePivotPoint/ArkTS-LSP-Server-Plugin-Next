@@ -2,9 +2,6 @@ import type * as ts from 'typescript'
 import { ETSLanguagePlugin } from '@arkts/language-plugin'
 import { createLanguageServicePlugin } from '@volar/typescript/lib/quickstart/createLanguageServicePlugin'
 
-/** Current configuration */
-let currentConfig: any = {}
-
 /**
  * ### 这个插件做了什么？
  *
@@ -18,31 +15,23 @@ let currentConfig: any = {}
  *
  * 点开一个`.ts`文件然后按 Ctrl + shift + P 输入`Typescript: Open TS Server Log`
  */
-const volarPlugin: ts.server.PluginModuleFactory = createLanguageServicePlugin((ts, info) => {
-  const sdkPath = currentConfig?.lspOptions?.ohos?.sdkPath
+const plugin: ts.server.PluginModuleFactory = createLanguageServicePlugin((ts, info) => {
+  const sdkPath = info.config?.lspOptions?.ohos?.sdkPath
 
   console.warn(`ETS typescript plugin loaded! sdkPath: ${sdkPath}`)
   console.warn(`Current config: ${JSON.stringify(info.config)}`)
 
+  // 如果没有传递这个配置，则不启用插件
+  if (!info.config?.lspOptions?.ohos) {
+    return { languagePlugins: [] }
+  }
+
   return {
-    languagePlugins: [ETSLanguagePlugin(ts, { sdkPath, tsdk: currentConfig?.lspOptions?.typescript?.tsdk })],
+    languagePlugins: [
+      ETSLanguagePlugin(ts, { sdkPath, tsdk: info.config?.lspOptions?.typescript?.tsdk }),
+    ],
   }
 })
-
-const plugin: ts.server.PluginModuleFactory = (mod) => {
-  const volarTSPlugin = volarPlugin(mod)
-
-  return {
-    create(createInfo) {
-      currentConfig = createInfo.config
-      return volarTSPlugin.create(createInfo)
-    },
-    getExternalFiles: volarTSPlugin.getExternalFiles,
-    onConfigurationChanged(config) {
-      currentConfig = config
-    },
-  }
-}
 
 // eslint-disable-next-line no-restricted-syntax
 export = plugin

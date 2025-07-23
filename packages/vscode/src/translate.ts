@@ -12,15 +12,18 @@ export interface TOptions {
   args?: unknown[]
 }
 
-export type TFn = (key: string, options: TOptions) => string
-
 @Service
 export class Translator implements IOnActivate {
   async onActivate(context: vscode.ExtensionContext): Promise<void> {
+    const localeFilePath = vscode.Uri.joinPath(context.extensionUri, `package.nls.${vscode.env.language}.json`).toString()
+    const defaultLocaleFilePath = vscode.Uri.joinPath(context.extensionUri, 'package.nls.json').toString()
+
+    const localeFileExist = await vscode.workspace.fs.stat(vscode.Uri.parse(localeFilePath)).then(
+      stat => stat.type === vscode.FileType.File,
+      () => false,
+    )
     await l10n.config({
-      uri: vscode.env.language.includes('en')
-        ? vscode.Uri.joinPath(context.extensionUri, 'package.nls.json').toString()
-        : vscode.Uri.joinPath(context.extensionUri, `package.nls.${vscode.env.language}.json`).toString(),
+      uri: localeFileExist ? localeFilePath : defaultLocaleFilePath,
     })
   }
 
