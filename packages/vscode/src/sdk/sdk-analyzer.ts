@@ -23,13 +23,17 @@ export class SdkAnalyzer {
   async getSdkUri(force: boolean = false): Promise<vscode.Uri> {
     if (this.isSdkUriExists && !force)
       return this.sdkUri
-    await this.fileSystem
-      .mustBeDirectory(this.sdkUri, SdkAnalyzerException.Code.SDKPathNotFound, SdkAnalyzerException.Code.SDKPathNotDirectory)
-      .catch((error) => {
+    
+    try {
+      await this.fileSystem.mustBeDirectory(this.sdkUri, SdkAnalyzerException.Code.SDKPathNotFound, SdkAnalyzerException.Code.SDKPathNotDirectory)
+      this.isSdkUriExists = true
+      return this.sdkUri
+    } catch (error) {
+      if (error instanceof SdkAnalyzerException) {
         throw SdkAnalyzerException.fromFileSystemException(error, this.translator)
-      })
-    this.isSdkUriExists = true
-    return this.sdkUri
+      }
+      throw error
+    }
   }
 
   private _cachedEtsComponentFolder: vscode.Uri | undefined
@@ -42,13 +46,17 @@ export class SdkAnalyzer {
     if (this._cachedEtsComponentFolder && !force)
       return this._cachedEtsComponentFolder
     const etsComponentUri = vscode.Uri.joinPath(this.sdkUri, 'ets', 'component')
-    await this.fileSystem
-      .mustBeDirectory(etsComponentUri, SdkAnalyzerException.Code.EtsComponentPathNotFound, SdkAnalyzerException.Code.EtsComponentPathNotDirectory)
-      .catch((error) => {
+    
+    try {
+      await this.fileSystem.mustBeDirectory(etsComponentUri, SdkAnalyzerException.Code.EtsComponentPathNotFound, SdkAnalyzerException.Code.EtsComponentPathNotDirectory)
+      this._cachedEtsComponentFolder = etsComponentUri
+      return etsComponentUri
+    } catch (error) {
+      if (error instanceof SdkAnalyzerException) {
         throw SdkAnalyzerException.fromFileSystemException(error, this.translator)
-      })
-    this._cachedEtsComponentFolder = etsComponentUri
-    return etsComponentUri
+      }
+      throw error
+    }
   }
 
   private _cachedEtsLoaderConfigPath: vscode.Uri | undefined
@@ -61,13 +69,17 @@ export class SdkAnalyzer {
     if (this._cachedEtsLoaderConfigPath && !force)
       return this._cachedEtsLoaderConfigPath
     const etsLoaderConfigUri = vscode.Uri.joinPath(this.sdkUri, 'ets', 'build-tools', 'ets-loader', 'tsconfig.json')
-    await this.fileSystem
-      .mustBeFile(etsLoaderConfigUri, SdkAnalyzerException.Code.EtsLoaderConfigPathNotFound, SdkAnalyzerException.Code.EtsLoaderConfigPathNotFile)
-      .catch((error) => {
+    
+    try {
+      await this.fileSystem.mustBeFile(etsLoaderConfigUri, SdkAnalyzerException.Code.EtsLoaderConfigPathNotFound, SdkAnalyzerException.Code.EtsLoaderConfigPathNotFile)
+      this._cachedEtsLoaderConfigPath = etsLoaderConfigUri
+      return etsLoaderConfigUri
+    } catch (error) {
+      if (error instanceof SdkAnalyzerException) {
         throw SdkAnalyzerException.fromFileSystemException(error, this.translator)
-      })
-    this._cachedEtsLoaderConfigPath = etsLoaderConfigUri
-    return etsLoaderConfigUri
+      }
+      throw error
+    }
   }
 
   /**

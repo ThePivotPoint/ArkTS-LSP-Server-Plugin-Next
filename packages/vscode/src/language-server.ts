@@ -73,7 +73,9 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
   }
 
   private async handleLspError(error: unknown): Promise<void> {
+    this.getConsola().error(`捕获到错误：`)
     this.getConsola().error(error)
+    console.error(error)
     const choiceSdkPath = this.translator.t('sdk.error.choiceSdkPathMasually')
     const downloadOrChoiceSdkPath = this.translator.t('sdk.error.downloadOrChoiceSdkPath')
     const detail = this.errorToString(error)
@@ -151,7 +153,7 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
       vscode.window.showErrorMessage(this.translator.t('sdk.error.validSdkPath'))
       throw new Error(this.translator.t('sdk.error.validSdkPath'))
     }
-    const sdkAnalyzer = new SdkAnalyzer(vscode.Uri.parse(sdkPath), this, this.translator)
+    const sdkAnalyzer = new SdkAnalyzer(vscode.Uri.file(sdkPath), this, this.translator)
     const tsdk = await getTsdk(this.context)
 
     return {
