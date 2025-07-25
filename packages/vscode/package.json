@@ -96,6 +96,12 @@
         "bases": ["typescript"]
       }
     ],
+    "snippets": [
+      {
+        "language": "ets",
+        "path": "./snippets/ets.code-snippets"
+      }
+    ],
     "grammars": [
       {
         "language": "ets",

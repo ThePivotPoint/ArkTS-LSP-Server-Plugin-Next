@@ -24,13 +24,16 @@
 - 🖊️ 完善的JSON Schema支持。支持以下文件的JSON Schema：
   - `build-profile.json5` 模块级别/项目级别配置
   - `oh-package.json5` 模块级别/项目级别配置
-  - `module.json5` 模块级别/项目级别配置
   - `code-linter.json5` 模块级别/项目级别配置
   - `resources/element/`下所有的`color.json`等的kv值配置
-  - `main_pages.json5`
+  - `module.json5` 配置
+  - `mock-config.json5`配置
+  - `hvigor-config.json5`配置
+  - `main_pages.json5`配置
 - 📦 1.x版本开始支持安装和管理`OpenHarmony SDK`，并且支持根据当前打开的项目自动探测`API版本`，发出弹窗提示`下载`或`切换`
 - ✨ 1.x版本开始支持`.ets`文件的`代码格式化`和`大纲`展示功能
-- 🆓 `$r`，`$rawfile` 补全、代码格式化、`hilog`日志等功能正在计划支持的路上，欢迎PR👀
+- ✂️ 支持和`TypeScript`一样的`snippets`，并且添加了`Struct Declaration`等`ArkTS`独有的`Snippets`
+- 🆓 `$r`，`$rawfile` 补全、`hilog`日志等功能正在计划支持的路上，欢迎PR👀
 
 ## VSCode 文件图标包 🖼️
 
