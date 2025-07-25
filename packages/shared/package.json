@@ -38,6 +38,9 @@
     },
     "./out/*": "./out/*"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./out/index.js",
   "module": "./out/index.mjs",
   "types": "./out/index.d.ts",
