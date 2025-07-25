@@ -56,9 +56,7 @@ function publishToOvsce() {
 }
 
 ;(async () => {
-  const isPass = publishNpmPackages()
-  if (!isPass)
-    return
+  publishNpmPackages()
   publishToVsce()
   publishToOvsce()
 })()
