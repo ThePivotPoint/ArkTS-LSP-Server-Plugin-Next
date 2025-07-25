@@ -59,8 +59,6 @@ function publishToOvsce() {
   const isPass = publishNpmPackages()
   if (!isPass)
     return
-  const isVscePass = publishToVsce()
-  if (!isVscePass)
-    return
+  publishToVsce()
   publishToOvsce()
 })()
