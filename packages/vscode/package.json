@@ -62,6 +62,14 @@
         "url": "./schemas/code-linter.schema.json"
       },
       {
+        "fileMatch": "hvigor-config.json5",
+        "url": "./schemas/hvigor-config.schema.json"
+      },
+      {
+        "fileMatch": "mock-config.json5",
+        "url": "./schemas/mock-config.schema.json"
+      },
+      {
         "fileMatch": [
           "tsconfig.json",
           "tsconfig.*.json",
@@ -187,7 +195,8 @@
         {
           "id": "ets-hilog-view",
           "name": "HiLog",
-          "type": "webview"
+          "type": "webview",
+          "icon": "$(debug-console)"
         }
       ]
     },
