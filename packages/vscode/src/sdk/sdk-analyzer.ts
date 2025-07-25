@@ -8,11 +8,11 @@ import * as vscode from 'vscode'
 import { SdkAnalyzerException } from './sdk-analyzer-exception'
 
 interface ChoiceValidSdkPathStatus<TMetadata extends Record<string, any>> {
-    isValid: boolean
-    error: unknown
-    analyzer: SdkAnalyzer<TMetadata> | undefined
-    metadata?: TMetadata
-  }
+  isValid: boolean
+  error: unknown
+  analyzer: SdkAnalyzer<TMetadata> | undefined
+  metadata?: TMetadata
+}
 
 interface ChoiceValidSdkPathReturn<TMetadata extends Record<string, any>> {
   choicedAnalyzer: SdkAnalyzer<TMetadata> | undefined
@@ -29,7 +29,7 @@ export class SdkAnalyzer<TMetadata = Record<string, any>> {
     private readonly sdkUri: vscode.Uri,
     private readonly fileSystem: FileSystem,
     private readonly translator: Translator,
-    private readonly extraMetadata?: TMetadata
+    private readonly extraMetadata?: TMetadata,
   ) {}
 
   static async choiceValidSdkPath<TMetadata extends Record<string, any>>(...analyzers: ChoiceValidSdkPathOptions<TMetadata>[]): Promise<ChoiceValidSdkPathReturn<TMetadata>> {

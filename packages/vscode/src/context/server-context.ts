@@ -95,9 +95,8 @@ export abstract class LanguageServerContext extends AbstractWatcher {
     )
     const sdkPath = await sdkAnalyzer.choicedAnalyzer?.getSdkUri(force)
     this.getConsola().info(`Analyzed OHOS SDK path: ${sdkPath}, current using analyzer: ${sdkAnalyzer.choicedAnalyzer?.getExtraMetadata()?.type}`)
-    sdkAnalyzer.analyzerStatus.map(status => {
+    for (const status of sdkAnalyzer.analyzerStatus)
       this.getConsola().info(`(${status.analyzer?.getExtraMetadata()?.type || status.metadata?.type || 'unknown type'}) Analyzer status: ${status.isValid ? 'available ✅' : 'no available ❌'} ${status.error ? status.error : ''}`)
-    })
     this._analyzedSdkPath = sdkPath?.fsPath
     this._analyzerSdkAnalyzer = sdkAnalyzer.choicedAnalyzer
     return this._analyzedSdkPath
