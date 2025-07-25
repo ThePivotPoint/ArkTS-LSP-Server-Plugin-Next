@@ -8,6 +8,65 @@
       "type": "boolean",
       "default": true
     },
+    "removePermissions": {
+      "description": "Indicates the permissions to remove.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "enum": [
+            "name",
+            "reason",
+            "usedScene"
+          ]
+        },
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "description": "Specifies the permission name to be used.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Deprecated, describe the reason for applying for the permission.",
+            "type": "string",
+            "deprecated": true,
+            "deprecationMessage": "This property is not necessary here."
+          },
+          "usedScene": {
+            "description": "Deprecated, this section describes the scenarios and timing of permission usage.",
+            "type": "object",
+            "deprecated": true,
+            "deprecationMessage": "This property is not necessary here.",
+            "propertyNames": {
+              "enum": [
+                "abilities",
+                "when"
+              ]
+            },
+            "properties": {
+              "abilities": {
+                "description": "This tag identifies the abilities that need the permission.",
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "when": {
+                "description": "This tag identifies the time when the permission is used.",
+                "type": "string",
+                "enum": [
+                  "inuse",
+                  "always"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     "copyFrom": {
       "$ref": "#/definitions/name"
     },
@@ -79,7 +138,10 @@
       "type": "object",
       "propertyNames": {
         "enum": [
-          "compression"
+          "compression",
+          "copyCodeResource",
+          "resCompileThreads",
+          "ignoreResourcePattern"
         ]
       },
       "properties": {
@@ -174,6 +236,41 @@
                 }
               }
             }
+          }
+        },
+        "copyCodeResource": {
+          "description": "Configurations related to copying static resource files in the ets directory.",
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "enable",
+              "excludes"
+            ]
+          },
+          "properties": {
+            "enable": {
+              "description": "Whether to copy and pack static resource files in the ets directory. The default value is true.",
+              "type": "boolean"
+            },
+            "excludes": {
+              "description": "Filters defined with glob patterns. The setting does not take effect when enable is set to false",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "resCompileThreads": {
+          "description": "Number of resource compilation threads",
+          "type": "integer",
+          "minimum": 1
+        },
+        "ignoreResourcePattern": {
+          "description": "Filters defined with glob patterns. Files in resources matching any of these patterns will not be packaged.",
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         }
       }
@@ -302,7 +399,8 @@
           "filter",
           "headerPath",
           "collectAllLibs",
-          "librariesInfo"
+          "librariesInfo",
+          "excludeSoFromInterfaceHar"
         ]
       },
       "properties": {
@@ -433,6 +531,11 @@
             "type": "string"
           },
           "description": "Path to a directory containing headers to export to dependents of this module."
+        },
+        "excludeSoFromInterfaceHar": {
+          "description": "While true, the .so file won't be included in the interface har when packaging the HSP; this only applies to the HSP package.",
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -449,7 +552,10 @@
           "runtimeOnly",
           "integratedHsp",
           "branchElimination",
-          "transformLib"
+          "transformLib",
+          "autoLazyImport",
+          "skipOhModulesLint",
+          "reExportCheckMode"
         ]
       },
       "properties": {
@@ -507,7 +613,8 @@
           "type": "object",
           "propertyNames": {
             "enum": [
-              "ruleOptions"
+              "ruleOptions",
+              "consumerFiles"
             ]
           },
           "properties": {
@@ -540,6 +647,16 @@
                   }
                 }
               }
+            },
+            "consumerFiles": {
+              "description": "Obfuscation rule files included in the hsp.",
+              "type": [
+                "string",
+                "array"
+              ],
+              "items": {
+                "type": "string"
+              }
             }
           }
         },
@@ -559,13 +676,33 @@
         },
 
         "branchElimination": {
-          "description": "enbale branchElimination",
+          "description": "Enable branchElimination.",
           "type": "boolean"
         },
         "transformLib": {
-          "description": "Configure the transformLib file  used by during the build process.",
+          "description": "Configure the transformLib file used by during the build process.",
           "type": "string",
           "maxLength": 127
+        },
+        "autoLazyImport": {
+          "description": "Enable the import dependency to have the automatic lazy loading capability.",
+          "type": "boolean",
+          "default": false
+        },
+        "skipOhModulesLint": {
+          "description": "Specifies whether to skip the ArkTS linter check for the oh_modules directory in the project.",
+          "type": "boolean",
+          "default": false
+        },
+        "reExportCheckMode": {
+          "type": "string",
+          "description": "Specify the checking mode of re-export.",
+          "default": "noCheck",
+          "enum": [
+            "noCheck",
+            "compatible",
+            "strict"
+          ]
         }
       }
     },
@@ -579,7 +716,9 @@
           "sourceOption",
           "napiLibFilterOption",
           "arkOptions",
-          "nativeLib"
+          "nativeLib",
+          "removePermissions",
+          "generateSharedTgz"
         ]
       },
       "properties": {
@@ -592,6 +731,9 @@
         "sourceOption": {
           "$ref": "#/definitions/sourceOption"
         },
+        "removePermissions": {
+          "$ref": "#/definitions/removePermissions"
+        },
         "napiLibFilterOption": {
           "$ref": "#/definitions/napiLibFilterOption"
         },
@@ -600,6 +742,10 @@
         },
         "arkOptions": {
           "$ref": "#/definitions/arkOptions"
+        },
+        "generateSharedTgz": {
+          "type": "boolean",
+          "description": "Determine to generate shared tgz while compiling HSP."
         }
       }
     },
@@ -614,9 +760,11 @@
           "resOptions",
           "externalNativeOptions",
           "sourceOption",
+          "removePermissions",
           "napiLibFilterOption",
           "arkOptions",
-          "nativeLib"
+          "nativeLib",
+          "generateSharedTgz"
         ]
       },
       "properties": {
@@ -638,6 +786,9 @@
         "sourceOption": {
           "$ref": "#/definitions/sourceOption"
         },
+        "removePermissions": {
+          "$ref": "#/definitions/removePermissions"
+        },
         "napiLibFilterOption": {
           "$ref": "#/definitions/napiLibFilterOption"
         },
@@ -646,6 +797,10 @@
         },
         "arkOptions": {
           "$ref": "#/definitions/arkOptions"
+        },
+        "generateSharedTgz": {
+          "type": "boolean",
+          "description": "Determine to generate shared tgz while compiling HSP."
         }
       }
     },
@@ -1466,6 +1621,7 @@
                       "resOptions",
                       "externalNativeOptions",
                       "sourceOption",
+                      "removePermissions",
                       "napiLibFilterOption",
                       "arkOptions",
                       "nativeLib"
@@ -1498,6 +1654,7 @@
             "resOptions",
             "externalNativeOptions",
             "sourceOption",
+            "removePermissions",
             "napiLibFilterOption",
             "arkOptions",
             "nativeLib"
@@ -1524,6 +1681,7 @@
               "resOptions",
               "externalNativeOptions",
               "sourceOption",
+              "removePermissions",
               "napiLibFilterOption",
               "arkOptions",
               "nativeLib"

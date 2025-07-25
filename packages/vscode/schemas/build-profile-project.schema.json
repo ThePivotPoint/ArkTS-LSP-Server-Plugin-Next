@@ -80,7 +80,9 @@
           "arkOptions",
           "nativeLib",
           "strictMode",
-          "nativeCompiler"
+          "nativeCompiler",
+          "removePermissions",
+          "generateSharedTgz"
         ]
       },
       "properties": {
@@ -89,7 +91,8 @@
           "type": "object",
           "propertyNames": {
             "enum": [
-              "buildAppSkipSignHap"
+              "buildAppSkipSignHap",
+              "fastBuildApp"
             ]
           },
           "properties": {
@@ -97,6 +100,70 @@
               "description": "The build APP does not generate a signed HAP package.",
               "type": "boolean",
               "default": false
+            },
+            "fastBuildApp": {
+              "description": "Optimize the build time for HAP/HSP packaging.",
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "removePermissions": {
+          "description": "Indicates the permissions to remove.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "propertyNames": {
+              "enum": [
+                "name",
+                "reason",
+                "usedScene"
+              ]
+            },
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "description": "Specifies the permission name to be used.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "Deprecated, describe the reason for applying for the permission.",
+                "type": "string",
+                "deprecated": true,
+                "deprecationMessage": "This property is not necessary here."
+              },
+              "usedScene": {
+                "description": "Deprecated, this section describes the scenarios and timing of permission usage.",
+                "type": "object",
+                "deprecated": true,
+                "deprecationMessage": "This property is not necessary here.",
+                "propertyNames": {
+                  "enum": [
+                    "abilities",
+                    "when"
+                  ]
+                },
+                "properties": {
+                  "abilities": {
+                    "description": "This tag identifies the abilities that need the permission.",
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "when": {
+                    "description": "This tag identifies the time when the permission is used.",
+                    "type": "string",
+                    "enum": [
+                      "inuse",
+                      "always"
+                    ]
+                  }
+                }
+              }
             }
           }
         },
@@ -110,7 +177,10 @@
           "type": "object",
           "propertyNames": {
             "enum": [
-              "compression"
+              "compression",
+              "copyCodeResource",
+              "resCompileThreads",
+              "ignoreResourcePattern"
             ]
           },
           "properties": {
@@ -205,6 +275,41 @@
                     }
                   }
                 }
+              }
+            },
+            "copyCodeResource": {
+              "description": "Configurations related to copying static resource files in the ets directory.",
+              "type": "object",
+              "propertyNames": {
+                "enum": [
+                  "enable",
+                  "excludes"
+                ]
+              },
+              "properties": {
+                "enable": {
+                  "description": "Whether to copy and pack static resource files in the ets directory. The default value is true.",
+                  "type": "boolean"
+                },
+                "excludes": {
+                  "description": "Filters defined with glob patterns. The setting does not take effect when enable is set to false",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "resCompileThreads": {
+              "description": "Number of resource compilation threads",
+              "type": "integer",
+              "minimum": 1
+            },
+            "ignoreResourcePattern": {
+              "description": "Filters defined with glob patterns. Files in resources matching any of these patterns will not be packaged.",
+              "type": "array",
+              "items": {
+                "type": "string"
               }
             }
           }
@@ -354,7 +459,11 @@
               "hostPGO",
               "types",
               "buildProfileFields",
-              "tscConfig"
+              "tscConfig",
+              "autoLazyImport",
+              "skipOhModulesLint",
+              "branchElimination",
+              "reExportCheckMode"
             ]
           },
           "properties": {
@@ -394,7 +503,8 @@
               "type": "object",
               "propertyNames": {
                 "enum": [
-                  "targetESVersion"
+                  "targetESVersion",
+                  "maxFlowDepth"
                 ]
               },
               "properties": {
@@ -406,8 +516,41 @@
                     "ES2017",
                     "ES2021"
                   ]
+                },
+                "maxFlowDepth": {
+                  "type": [
+                    "integer"
+                  ],
+                  "default": 2000,
+                  "minimum": 2000,
+                  "maximum": 65535
                 }
               }
+            },
+            "autoLazyImport": {
+              "description": "Enable the import dependency to have the automatic lazy loading capability.",
+              "type": "boolean",
+              "default": false
+            },
+            "branchElimination": {
+              "description": "Enable branchElimination.",
+              "type": "boolean",
+              "default": false
+            },
+            "skipOhModulesLint": {
+              "description": "Specifies whether to skip the ArkTS linter check for the oh_modules directory in the project.",
+              "type": "boolean",
+              "default": false
+            },
+            "reExportCheckMode": {
+              "type": "string",
+              "description": "Specify the checking mode of re-export.",
+              "default": "noCheck",
+              "enum": [
+                "noCheck",
+                "compatible",
+                "strict"
+              ]
             }
           }
         },
@@ -429,7 +572,8 @@
               "filter",
               "headerPath",
               "collectAllLibs",
-              "excludeFromHar"
+              "excludeFromHar",
+              "excludeSoFromInterfaceHar"
             ]
           },
           "properties": {
@@ -545,6 +689,11 @@
             "excludeFromHar": {
               "type": "boolean",
               "description": "Indicates whether to exclude so in the har dependency. The default value is true."
+            },
+            "excludeSoFromInterfaceHar": {
+              "description": "While true, the .so file won't be included in the interface har when packaging the HSP; this only applies to the HSP package.",
+              "type": "boolean",
+              "default": false
             }
           }
         },
@@ -587,6 +736,10 @@
               "default": false
             }
           }
+        },
+        "generateSharedTgz": {
+          "type": "boolean",
+          "description": "Determine to generate shared tgz while compiling HSP."
         }
       }
     }
@@ -673,7 +826,8 @@
                 ]
               },
               "name": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1
               },
               "type": {
                 "type": "string",
@@ -753,6 +907,12 @@
                       "anyOf": [
                         {
                           "pattern": "^((?:[5-9]|[1-9]\\d+)\\.\\d+\\.\\d+\\(\\d+\\)|4\\.(?:[1-9]\\d*\\.\\d+\\(\\d+\\)|0\\.(?:[1-9]\\d*\\(\\d+\\)|0\\((?:1[1-9]|[2-9]\\d+)\\))))$",
+                          "type": [
+                            "string"
+                          ]
+                        },
+                        {
+                          "pattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}(?:\\(\\d{1,3}(?:\\.\\d{1,3}){0,2}\\))?$",
                           "type": [
                             "string"
                           ]
@@ -953,12 +1113,12 @@
                 "properties": {
                   "compileSdkVersion": {
                     "description": "Specifies the SDK API version when the OpenHarmony application is compiled. This value determines the value of apiTargetVersion in the HAP package.",
-                    "type": "integer",
+                    "type": ["integer", "string"],
                     "exclusiveMinimum": 7
                   },
                   "compatibleSdkVersion": {
                     "description": "Specifies the lowest SDK API level version compatible with the OpenHarmony application during compilation. This value determines the value of apiCompatibleVersion in the HAP package.",
-                    "type": "integer",
+                    "type": ["integer", "string"],
                     "exclusiveMinimum": 3
                   }
                 }
@@ -968,12 +1128,12 @@
               "properties": {
                 "compileSdkVersion": {
                   "description": "Specifies the SDK API version when the OpenHarmony application is compiled. This value determines the value of apiTargetVersion in the HAP package.",
-                  "type": "integer",
+                  "type": ["integer", "string"],
                   "exclusiveMinimum": 7
                 },
                 "compatibleSdkVersion": {
                   "description": "Specifies the lowest SDK API level version compatible with the OpenHarmony application during compilation. This value determines the value of apiCompatibleVersion in the HAP package.",
-                  "type": "integer",
+                  "type": ["integer", "string"],
                   "exclusiveMinimum": 3
                 }
               }
