@@ -83,8 +83,10 @@ export class SdkVersionGuesser extends Environment implements IOnActivate {
 
     try {
       const buildProfile = parseJson5(fs.readFileSync(buildProfileFilePath.fsPath, 'utf-8'))
-      const sdkVersion = buildProfile?.app?.products?.[0]?.compileSdkVersion
-      if (!sdkVersion || typeof sdkVersion !== 'number')
+      let sdkVersion: string | number | undefined = buildProfile?.app?.products?.[0]?.compileSdkVersion
+      if (typeof sdkVersion === 'string')
+        sdkVersion = Number(sdkVersion)
+      if (!sdkVersion || typeof sdkVersion !== 'number' || Number.isNaN(sdkVersion))
         return
 
       if (sdkVersion === 10)
