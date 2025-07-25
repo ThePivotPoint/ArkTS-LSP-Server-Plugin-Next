@@ -1,8 +1,8 @@
 {
   "name": "@arkts/typescript-plugin",
-  "version": "2.0.0-alpha.1",
+  "version": "1.0.0",
   "private": true,
-  "description": "ArkTS Typescript Plugin",
+  "description": "ArkTS Typescript Plugin.",
   "author": "Naily Zero <zero@naily.cc>",
   "license": "MIT",
   "homepage": "https://github.com/Groupguanfang/arkTS/tree/main/packages/typescript-plugin",
