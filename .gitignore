@@ -5,3 +5,4 @@ node_modules
 *.tsbuildinfo
 *.vsix
 .DS_Store
+local.properties
