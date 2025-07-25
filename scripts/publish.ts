@@ -9,7 +9,7 @@ const dirname = fileURLToPath(new URL('.', import.meta.url))
 function publishNpmPackages() {
   try {
     logger.info(`Publishing @arkts/* packages...`)
-    const command = `pnpm -F "@arkts/*" publish ${process.argv.slice(2).join(' ')}`
+    const command = `pnpm -F "@arkts/*" publish --publish-branch=next ${process.argv.slice(2).join(' ')}`
     logger.info(`Executing command: ${command}`)
     execSync(command, { cwd: path.resolve(dirname, '..'), stdio: 'inherit' })
     return true
