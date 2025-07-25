@@ -1,5 +1,5 @@
 import type * as vscode from 'vscode'
-import type { URI } from 'vscode-uri'
+import type { Uri } from 'vscode'
 import type { AbstractWatcher } from '../abstract-watcher'
 import type { Translator } from '../translate'
 import fs from 'node:fs'
@@ -7,7 +7,7 @@ import path from 'node:path'
 
 export class ResourceDetector {
   constructor(
-    private readonly filePath: URI | string,
+    private readonly filePath: Uri | string,
     protected readonly context: vscode.ExtensionContext,
     protected readonly translator: Translator,
     protected readonly watcher: AbstractWatcher,
