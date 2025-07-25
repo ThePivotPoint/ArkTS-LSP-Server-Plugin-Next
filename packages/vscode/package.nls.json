@@ -50,6 +50,7 @@
   "sdk.error.downloadOrChoiceSdkPath": "Download or choose a OpenHarmony SDK path",
   "configuration.ets.sdkPath.description": "The default OpenHarmony SDK path.",
   "configuration.ets.baseSdkPath.description": "The default OpenHarmony SDK base path. All SDKs will be installed under this path. (You can use `${os.homedir}` to get the home directory)",
+  "configuration.ets.hdcPath.description": "The path to the HDC tool, used for `hilog` and others.",
   "configuration.ets.lspDebugMode.description": "Enable ETS Language Server debug logging.",
   "ets.language-server.restart.reloadWindow": "ETS Language Server restarted! If the internal lib have any error or uncorrect, you can click this button to reload window.",
   "ets.language-server.restart.reloadWindow.button": "Reload Window",

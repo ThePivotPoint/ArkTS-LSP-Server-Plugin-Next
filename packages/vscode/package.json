@@ -140,6 +140,11 @@
           "description": "%configuration.ets.lspDebugMode.description%",
           "default": false
         },
+        "ets.hdcPath": {
+          "type": "string",
+          "description": "%configuration.ets.hdcPath.description%",
+          "default": ""
+        },
         "ets.sdkList": {
           "type": "object",
           "description": "A list of installed OpenHarmony SDK paths. Keys should follow the pattern API[number] (e.g., API9, API10).",

@@ -26,6 +26,7 @@ export function useCompiledWebview(htmlPath: MaybeRefOrGetter<string>, options: 
     ...options,
     webviewOptions: {
       enableScripts: true,
+      enableCommandUris: true,
       localResourceRoots: [vscode.Uri.joinPath(extensionContext.value!.extensionUri, 'build')],
       ...options?.webviewOptions,
     },
