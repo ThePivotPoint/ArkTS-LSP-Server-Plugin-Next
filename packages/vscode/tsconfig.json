@@ -4,7 +4,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
-    "outDir": "out"
+    "outDir": "out",
+    "lib": ["ES2020", "DOM"]
   },
   "references": [
     {
