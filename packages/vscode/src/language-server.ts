@@ -10,7 +10,6 @@ import { Autowired } from 'unioc'
 import { Command, Disposable, ExtensionContext, IOnActivate, WatchConfiguration } from 'unioc/vscode'
 import * as vscode from 'vscode'
 import { LanguageServerContext } from './context/server-context'
-import { SdkAnalyzer } from './sdk/sdk-analyzer'
 import { Translator } from './translate'
 import { sleep } from './utils'
 
@@ -25,10 +24,6 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
 
   onExecuteCommand(): void {
     this.restart().catch(e => this.handleLspError(e))
-  }
-
-  constructor() {
-    super()
   }
 
   async onActivate(context: vscode.ExtensionContext): Promise<void> {
@@ -149,11 +144,11 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
    */
   async getClientOptions(force: boolean = false): Promise<LanguageClientOptions> {
     const sdkPath = await this.getAnalyzedSdkPath(force)
-    if (!sdkPath) {
+    const sdkAnalyzer = await this.getAnalyzedSdkAnalyzer(force)
+    if (!sdkPath || !sdkAnalyzer) {
       vscode.window.showErrorMessage(this.translator.t('sdk.error.validSdkPath'))
       throw new Error(this.translator.t('sdk.error.validSdkPath'))
     }
-    const sdkAnalyzer = new SdkAnalyzer(vscode.Uri.file(sdkPath), this, this.translator)
     const tsdk = await getTsdk(this.context)
 
     return {

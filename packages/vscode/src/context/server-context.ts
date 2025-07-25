@@ -1,9 +1,15 @@
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClient, LanguageClientOptions } from '@volar/vscode/node'
 import type { TypescriptLanguageFeatures } from 'packages/shared/out/index.mjs'
+import type { Translator } from '../translate'
 import { executeCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
 import { AbstractWatcher } from '../abstract-watcher'
+import { SdkAnalyzer } from '../sdk/sdk-analyzer'
+
+interface SdkAnalyzerMetadata {
+  type: 'local' | 'workspaceFolder' | 'global'
+}
 
 export abstract class LanguageServerContext extends AbstractWatcher {
   /** Start the language server. */
@@ -14,6 +20,8 @@ export abstract class LanguageServerContext extends AbstractWatcher {
   abstract restart(): Promise<void>
   /** Get the current language client. */
   abstract getCurrentLanguageClient(): LanguageClient | undefined
+  /** Current translator. */
+  protected readonly translator: Translator
 
   /** Listen to all local.properties files in the workspace. */
   protected listenAllLocalPropertiesFile(): void {
@@ -57,17 +65,49 @@ export abstract class LanguageServerContext extends AbstractWatcher {
   }
 
   private _analyzedSdkPath: string | undefined
+  private _analyzerSdkAnalyzer: SdkAnalyzer<SdkAnalyzerMetadata> | undefined
 
   /** Get the path of the Ohos SDK from `local.properties` file or configuration. */
   protected async getAnalyzedSdkPath(force: boolean = false): Promise<string | undefined> {
     if (!force && this._analyzedSdkPath)
       return this._analyzedSdkPath
+
+    // Check the local.properties file first
     const localSdkPath = await this.getOhosSdkPathFromLocalProperties()
+    const localSdkAnalyzer = localSdkPath ? new SdkAnalyzer<SdkAnalyzerMetadata>(vscode.Uri.file(localSdkPath), this, this.translator, { type: 'local' }) : undefined
+
+    // Check the workspace folder configuration
     const inspectedConfiguration = vscode.workspace.getConfiguration('ets').inspect<string>('sdkPath') || {} as ReturnType<ReturnType<typeof vscode.workspace.getConfiguration>['inspect']>
-    const sdkPath = localSdkPath || inspectedConfiguration?.workspaceFolderValue || inspectedConfiguration?.globalValue
-    this.getConsola().info(`Analyzed OHOS SDK path: ${sdkPath}`)
-    this._analyzedSdkPath = sdkPath as string | undefined
+    const workspaceFolderAnalyzer = inspectedConfiguration?.workspaceFolderValue && typeof inspectedConfiguration.workspaceFolderValue === 'string'
+      ? new SdkAnalyzer<SdkAnalyzerMetadata>(vscode.Uri.file(inspectedConfiguration.workspaceFolderValue), this, this.translator, { type: 'workspaceFolder' })
+      : undefined
+
+    // Check the global configuration
+    const globalAnalyzer = inspectedConfiguration?.globalValue && typeof inspectedConfiguration.globalValue === 'string'
+      ? new SdkAnalyzer<SdkAnalyzerMetadata>(vscode.Uri.file(inspectedConfiguration.globalValue), this, this.translator, { type: 'global' })
+      : undefined
+
+    // Choose a valid SDK path
+    const sdkAnalyzer = await SdkAnalyzer.choiceValidSdkPath<SdkAnalyzerMetadata>(
+      { analyzer: localSdkAnalyzer, metadata: { type: 'global' } },
+      { analyzer: workspaceFolderAnalyzer, metadata: { type: 'workspaceFolder' } },
+      { analyzer: globalAnalyzer, metadata: { type: 'global' } },
+    )
+    const sdkPath = await sdkAnalyzer.choicedAnalyzer?.getSdkUri(force)
+    this.getConsola().info(`Analyzed OHOS SDK path: ${sdkPath}, current using analyzer: ${sdkAnalyzer.choicedAnalyzer?.getExtraMetadata()?.type}`)
+    sdkAnalyzer.analyzerStatus.map(status => {
+      this.getConsola().info(`(${status.analyzer?.getExtraMetadata()?.type || status.metadata?.type || 'unknown type'}) Analyzer status: ${status.isValid ? 'available ✅' : 'no available ❌'} ${status.error ? status.error : ''}`)
+    })
+    this._analyzedSdkPath = sdkPath?.fsPath
+    this._analyzerSdkAnalyzer = sdkAnalyzer.choicedAnalyzer
     return this._analyzedSdkPath
+  }
+
+  protected async getAnalyzedSdkAnalyzer(force: boolean = false): Promise<SdkAnalyzer<SdkAnalyzerMetadata> | undefined> {
+    if (!force && this._analyzerSdkAnalyzer)
+      return this._analyzerSdkAnalyzer
+    await this.getAnalyzedSdkPath(force)
+    return this._analyzerSdkAnalyzer
   }
 
   /** Configure the volar typescript plugin by `ClientOptions`. */

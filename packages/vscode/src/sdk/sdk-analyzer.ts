@@ -7,12 +7,73 @@ import fg from 'fast-glob'
 import * as vscode from 'vscode'
 import { SdkAnalyzerException } from './sdk-analyzer-exception'
 
-export class SdkAnalyzer {
+interface ChoiceValidSdkPathStatus<TMetadata extends Record<string, any>> {
+    isValid: boolean
+    error: unknown
+    analyzer: SdkAnalyzer<TMetadata> | undefined
+    metadata?: TMetadata
+  }
+
+interface ChoiceValidSdkPathReturn<TMetadata extends Record<string, any>> {
+  choicedAnalyzer: SdkAnalyzer<TMetadata> | undefined
+  analyzerStatus: ChoiceValidSdkPathStatus<TMetadata>[]
+}
+
+interface ChoiceValidSdkPathOptions<TMetadata extends Record<string, any>> {
+  analyzer: SdkAnalyzer<TMetadata> | undefined
+  metadata?: TMetadata
+}
+
+export class SdkAnalyzer<TMetadata = Record<string, any>> {
   constructor(
     private readonly sdkUri: vscode.Uri,
     private readonly fileSystem: FileSystem,
     private readonly translator: Translator,
+    private readonly extraMetadata?: TMetadata
   ) {}
+
+  static async choiceValidSdkPath<TMetadata extends Record<string, any>>(...analyzers: ChoiceValidSdkPathOptions<TMetadata>[]): Promise<ChoiceValidSdkPathReturn<TMetadata>> {
+    const analyzerStatus: ChoiceValidSdkPathStatus<TMetadata>[] = []
+
+    for (let i = 0; i < analyzers.length; i++) {
+      if (!analyzers[i].analyzer) {
+        analyzerStatus[i] = {
+          isValid: false,
+          error: new Error('Analyzer is undefined'),
+          analyzer: undefined,
+          metadata: analyzers[i].metadata,
+        }
+        continue
+      }
+
+      try {
+        await analyzers[i].analyzer?.getAnalyzedSdkPath()
+        analyzerStatus[i] = {
+          isValid: true,
+          error: undefined,
+          analyzer: analyzers[i].analyzer,
+          metadata: analyzers[i].metadata,
+        }
+      }
+      catch (error) {
+        analyzerStatus[i] = {
+          isValid: false,
+          error,
+          analyzer: analyzers[i].analyzer,
+          metadata: analyzers[i].metadata,
+        }
+      }
+    }
+
+    return {
+      choicedAnalyzer: analyzerStatus.find(status => status.isValid)?.analyzer,
+      analyzerStatus,
+    }
+  }
+
+  getExtraMetadata(): TMetadata | undefined {
+    return this.extraMetadata
+  }
 
   private isSdkUriExists = false
   /**
@@ -58,6 +119,33 @@ export class SdkAnalyzer {
         throw SdkAnalyzerException.fromFileSystemException(error, this.translator)
       }
       throw error
+    }
+  }
+
+  async getAnalyzedSdkPath(): Promise<vscode.Uri | SdkAnalyzerException> {
+    try {
+      const sdkUri = await this.getSdkUri()
+      await this.getEtsComponentFolder()
+      await this.getEtsLoaderConfigPath()
+      return sdkUri
+    }
+    catch (error) {
+      if (error instanceof SdkAnalyzerException) {
+        return SdkAnalyzerException.fromFileSystemException(error, this.translator)
+      }
+      throw error
+    }
+  }
+
+  async isValidSdkPath(): Promise<boolean> {
+    try {
+      await this.getSdkUri()
+      await this.getEtsComponentFolder()
+      await this.getEtsLoaderConfigPath()
+      return true
+    }
+    catch {
+      return false
     }
   }
 
