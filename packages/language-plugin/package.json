@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "@volar/language-core": "catalog:prod",
-    "@volar/typescript": "catalog:prod"
+    "@volar/typescript": "catalog:prod",
+    "vscode-uri": "catalog:prod"
   }
 }
