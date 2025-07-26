@@ -106,7 +106,6 @@ export class SdkInstaller extends Environment implements Command {
       cacheDir: path.join(baseSdkPath, '.tmp', apiNumberVersion),
       targetDir: path.join(baseSdkPath, apiNumberVersion),
       resumeDownload: true,
-      clean: true,
     })
 
     // Step 1: Download the SDK
@@ -199,6 +198,11 @@ export class SdkInstaller extends Environment implements Command {
         this.getConsola().info(`Extracting zip API ${apiNumberVersion}: ${e.path}`)
       })
       await downloader.extractZip()
+    })
+
+    downloader.clean().catch(error => {
+      console.error(error)
+      this.getConsola().error(`Failed to clean up the SDK installer: ${error.message}`)
     })
 
     // Step 5: Check the install status of the SDK
