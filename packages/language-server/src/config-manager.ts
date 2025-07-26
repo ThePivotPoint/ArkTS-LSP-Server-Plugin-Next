@@ -23,7 +23,6 @@ export class LanguageServerConfigManager {
       tsdk: '',
     },
     debug: false,
-    waitForEtsConfigurationChangedRequested: false,
   }
 
   setDebug(debug: boolean): this {
