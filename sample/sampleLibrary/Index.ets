@@ -1,0 +1,1 @@
+export { add, MyCustomComponent } from './src/main/ets/utils/Calc';

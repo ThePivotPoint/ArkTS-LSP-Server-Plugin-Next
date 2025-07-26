@@ -5,6 +5,8 @@
   "main": "",
   "author": "",
   "license": "",
-  "dependencies": {}
+  "dependencies": {
+    "sample-library": "file:../sampleLibrary"
+  }
 }
 

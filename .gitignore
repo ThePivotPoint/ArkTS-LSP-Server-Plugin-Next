@@ -6,3 +6,9 @@ node_modules
 *.vsix
 .DS_Store
 local.properties
+oh_modules
+.preview
+.cxx
+.test
+.hvigor
+.idea

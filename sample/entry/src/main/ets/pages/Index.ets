@@ -1,3 +1,5 @@
+import { MyCustomComponent } from 'sample-library'
+
 @Entry
 @Component
 struct Index {
@@ -11,6 +13,8 @@ struct Index {
           .fontSize(50)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
+
+        MyCustomComponent()
       }.width('100%')
         .height(200)
         .accessibilityDescription('Test')
