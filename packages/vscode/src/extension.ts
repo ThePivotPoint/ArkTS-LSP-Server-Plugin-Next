@@ -10,6 +10,19 @@ import { EtsLanguageServer } from './language-server'
 import './res/resource-provider'
 import './sdk/sdk-guesser'
 import type { IClassWrapper } from 'unioc'
+import * as vscode from 'vscode'
+
+vscode.workspace.onDidOpenTextDocument((document) => {
+  if (document.fileName.endsWith('.json5')) {
+    vscode.languages.setTextDocumentLanguage(document, 'jsonc')
+  }
+})
+
+vscode.workspace.textDocuments.forEach((document) => {
+  if (document.fileName.endsWith('.json5')) {
+    vscode.languages.setTextDocumentLanguage(document, 'jsonc')
+  }
+})
 
 class ArkTSExtension extends VSCodeBootstrap<Promise<LabsInfo | undefined>> {
   beforeInitialize(context: ExtensionContext): Promise<void> | void {

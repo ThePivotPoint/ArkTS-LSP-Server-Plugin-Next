@@ -34,7 +34,8 @@ export abstract class LanguageServerContext extends AbstractWatcher {
       this.getConsola().info(`Listening ${vscode.Uri.joinPath(workspaceFolder.uri, 'build-profile.json5').fsPath}`)
     }
 
-    this.watcher.on('all', (event, path) => this.onLocalPropertiesChanged(event, path))
+    this.watcher.on('change', (path) => this.onLocalPropertiesChanged('change', path))
+    this.watcher.on('unlink', (path) => this.onLocalPropertiesChanged('unlink', path))
   }
 
   private isFirstStart: boolean = true

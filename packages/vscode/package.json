@@ -31,7 +31,9 @@
   },
   "activationEvents": [
     "onLanguage:typescript",
-    "onLanguage:typescriptreact"
+    "onLanguage:typescriptreact",
+    "onStartupFinished",
+    "onFileSystem:file"
   ],
   "contributes": {
     "jsonValidation": [
