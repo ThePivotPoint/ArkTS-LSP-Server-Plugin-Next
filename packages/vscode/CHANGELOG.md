@@ -1,5 +1,11 @@
 # vscode-naily-ets
 
+## 1.0.19
+
+### Patch Changes
+
+- [`f650268`](https://github.com/Groupguanfang/arkTS/commit/f650268cbad8ca60873f9fbb8cf3d20e48873739) Thanks [@Groupguanfang](https://github.com/Groupguanfang)! - fix: windows 下路径问题
+
 ## 1.0.18
 
 ### Patch Changes
