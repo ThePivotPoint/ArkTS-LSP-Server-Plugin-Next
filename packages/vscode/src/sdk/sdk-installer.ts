@@ -200,7 +200,7 @@ export class SdkInstaller extends Environment implements Command {
       await downloader.extractZip()
     })
 
-    downloader.clean().catch(error => {
+    downloader.clean().catch((error) => {
       console.error(error)
       this.getConsola().error(`Failed to clean up the SDK installer: ${error.message}`)
     })

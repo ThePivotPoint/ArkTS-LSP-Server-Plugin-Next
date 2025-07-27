@@ -1,11 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "lib": ["ES2020", "DOM"],
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
-    "outDir": "out",
-    "lib": ["ES2020", "DOM"]
+    "outDir": "out"
   },
   "references": [
     {

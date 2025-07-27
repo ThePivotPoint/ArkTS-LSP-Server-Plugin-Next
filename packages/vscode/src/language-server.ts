@@ -225,7 +225,8 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
   async stop(willRestart: boolean = false): Promise<void> {
     if (this._client) {
       await this._client.stop()
-      if (!willRestart) this.watcher.removeAllListeners()
+      if (!willRestart)
+        this.watcher.removeAllListeners()
       this.getConsola().info('ETS Language Server stopped!')
       vscode.window.setStatusBarMessage('ETS Language Server stopped!', 1000)
     }
