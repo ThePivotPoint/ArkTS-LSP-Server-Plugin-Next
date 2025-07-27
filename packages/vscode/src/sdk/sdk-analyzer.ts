@@ -206,7 +206,7 @@ export class SdkAnalyzer<TMetadata = Record<string, any>> {
       relativeWithConfigFilePaths[ohPackageJson.name] = [
         vscode.Uri.joinPath(currentWorkspaceDir, mod.srcPath).fsPath,
       ]
-      relativeWithConfigFilePaths[path.join(ohPackageJson.name, '*')] = [
+      relativeWithConfigFilePaths[ohPackageJson.name + '/*'] = [
         vscode.Uri.joinPath(currentWorkspaceDir, mod.srcPath, '*').fsPath,
       ]
     }
