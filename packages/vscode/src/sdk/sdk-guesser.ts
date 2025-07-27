@@ -1,7 +1,6 @@
 import type { SdkVersion } from '@arkts/sdk-downloader'
 import fs from 'node:fs'
 import path from 'node:path'
-import { parse as parseJson5 } from 'json5'
 import { Autowired, Service } from 'unioc'
 import { IOnActivate } from 'unioc/vscode'
 import * as vscode from 'vscode'
@@ -77,12 +76,12 @@ export class SdkVersionGuesser extends Environment implements IOnActivate {
     if (!currentWorkspaceDir)
       return
 
-    const buildProfileFilePath = vscode.Uri.joinPath(currentWorkspaceDir, 'build-profile.json5')
-    if (!fs.existsSync(buildProfileFilePath.fsPath) || !fs.statSync(buildProfileFilePath.fsPath).isFile())
+    const buildProfileJson5 = this.readBuildProfileJson5()
+    if (!buildProfileJson5)
       return
+    const [buildProfileFilePath, buildProfile] = buildProfileJson5 || []
 
     try {
-      const buildProfile = parseJson5(fs.readFileSync(buildProfileFilePath.fsPath, 'utf-8'))
       let sdkVersion: string | number | undefined = buildProfile?.app?.products?.[0]?.compileSdkVersion
       if (typeof sdkVersion === 'string')
         sdkVersion = Number(sdkVersion)

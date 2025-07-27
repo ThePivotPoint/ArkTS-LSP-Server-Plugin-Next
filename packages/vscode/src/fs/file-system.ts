@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import { ExtensionLogger } from '@arkts/shared/vscode'
+import { parse as parseJson5 } from 'json5'
 import { Service } from 'unioc'
 import * as vscode from 'vscode'
 import { FileSystemException } from './file-system-exception'
@@ -58,5 +59,42 @@ export class FileSystem extends ExtensionLogger {
   async createDirectoryIfNotExists(folderPath: string): Promise<void> {
     if (!fs.existsSync(folderPath))
       fs.mkdirSync(folderPath, { recursive: true })
+  }
+
+  /**
+   * Read the `build-profile.json5` file from project root.
+   *
+   * @param base - The base directory to read the `build-profile.json5` file from.
+   */
+  readBuildProfileJson5<T = any>(base: vscode.Uri | undefined = this.getCurrentWorkspaceDir()): [vscode.Uri, T] | undefined {
+    if (!base)
+      return
+
+    const buildProfileFilePath = vscode.Uri.joinPath(base, 'build-profile.json5')
+    if (!fs.existsSync(buildProfileFilePath.fsPath) || !fs.statSync(buildProfileFilePath.fsPath).isFile())
+      return
+
+    try {
+      const content = fs.readFileSync(buildProfileFilePath.fsPath, 'utf-8')
+      const parsedContent = parseJson5(content)
+      return [buildProfileFilePath, parsedContent]
+    }
+    catch {}
+  }
+
+  readOhPackageJson5<T = any>(base: vscode.Uri | undefined = this.getCurrentWorkspaceDir()): [vscode.Uri, T] | undefined {
+    if (!base)
+      return
+
+    const ohPackageFilePath = vscode.Uri.joinPath(base, 'oh-package.json5')
+    if (!fs.existsSync(ohPackageFilePath.fsPath) || !fs.statSync(ohPackageFilePath.fsPath).isFile())
+      return
+
+    try {
+      const content = fs.readFileSync(ohPackageFilePath.fsPath, 'utf-8')
+      const parsedContent = parseJson5(content)
+      return [ohPackageFilePath, parsedContent]
+    }
+    catch {}
   }
 }

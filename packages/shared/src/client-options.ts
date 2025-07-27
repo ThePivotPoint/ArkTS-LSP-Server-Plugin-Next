@@ -18,8 +18,10 @@ export interface OhosClientOptions {
   typeRoots: string[]
   /** The base url for the typescript compiler. */
   baseUrl: string
-  /** The paths for the typescript compiler. */
+  /** The paths for the typescript compiler, will be original pass to typescript. */
   paths: import('ohos-typescript').MapLike<string[]>
+  /** The paths for the typescript compiler, will be converted to relative paths with detected tsconfig file. */
+  relativeWithConfigFilePaths?: import('ohos-typescript').MapLike<string[]>
 }
 
 export interface EtsServerClientOptions {

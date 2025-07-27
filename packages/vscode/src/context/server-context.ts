@@ -30,6 +30,8 @@ export abstract class LanguageServerContext extends AbstractWatcher {
     for (const workspaceFolder of workspaceFolders) {
       this.watcher.add(vscode.Uri.joinPath(workspaceFolder.uri, 'local.properties').fsPath)
       this.getConsola().info(`Listening ${vscode.Uri.joinPath(workspaceFolder.uri, 'local.properties').fsPath}`)
+      this.watcher.add(vscode.Uri.joinPath(workspaceFolder.uri, 'build-profile.json5').fsPath)
+      this.getConsola().info(`Listening ${vscode.Uri.joinPath(workspaceFolder.uri, 'build-profile.json5').fsPath}`)
     }
 
     this.watcher.on('all', (event, path) => this.onLocalPropertiesChanged(event, path))

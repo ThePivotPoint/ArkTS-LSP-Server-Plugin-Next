@@ -18,6 +18,7 @@ export class LanguageServerConfigManager {
       lib: [],
       typeRoots: [],
       paths: {},
+      relativeWithConfigFilePaths: {},
     },
     typescript: {
       tsdk: '',
@@ -175,6 +176,16 @@ export class LanguageServerConfigManager {
     return this.config.ohos.paths || {}
   }
 
+  setRelativeWithConfigFilePaths(relativeWithConfigFilePaths: import('ohos-typescript').MapLike<string[]>): this {
+    this.logger.getConsola().info(`ohos.relativeWithConfigFilePaths changed: new: ${JSON.stringify(relativeWithConfigFilePaths, null, 2)}, old: ${JSON.stringify(this.config.ohos.relativeWithConfigFilePaths, null, 2)}`)
+    this.config.ohos.relativeWithConfigFilePaths = relativeWithConfigFilePaths
+    return this
+  }
+
+  getRelativeWithConfigFilePaths(): import('ohos-typescript').MapLike<string[]> {
+    return this.config.ohos.relativeWithConfigFilePaths || {}
+  }
+
   setLocale(locale: string): this {
     this.logger.getConsola().info(`locale changed: new: ${locale}, old: ${this.locale}`)
     this.locale = locale
@@ -198,6 +209,8 @@ export class LanguageServerConfigManager {
       this.setLib(config.ohos.lib)
     if (config.ohos?.paths)
       this.setPaths(config.ohos.paths)
+    if (config.ohos?.relativeWithConfigFilePaths)
+      this.setRelativeWithConfigFilePaths(config.ohos.relativeWithConfigFilePaths)
     if (config.ohos?.sdkPath)
       this.setSdkPath(config.ohos.sdkPath)
     if (config.ohos?.typeRoots)
@@ -209,9 +222,28 @@ export class LanguageServerConfigManager {
     return this
   }
 
+  private convertPaths<CompilerOpts extends { paths?: import('ohos-typescript').MapLike<string[]>, [key: string]: any }>(compilerOptions: CompilerOpts): CompilerOpts {
+    if (typeof compilerOptions.configFilePath === 'string') {
+      const configFilePathDir = path.dirname(compilerOptions.configFilePath)
+      const baseUrl = this.getBaseUrl()
+
+      for (const mappingPath in compilerOptions.paths || {}) {
+        if (!Array.isArray(compilerOptions.paths?.[mappingPath]))
+          continue
+
+        compilerOptions.paths[mappingPath] = compilerOptions.paths[mappingPath].map((p) => {
+          return path.isAbsolute(p) ? p : path.relative(baseUrl, path.resolve(configFilePathDir, p))
+        })
+      }
+    }
+    return compilerOptions
+  }
+
   getTsConfig(originalSettings: ets.CompilerOptions): ets.CompilerOptions {
-    return defu({
-      ...originalSettings as ets.CompilerOptions,
+    // 将 originalSettings.paths 中的路径转换为相对于 baseUrl 的路径，这样用户就仍然能使用tsconfig配置paths
+    originalSettings = defu({ paths: this.getRelativeWithConfigFilePaths() }, originalSettings)
+    originalSettings = this.convertPaths(originalSettings)
+    return defu(originalSettings, {
       etsLoaderPath: this.getEtsLoaderPath(),
       typeRoots: this.getTypeRoots(),
       baseUrl: this.getBaseUrl(),

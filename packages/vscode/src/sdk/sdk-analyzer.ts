@@ -1,11 +1,11 @@
 import type { OhosClientOptions } from '@arkts/shared'
-import type { FileSystem } from '../fs/file-system'
 import type { Translator } from '../translate'
 import path from 'node:path'
 import process from 'node:process'
 import fg from 'fast-glob'
 import * as vscode from 'vscode'
 import { SdkAnalyzerException } from './sdk-analyzer-exception'
+import { AbstractWatcher } from '../abstract-watcher'
 
 interface ChoiceValidSdkPathStatus<TMetadata extends Record<string, any>> {
   isValid: boolean
@@ -27,7 +27,7 @@ interface ChoiceValidSdkPathOptions<TMetadata extends Record<string, any>> {
 export class SdkAnalyzer<TMetadata = Record<string, any>> {
   constructor(
     private readonly sdkUri: vscode.Uri,
-    private readonly fileSystem: FileSystem,
+    private readonly fileSystem: AbstractWatcher,
     private readonly translator: Translator,
     private readonly extraMetadata?: TMetadata,
   ) {}
@@ -173,6 +173,46 @@ export class SdkAnalyzer<TMetadata = Record<string, any>> {
     }
   }
 
+  private getRelativeWithConfigFilePaths(): Record<string, string[]> {
+    const currentWorkspaceDir = this.fileSystem.getCurrentWorkspaceDir()
+    if (!currentWorkspaceDir)
+      return {}
+
+    const buildProfileJson5 = this.fileSystem.readBuildProfileJson5<unknown>()
+    if (!buildProfileJson5)
+      return {}
+
+    const [buildProfileFilePath, buildProfile] = buildProfileJson5 || []
+    if (!buildProfile || !buildProfileFilePath)
+      return {}
+
+    if (typeof buildProfile !== 'object' || !buildProfile || !('modules' in buildProfile) || !Array.isArray(buildProfile.modules))
+      return {}
+
+    const relativeWithConfigFilePaths: Record<string, string[]> = {}
+    for (let i = 0; i < buildProfile.modules.length; i++) {
+      const mod: unknown = buildProfile.modules[i]
+      if (typeof mod !== 'object' || !mod || !('srcPath' in mod) || typeof mod.srcPath !== 'string')
+        continue
+
+      const ohPackageJson5 = this.fileSystem.readOhPackageJson5<unknown>(vscode.Uri.joinPath(currentWorkspaceDir, mod.srcPath))
+      if (!ohPackageJson5)
+        continue
+      const [ohPackageJson5Path, ohPackageJson] = ohPackageJson5
+      this.fileSystem.watcher.add(ohPackageJson5Path.fsPath)
+      this.fileSystem.getConsola().info(`Listening ${ohPackageJson5Path}`)
+      if (typeof ohPackageJson !== 'object' || !ohPackageJson || !('name' in ohPackageJson) || typeof ohPackageJson.name !== 'string')
+        continue
+      relativeWithConfigFilePaths[ohPackageJson.name] = [
+        vscode.Uri.joinPath(currentWorkspaceDir, mod.srcPath).fsPath,
+      ]
+      relativeWithConfigFilePaths[path.join(ohPackageJson.name, '*')] = [
+        vscode.Uri.joinPath(currentWorkspaceDir, mod.srcPath, '*').fsPath,
+      ]
+    }
+    return relativeWithConfigFilePaths
+  }
+
   /**
    * Convert the `SdkAnalyzer` to client options.
    *
@@ -279,6 +319,7 @@ export class SdkAnalyzer<TMetadata = Record<string, any>> {
         ].filter(Boolean) as string[],
         '@internal/full/*': ['./api/@internal/full/*'],
       },
+      relativeWithConfigFilePaths: this.getRelativeWithConfigFilePaths(),
       etsLoaderPath: etsLoaderPath.fsPath,
     }
   }

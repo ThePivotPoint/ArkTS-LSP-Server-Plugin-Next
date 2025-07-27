@@ -8,7 +8,7 @@ export class AbstractWatcher extends FileSystem implements Disposable {
   private _watcher: FSWatcher | undefined
   private static readonly watchers: FSWatcher[] = []
 
-  protected get watcher(): FSWatcher {
+  get watcher(): FSWatcher {
     if (!this._watcher) {
       this._watcher = watch([])
       AbstractWatcher.watchers.push(this._watcher)

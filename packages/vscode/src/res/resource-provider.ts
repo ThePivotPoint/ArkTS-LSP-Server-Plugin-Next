@@ -30,7 +30,7 @@ export class ResourceProvider extends FileSystem implements DefinitionProvider, 
     const resourceMatcherResult = resourceMatcher.match(document, position)
     if (!resourceMatcherResult)
       return undefined
-    return new ResourceFinder(document.uri, this.context, this.translator, this.watcher).findRelativeResource(resourceMatcherResult.content)
+    return new ResourceFinder(document.uri, this.context, this.translator).findRelativeResource(resourceMatcherResult.content)
   }
 
   async provideHover(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Hover | undefined> {
@@ -38,7 +38,7 @@ export class ResourceProvider extends FileSystem implements DefinitionProvider, 
     const resourceMatcherResult = resourceMatcher.match(document, position)
     if (!resourceMatcherResult)
       return undefined
-    const resourceFinder = new ResourceFinder(document.uri, this.context, this.translator, this.watcher)
+    const resourceFinder = new ResourceFinder(document.uri, this.context, this.translator)
     const resourceLocations = await resourceFinder.findRelativeResource(resourceMatcherResult.content)
     if (!resourceLocations)
       return undefined
