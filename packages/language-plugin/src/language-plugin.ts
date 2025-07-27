@@ -2,6 +2,7 @@ import type { LanguagePlugin } from '@volar/language-core'
 import type * as ets from 'ohos-typescript'
 import type * as ts from 'typescript'
 import type { URI } from 'vscode-uri'
+import path from 'node:path'
 import { createEmptyVirtualCode, createVirtualCode } from './ets-code'
 import { createLazyGetter } from './utils'
 import '@volar/typescript'
@@ -31,7 +32,7 @@ export function ETSLanguagePlugin(tsOrEts: typeof ets | typeof ts, { sdkPath = '
       return undefined
     },
     createVirtualCode(uri, languageId, snapshot) {
-      const filePath = typeof uri === 'string' ? uri : uri.fsPath
+      const filePath = path.resolve(typeof uri === 'string' ? uri : uri.fsPath)
       const isInSdkPath = filePath.startsWith(sdkPath)
       const isInTsdkPath = filePath.startsWith(tsdk)
       const isDTS = filePath.endsWith('.d.ts')
