@@ -1,5 +1,11 @@
 # vscode-naily-ets
 
+## 1.0.18
+
+### Patch Changes
+
+- [`84bb0a8`](https://github.com/Groupguanfang/arkTS/commit/84bb0a8d7ff284c9be77e7957d035c5b97abaf7f) Thanks [@Groupguanfang](https://github.com/Groupguanfang)! - fix: json5 高亮, watcher
+
 ## 1.0.17
 
 ### Patch Changes
