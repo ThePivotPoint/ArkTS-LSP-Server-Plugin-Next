@@ -23,6 +23,18 @@ export abstract class LanguageServerContext extends AbstractWatcher {
   /** Current translator. */
   protected readonly translator: Translator
 
+  private debounce<Fn extends (...args: any[]) => any>(func: Fn, delay: number): (...args: Parameters<Fn>) => void {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    return function (...args) {
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        // eslint-disable-next-line ts/ban-ts-comment
+        // @ts-ignore
+        func.apply(this, args)
+      }, delay)
+    }
+  }
+
   /** Listen to all local.properties files in the workspace. */
   protected listenAllLocalPropertiesFile(): void {
     const workspaceFolders = vscode.workspace.workspaceFolders ?? []
@@ -34,8 +46,9 @@ export abstract class LanguageServerContext extends AbstractWatcher {
       this.getConsola().info(`Listening ${vscode.Uri.joinPath(workspaceFolder.uri, 'build-profile.json5').fsPath}`)
     }
 
-    this.watcher.on('change', path => this.onLocalPropertiesChanged('change', path))
-    this.watcher.on('unlink', path => this.onLocalPropertiesChanged('unlink', path))
+    const debouncedOnLocalPropertiesChanged = this.debounce(this.onLocalPropertiesChanged.bind(this), 1000)
+    this.watcher.on('change', path => debouncedOnLocalPropertiesChanged('change', path))
+    this.watcher.on('unlink', path => debouncedOnLocalPropertiesChanged('unlink', path))
   }
 
   private isFirstStart: boolean = true
