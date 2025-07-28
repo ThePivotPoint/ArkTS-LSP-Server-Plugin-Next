@@ -1,0 +1,96 @@
+{
+  "name": "Hilog",
+  "scopeName": "source.hilog",
+  "patterns": [
+    {
+      "name": "meta.hilog.line",
+      "match": "^(\\d{2}-\\d{2})\\s+(\\d{2}:\\d{2}:\\d{2}\\.\\d{3})\\s+(\\d+)\\s+(\\d+)\\s+([VDIWEF])\\s+([A-Z]\\d+/[^/]+/[^:]+:)\\s+(.*)",
+      "captures": {
+        "1": {
+          "name": "constant.numeric.date.hilog"
+        },
+        "2": {
+          "name": "constant.numeric.time.hilog"
+        },
+        "3": {
+          "name": "variable.parameter.process-id.hilog"
+        },
+        "4": {
+          "name": "variable.parameter.thread-id.hilog"
+        },
+        "5": {
+          "name": "keyword.other.level.hilog"
+        },
+        "6": {
+          "name": "entity.name.tag.domain.hilog"
+        },
+        "7": {
+          "name": "string.unquoted.message.hilog"
+        }
+      }
+    },
+    {
+      "name": "constant.numeric.date.hilog",
+      "match": "^\\d{2}-\\d{2}(?=\\s)"
+    },
+    {
+      "name": "constant.numeric.time.hilog",
+      "match": "\\d{2}:\\d{2}:\\d{2}\\.\\d{3}"
+    },
+    {
+      "name": "variable.parameter.process-id.hilog",
+      "match": "(?<=\\s)\\d{4,5}(?=\\s+\\d{4,5}\\s+[VDIWEF])"
+    },
+    {
+      "name": "variable.parameter.thread-id.hilog",
+      "match": "(?<=\\s\\d{4,5}\\s+)\\d{4,5}(?=\\s+[VDIWEF])"
+    },
+    {
+      "name": "keyword.other.level.debug.hilog",
+      "match": "\\bD\\b"
+    },
+    {
+      "name": "keyword.other.level.verbose.hilog",
+      "match": "\\bV\\b"
+    },
+    {
+      "name": "keyword.other.level.info.hilog",
+      "match": "\\bI\\b"
+    },
+    {
+      "name": "keyword.other.level.warn.hilog",
+      "match": "\\bW\\b"
+    },
+    {
+      "name": "keyword.other.level.error.hilog",
+      "match": "\\bE\\b"
+    },
+    {
+      "name": "keyword.other.level.fatal.hilog",
+      "match": "\\bF\\b"
+    },
+    {
+      "name": "entity.name.tag.domain.hilog",
+      "match": "[A-Z]\\d+/[^/\\s]+/[^:\\s]+:"
+    },
+    {
+      "name": "entity.name.section.domain-id.hilog",
+      "match": "(?<=/)[A-Z]\\d+(?=/)"
+    },
+    {
+      "name": "entity.name.function.process-name.hilog",
+      "match": "(?<=/)[^/\\s]+(?=/[^:\\s]+:)"
+    },
+    {
+      "name": "entity.name.type.log-tag.hilog",
+      "match": "(?<=/)[^:\\s]+(?=:)"
+    },
+    {
+      "name": "string.unquoted.message.hilog",
+      "match": "(?<=:\\s).*$"
+    }
+  ],
+  "repository": {},
+  "fileTypes": ["hilog"],
+  "uuid": "hilog-log-grammar"
+}
