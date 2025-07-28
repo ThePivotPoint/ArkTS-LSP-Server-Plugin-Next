@@ -115,10 +115,6 @@
       {
         "language": "ets",
         "path": "./snippets/ets.code-snippets"
-      },
-      {
-        "language": "hilog",
-        "path": "./snippets/hilog.code-snippets"
       }
     ],
     "grammars": [
