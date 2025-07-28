@@ -1,5 +1,11 @@
 # vscode-naily-ets
 
+## 1.0.20
+
+### Patch Changes
+
+- [`c1bb990`](https://github.com/Groupguanfang/arkTS/commit/c1bb990f0b0f8e52296351da99777a7075303dc4) Thanks [@Groupguanfang](https://github.com/Groupguanfang)! - feat: add debounce when restart ETS server
+
 ## 1.0.19
 
 ### Patch Changes
