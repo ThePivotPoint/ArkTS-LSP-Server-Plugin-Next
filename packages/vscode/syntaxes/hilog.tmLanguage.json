@@ -19,27 +19,27 @@
       "match": "(?<=^\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\s+\\d+\\s+)\\d+(?=\\s+[VDIWEF])"
     },
     {
-      "name": "keyword.other.level.debug.hilog",
+      "name": "support.constant.debug.hilog",
       "match": "(?<=\\s)D(?=\\s)"
     },
     {
-      "name": "keyword.other.level.verbose.hilog",
+      "name": "comment.hilog",
       "match": "(?<=\\s)V(?=\\s)"
     },
     {
-      "name": "keyword.other.level.info.hilog",
+      "name": "entity.name.function.hilog",
       "match": "(?<=\\s)I(?=\\s)"
     },
     {
-      "name": "keyword.other.level.warn.hilog",
+      "name": "constant.language.warn.hilog",
       "match": "(?<=\\s)W(?=\\s)"
     },
     {
-      "name": "keyword.other.level.error.hilog",
+      "name": "invalid.illegal.hilog",
       "match": "(?<=\\s)E(?=\\s)"
     },
     {
-      "name": "keyword.other.level.fatal.hilog",
+      "name": "markup.deleted.hilog",
       "match": "(?<=\\s)F(?=\\s)"
     },
     {
@@ -56,6 +56,8 @@
     }
   ],
   "repository": {},
-  "fileTypes": ["hilog"],
+  "fileTypes": [
+    "hilog"
+  ],
   "uuid": "hilog-log-grammar"
 }
