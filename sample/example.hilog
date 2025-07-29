@@ -1,14 +1,7 @@
-04-19	17:02:14.735	5394	5394	I	A03200/test_server/testTag:	this is a info level hilog
-04-19	17:02:15.123	5394	5395	D	A03200/test_server/debugTag:	this is a debug message
-04-19	17:02:15.456	5394	5396	W	A03200/test_server/warnTag:	this is a warning message
-04-19	17:02:15.789	5394	5397	E	A03200/test_server/errorTag:	this is an error message
-04-19	17:02:16.012	5394	5398	F	A03200/test_server/fatalTag:	this is a fatal error message
-04-19	17:02:16.345	5394	5399	V	A03200/test_server/verboseTag:	this is a verbose message
-04-19	17:02:16.678	6000	6001	I	B04500/app_name/mainTag:	application started successfully
-04-19	17:02:16.901	6000	6002	D	B04500/app_name/initTag:	initializing components
-04-19	17:02:17.234	6000	6003	W	B04500/app_name/configTag:	configuration file not found, using defaults
-04-19	17:02:17.567	6000	6004	E	B04500/app_name/networkTag:	failed to connect to server
-04-19	17:02:17.890	6000	6005	I	C05600/ui_framework/renderTag:	UI components rendered successfully
-04-19	17:02:18.123	6000	6006	D	C05600/ui_framework/animationTag:	starting animation sequence
-04-19	17:02:18.456	6000	6007	W	C05600/ui_framework/performanceTag:	frame rate dropped below 60fps
-04-19	17:02:18.789	6000	6008	E	C05600/ui_framework/memoryTag:	memory usage exceeded threshold
+07-29 11:45:41.185  1101 17393 W C01719/ffrt: 4273:FFRTQosApplyForOther:244 tid 17393, Interrupted system call, ret:-1, eno:4
+07-29 11:45:41.185   185   185 I C01560/WifiWpaStaHal: AssignCmdLen, startScan, freSize=0, hiddenSsidSize=0
+07-29 11:45:41.185  1237  1238 I C05200/wpa_supplicant: Ready to start scan
+07-29 11:45:41.185  1237  1238 I C05200/wpa_supplicant: wlan0: No enabled networks (1 disabled networks)
+07-29 11:45:41.186  1237  1238 I C05200/wpa_supplicant: wlan0: State: INACTIVE -> SCANNING
+07-29 11:45:41.186  1237  1238 I C05200/wpa_supplicant: wlan0: Starting AP scan for wildcard SSID
+07-29 11:45:41.186  1237  1238 I C05200/wpa_supplicant: wlan0: Add radio work 'scan'@0x7f97013320
