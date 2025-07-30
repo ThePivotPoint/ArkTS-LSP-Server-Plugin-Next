@@ -1,7 +1,0 @@
-07-29 11:45:41.185  1101 17393 W C01719/ffrt: 4273:FFRTQosApplyForOther:244 tid 17393, Interrupted system call, ret:-1, eno:4
-07-29 11:45:41.185   185   185 I C01560/WifiWpaStaHal: AssignCmdLen, startScan, freSize=0, hiddenSsidSize=0
-07-29 11:45:41.185  1237  1238 I C05200/wpa_supplicant: Ready to start scan
-07-29 11:45:41.185  1237  1238 I C05200/wpa_supplicant: wlan0: No enabled networks (1 disabled networks)
-07-29 11:45:41.186  1237  1238 I C05200/wpa_supplicant: wlan0: State: INACTIVE -> SCANNING
-07-29 11:45:41.186  1237  1238 I C05200/wpa_supplicant: wlan0: Starting AP scan for wildcard SSID
-07-29 11:45:41.186  1237  1238 I C05200/wpa_supplicant: wlan0: Add radio work 'scan'@0x7f97013320
