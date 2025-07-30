@@ -259,6 +259,7 @@
     "vsce": "vsce"
   },
   "devDependencies": {
+    "@arkts/headless-jsonrpc": "catalog:prod",
     "@arkts/language-server": "workspace:*",
     "@arkts/sdk-downloader": "catalog:prod",
     "@types/vscode": "^1.82.0",
