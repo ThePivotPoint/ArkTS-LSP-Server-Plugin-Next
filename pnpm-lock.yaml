@@ -74,6 +74,9 @@ catalogs:
       specifier: ^0.2.2
       version: 0.2.2
   prod:
+    '@arkts/headless-jsonrpc':
+      specifier: ^0.0.9
+      version: 0.0.9
     '@arkts/sdk-downloader':
       specifier: ^0.1.22
       version: 0.1.22
@@ -550,6 +553,9 @@ importers:
 
   packages/vscode:
     devDependencies:
+      '@arkts/headless-jsonrpc':
+        specifier: catalog:prod
+        version: 0.0.9
       '@arkts/language-server':
         specifier: workspace:*
         version: link:../language-server
@@ -673,6 +679,9 @@ packages:
 
   '@antfu/utils@8.1.1':
     resolution: {integrity: sha512-Mex9nXf9vR6AhcXmMrlz/HVgYYZpVGJ6YlPgwl7UnaFpnshXs6EK/oa5Gpf3CzENMjkvEx2tQtntGnb7UtSTOQ==}
+
+  '@arkts/headless-jsonrpc@0.0.9':
+    resolution: {integrity: sha512-a5KynlcBqH71Kf3q4V7yaA0TFmSEhuMYlmrgWz3Vyatl47XAHzsF8OWv//QRkge9TtN6NzaS6KZ3hvhYn0WIlQ==}
 
   '@arkts/sdk-downloader@0.1.22':
     resolution: {integrity: sha512-aCB86FfyySd8Zqctzp6fqChJ4Px7o0NoD7/djxk9jdCOTPP5ti/9Me6Hd/4PG06fnvgBTfQHcs2OuMAxLElrHA==}
@@ -7212,6 +7221,10 @@ snapshots:
       pnpm-workspace-yaml: 0.3.1
 
   '@antfu/utils@8.1.1': {}
+
+  '@arkts/headless-jsonrpc@0.0.9':
+    dependencies:
+      '@types/vscode': 1.102.0
 
   '@arkts/sdk-downloader@0.1.22':
     dependencies:
