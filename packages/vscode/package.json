@@ -98,17 +98,6 @@
         "bases": [
           "typescript"
         ]
-      },
-      {
-        "id": "hilog",
-        "extensions": [
-          ".hilog"
-        ],
-        "aliases": [
-          "HiLog",
-          "hilog"
-        ],
-        "configuration": "./syntaxes/hilog-language-configuration.json"
       }
     ],
     "snippets": [
@@ -122,11 +111,6 @@
         "language": "ets",
         "scopeName": "source.ets",
         "path": "./syntaxes/ets.tmLanguage.json"
-      },
-      {
-        "language": "hilog",
-        "scopeName": "source.hilog",
-        "path": "./syntaxes/hilog.tmLanguage.json"
       }
     ],
     "commands": [
