@@ -8,8 +8,7 @@ import * as vscode from 'vscode'
 export function useCompiledWebview(htmlPath: MaybeRefOrGetter<string>, options: WebviewViewRegisterOptions = {}): ReturnType<typeof useWebviewView> {
   const html = ref('')
 
-  watchFile([path.join(path.dirname(toValue(htmlPath)), '**', '*')])
-    .on('all', () => loadHtml(toValue(htmlPath)))
+  watchFile(path.dirname(toValue(htmlPath))).on('all', () => loadHtml(toValue(htmlPath)))
   watch(() => htmlPath, () => loadHtml(toValue(htmlPath)))
 
   const webviewView = useWebviewView('ets-hilog-view', html, {

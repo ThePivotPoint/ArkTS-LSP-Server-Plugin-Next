@@ -1,6 +1,7 @@
+/* eslint-disable node/prefer-global/process */
+import type { ETSPluginOptions, TypescriptLanguageFeatures } from '@arkts/shared'
 import type { LabsInfo } from '@volar/vscode'
 import type { LanguageClient, LanguageClientOptions } from '@volar/vscode/node'
-import type { TypescriptLanguageFeatures } from 'packages/shared/out/index.mjs'
 import type { Translator } from '../translate'
 import { executeCommand } from 'reactive-vscode'
 import * as vscode from 'vscode'
@@ -84,7 +85,7 @@ export abstract class LanguageServerContext extends AbstractWatcher {
   private _analyzerSdkAnalyzer: SdkAnalyzer<SdkAnalyzerMetadata> | undefined
 
   /** Get the path of the Ohos SDK from `local.properties` file or configuration. */
-  protected async getAnalyzedSdkPath(force: boolean = false): Promise<string | undefined> {
+  public async getAnalyzedSdkPath(force: boolean = false): Promise<string | undefined> {
     if (!force && this._analyzedSdkPath)
       return this._analyzedSdkPath
 
@@ -127,14 +128,16 @@ export abstract class LanguageServerContext extends AbstractWatcher {
 
   /** Configure the volar typescript plugin by `ClientOptions`. */
   protected async configureTypeScriptPlugin(clientOptions: LanguageClientOptions): Promise<void> {
+    const typescriptPluginConfig: ETSPluginOptions = {
+      workspaceFolder: this.getCurrentWorkspaceDir()?.fsPath,
+      lspOptions: clientOptions.initializationOptions,
+    }
+    process.env.__etsTypescriptPluginFeature = JSON.stringify(typescriptPluginConfig)
     const typescriptLanguageFeatures = vscode.extensions.getExtension<TypescriptLanguageFeatures>('vscode.typescript-language-features')
     if (typescriptLanguageFeatures?.isActive) {
       executeCommand('typescript.restartTsServer')
     }
     await typescriptLanguageFeatures?.activate()
-    typescriptLanguageFeatures?.exports.getAPI?.(0)?.configurePlugin?.('ets-typescript-plugin', {
-      workspaceFolder: this.getCurrentWorkspaceDir()?.fsPath,
-      lspOptions: clientOptions.initializationOptions,
-    })
+    typescriptLanguageFeatures?.exports.getAPI?.(0)?.configurePlugin?.('ets-typescript-plugin', typescriptPluginConfig)
   }
 }

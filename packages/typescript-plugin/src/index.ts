@@ -1,6 +1,22 @@
 import type * as ts from 'typescript'
+import process from 'node:process'
 import { ETSLanguagePlugin } from '@arkts/language-plugin'
 import { createLanguageServicePlugin } from '@volar/typescript/lib/quickstart/createLanguageServicePlugin'
+
+/**
+ * 尝试解析环境变量 `__etsTypescriptPluginFeature`是否为JSON，如果解析失败则返回一个空对象。
+ *
+ * 这适用于在插件加载时获取配置或其他相关信息。
+ */
+function tryParseEnv(): Record<string, any> {
+  try {
+    return JSON.parse(process.env.__etsTypescriptPluginFeature || '{}')
+  }
+  catch (error) {
+    console.error('Failed to parse __etsTypescriptPluginFeature:', error)
+    return {}
+  }
+}
 
 /**
  * ### 这个插件做了什么？
@@ -16,6 +32,9 @@ import { createLanguageServicePlugin } from '@volar/typescript/lib/quickstart/cr
  * 点开一个`.ts`文件然后按 Ctrl + shift + P 输入`Typescript: Open TS Server Log`
  */
 const plugin: ts.server.PluginModuleFactory = createLanguageServicePlugin((ts, info) => {
+  const env = tryParseEnv()
+  if (env?.lspOptions?.ohos?.sdkPath)
+    info.config = env
   const sdkPath = info.config?.lspOptions?.ohos?.sdkPath
 
   console.warn(`ETS typescript plugin loaded! sdkPath: ${sdkPath}`)

@@ -1,27 +1,32 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useConnectionStore } from './composables/connection'
 
-const count = ref(0)
-const options = ref([1, 2, 3])
-const selected = ref('测试选项')
+const connectionStore = useConnectionStore()
+const text = ref('')
+async function sendMessage(): Promise<void> {
+  try {
+    const response = await connectionStore.connection.sendRequest({
+      method: 'hilog',
+      params: [1],
+      id: 1,
+    })
+    text.value = `${text.value}\n${JSON.stringify(response)}`
+  }
+  catch (error) {
+    text.value = `${text.value}\n${error instanceof Error ? `${error.name}: ${error.message}` : String(error)}`
+  }
+}
 </script>
 
 <template>
   <div :style="{ width: `100%`, height: `100%`, display: 'flex', flexDirection: 'column' }">
     <div>
-      <select v-model="selected">
-        <option value="测试选项">
-          测试选项
-        </option>
-        <option value="测试选项2">
-          测试选项2
-        </option>
-        <option value="测试选项3">
-          测试选项3
-        </option>
-      </select>
-      {{ count }}
-      {{ options }}
+      <button @click="sendMessage">
+        发送消息！！
+      </button>
+      <span>{{ text }}</span>
+      <span>{{ connectionStore.event }}</span>
     </div>
   </div>
 </template>
