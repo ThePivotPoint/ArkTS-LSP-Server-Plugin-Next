@@ -29,20 +29,29 @@
               "enum": [
                 "name",
                 "type",
+                "srcEntry",
+                "abilitySrcEntryDelegator",
+                "abilityStageSrcEntryDelegator",
                 "description",
                 "deliveryWithInstall",
                 "deviceTypes",
+                "deviceFeatures",
                 "pages",
                 "metadata",
+                "abilities",
+		        "extensionAbilities",
                 "requestPermissions",
                 "dependencies",
                 "libIsolation",
                 "compressNativeLibs",
+                "extractNativeLibs",
                 "installationFree",
                 "atomicService",
                 "targetModuleName",
                 "targetPriority",
-                "generateBuildHash"
+                "generateBuildHash",
+                "routerMap",
+                "appStartup"
               ]
             },
             "required": [
@@ -82,7 +91,9 @@
                 "definePermissions",
                 "testRunner",
                 "dependencies",
-                "libIsolation"
+                "libIsolation",
+                "routerMap",
+                "appStartup"
               ]
             },
             "required": [
@@ -107,15 +118,19 @@
                 "type",
                 "srcEntrance",
                 "srcEntry",
+                "abilitySrcEntryDelegator",
+                "abilityStageSrcEntryDelegator",
                 "description",
                 "process",
                 "mainElement",
                 "deviceTypes",
+                "deviceFeatures",
                 "deliveryWithInstall",
                 "installationFree",
                 "virtualMachine",
                 "uiSyntax",
                 "pages",
+                "systemTheme",
                 "metadata",
                 "abilities",
                 "extensionAbilities",
@@ -125,11 +140,17 @@
                 "dependencies",
                 "libIsolation",
                 "compressNativeLibs",
+                "extractNativeLibs",
                 "atomicService",
                 "generateBuildHash",
                 "isolationMode",
                 "proxyData",
-                "fileContextMenu"
+                "fileContextMenu",
+                "querySchemes",
+                "routerMap",
+                "appEnvironments",
+                "appStartup",
+                "hnpPackages"
               ]
             },
             "required": [
@@ -155,10 +176,13 @@
                 "type",
                 "srcEntrance",
                 "srcEntry",
+                "abilitySrcEntryDelegator",
+                "abilityStageSrcEntryDelegator",
                 "description",
                 "process",
                 "mainElement",
                 "deviceTypes",
+                "deviceFeatures",
                 "deliveryWithInstall",
                 "installationFree",
                 "virtualMachine",
@@ -173,10 +197,14 @@
                 "dependencies",
                 "libIsolation",
                 "compressNativeLibs",
+                "extractNativeLibs",
                 "atomicService",
                 "generateBuildHash",
                 "isolationMode",
-                "proxyData"
+                "proxyData",
+                "routerMap",
+                "appEnvironments",
+                "appStartup"
               ]
             },
             "required": [
@@ -193,7 +221,7 @@
           "description": "Indicates the module name.",
           "type": "string",
           "pattern": "^[a-zA-Z][0-9a-zA-Z_.]*$",
-          "maxLength": 31
+          "maxLength": 128
         },
         "type": {
           "description": "Indicates the type of the module.",
@@ -215,6 +243,18 @@
           "description": "This tag indicates the entry js code path corresponding to hap",
           "type": "string",
           "maxLength": 127
+        },
+        "abilitySrcEntryDelegator": {
+          "description": "This tag indicates the delegator for Ability",
+          "type": "string",
+          "pattern": "^[a-zA-Z][0-9a-zA-Z_.]*$",
+          "maxLength": 127
+        },
+        "abilityStageSrcEntryDelegator": {
+          "description": "This tag indicates the delegator for AbilityStage",
+          "type": "string",
+          "pattern": "^[a-zA-Z][0-9a-zA-Z_.]*$",
+          "maxLength": 128
         },
         "description": {
           "description": "Indicates the description of the current .hap file.",
@@ -239,11 +279,25 @@
             "type": "string",
             "enum": [
               "default",
+              "phone",
               "tablet",
               "tv",
               "wearable",
               "car",
               "2in1"
+            ]
+          }
+        },
+        "deviceFeatures": {
+          "description": "Declarable device capabilities required by the application.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "multi_process",
+              "free_multi_window",
+              "directory_permission"
             ]
           }
         },
@@ -265,7 +319,7 @@
           "default": "default"
         },
         "uiSyntax": {
-          "description": "Indicates the syntax type of JS Component.Default is hml.",
+          "description": "Indicates the syntax type of ETS Component.Default is hml.",
           "deprecationMessage": "Deprecated since api 9",
           "type": "string",
           "enum": [
@@ -275,9 +329,15 @@
           "default": "hml"
         },
         "pages": {
-          "description": "Used to list the information of each page in JS Component.",
+          "description": "Used to list the information of each page in ETS Component.",
           "type": "string",
           "pattern": "^[$]profile:[0-9a-zA-Z_.]+$",
+          "maxLength": 255
+        },
+        "systemTheme": {
+          "description": "Indicates the system theme of the module. The value is the index to the theme config file.",
+          "type": "string",
+          "pattern": "^[$]profile:theme_config[0-9a-zA-Z_.]*$",
           "maxLength": 255
         },
         "metadata": {
@@ -318,23 +378,11 @@
           "uniqueItems": true,
           "items": {
             "type": "object",
-            "oneOf": [
-              {
-                "required": [
-                  "name",
-                  "srcEntrance",
-                  "startWindowIcon",
-                  "startWindowBackground"
-                ]
-              },
-              {
-                "required": [
-                  "name",
-                  "srcEntry",
-                  "startWindowIcon",
-                  "startWindowBackground"
-                ]
-              }
+            "required": [
+              "name",
+              "srcEntry",
+              "startWindowIcon",
+              "startWindowBackground"
             ],
             "propertyNames": {
               "enum": [
@@ -353,6 +401,7 @@
                 "skills",
                 "backgroundModes",
                 "continuable",
+                "startWindow",
                 "startWindowIcon",
                 "startWindowBackground",
                 "removeMissionAfterTerminate",
@@ -367,7 +416,12 @@
                 "excludeFromMissions",
                 "recoverable",
                 "unclearableMission",
-                "isolationProcess"
+                "excludeFromDock",
+                "isolationProcess",
+                "preferMultiWindowOrientation",
+                "continueType",
+                "continueBundleName",
+                "process"
               ]
             },
             "properties": {
@@ -483,7 +537,9 @@
                     "enum": [
                       "actions",
                       "entities",
-                      "uris"
+                      "uris",
+                      "permissions",
+                      "domainVerify"
                     ]
                   },
                   "properties": {
@@ -520,7 +576,8 @@
                                 "pathRegex",
                                 "type",
                                 "utd",
-                                "maxFileSupported"
+                                "maxFileSupported",
+                                "linkFeature"
                               ]
                             },
                             "required": [
@@ -562,6 +619,12 @@
                               "maxFileSupported": {
                                 "description": "Indicates the maximum number of files that can be received.",
                                 "type": "integer"
+                              },
+                              "linkFeature": {
+                                "description": "Indicates the uri feature.",
+                                "type": "string",
+                                "pattern": "^[a-zA-Z][0-9a-zA-Z_.]*$",
+                                "maxLength": 127
                               }
                             }
                           },
@@ -581,6 +644,21 @@
                           }
                         ]
                       }
+                    },
+                    "permissions": {
+                      "description": "Indicates the permissions required for abilities of another application to call the current ability, generally in the format of a reverse domain name. The value can be either the permissions predefined in the OS or those customized by your application. If a custom permission is used, the value must be the same as the name value of a specific permission defined in the definePermissions attribute.",
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z][a-zA-Z_.]*$",
+                        "maxLength": 255
+                      }
+                    },
+                    "domainVerify": {
+                      "description": "Specifies whether the ability support domain verification. The \"true\" indicates the ability support domain verification. The \"false\" indicates the ability does not support domain verification. This tag is optional. The default value is false.",
+                      "type": "boolean",
+                      "default": false
                     }
                   }
                 }
@@ -608,6 +686,12 @@
                 "description": "Identifies whether the ability can be migrated. The default value is false.",
                 "type": "boolean"
               },
+              "startWindow": {
+                "description": "Indicates the startup page configuration. The value is the index to the resource file.",
+                "type": "string",
+                "pattern": "^[$]profile:[0-9a-zA-Z_.]+$",
+                "maxLength": 255
+              },
               "startWindowIcon": {
                 "description": "Indicates the icon of the startup page. The value is the index to the resource file.",
                 "type": "string",
@@ -627,19 +711,30 @@
               },
               "orientation": {
                 "description": "Indicates the display orientation of the ability. This attribute is valid only for abilities using the Page template.",
-                "enum": [
-                  "unspecified",
-                  "landscape",
-                  "portrait",
-                  "landscape_inverted",
-                  "portrait_inverted",
-                  "auto_rotation",
-                  "auto_rotation_landscape",
-                  "auto_rotation_portrait",
-                  "auto_rotation_restricted",
-                  "auto_rotation_landscape_restricted",
-                  "auto_rotation_portrait_restricted",
-                  "locked"
+                "oneOf": [
+                  {
+                    "enum": [
+                      "unspecified",
+                      "landscape",
+                      "portrait",
+                      "follow_recent",
+                      "landscape_inverted",
+                      "portrait_inverted",
+                      "auto_rotation",
+                      "auto_rotation_landscape",
+                      "auto_rotation_portrait",
+                      "auto_rotation_restricted",
+                      "auto_rotation_landscape_restricted",
+                      "auto_rotation_portrait_restricted",
+                      "locked",
+                      "auto_rotation_unspecified",
+                      "follow_desktop"
+                    ]
+                  },
+                  {
+                    "maxLength": 255,
+                    "pattern": "^[$]string:[0-9a-zA-Z_.]+|(?=.*[{])(?=.*[}])[0-9a-zA-Z_.{}]+$"
+                  }
                 ],
                 "type": "string"
               },
@@ -701,10 +796,55 @@
                 "type": "boolean",
                 "default": false
               },
+              "excludeFromDock": {
+                "description": "Specify whether to hide the application icon from the dock area.",
+                "type": "boolean",
+                "default": false
+              },
               "isolationProcess": {
                 "description": "Specifies whether the ability can run in an independent process",
                 "type": "boolean",
                 "default": false
+              },
+              "preferMultiWindowOrientation": {
+                "description": "Indicates the prefered multi window orientation.",
+                "type": "string",
+                "enum": [
+                  "default",
+                  "portrait",
+                  "landscape",
+                  "landscape_auto"
+
+                ],
+                "default": "default"
+              },
+              "continueType": {
+                "description": "Identifies the type of the ability can be migrated.",
+                "type": "array",
+                "uniqueItems": true,
+                "maxLength": 100,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z][0-9a-zA-Z_.]*$",
+                  "maxLength": 127
+                }
+              },
+              "continueBundleName": {
+                "description": "Configure the package names of other applications to be connected.",
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z][0-9a-zA-Z_.]+$",
+                  "maxLength": 128,
+                  "minLength": 7
+                }
+              },
+              "process": {
+                "description": "Running process tag the ability.",
+                "type": "string",
+                "maxLength": 31,
+                "pattern": "^[:][0-9a-zA-Z_]+$"
               }
             }
           }
@@ -714,72 +854,174 @@
           "type": "array",
           "items": {
             "type": "object",
-            "if": {
-              "properties": {
-                "type": {
-                  "const": "dataShare"
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "type": {
+                      "const": "dataShare"
+                    }
+                  }
+                },
+                "then": {
+                  "oneOf": [
+                    {
+                      "required": [
+                        "name",
+                        "srcEntrance",
+                        "type",
+                        "uri"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "name",
+                        "srcEntry",
+                        "type",
+                        "uri"
+                      ]
+                    }
+                  ]
+                },
+                "else": {
+                  "oneOf": [
+                    {
+                      "required": [
+                        "name",
+                        "srcEntrance",
+                        "type"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "name",
+                        "srcEntry",
+                        "type"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "type": {
+                      "const": "appService"
+                    }
+                  }
+                },
+                "then": {
+                  "propertyNames": {
+                    "enum": [
+                      "priority",
+                      "name",
+                      "srcEntrance",
+                      "srcEntry",
+                      "icon",
+                      "label",
+                      "description",
+                      "type",
+                      "permissions",
+                      "uri",
+                      "readPermission",
+                      "writePermission",
+                      "visible",
+                      "exported",
+                      "skills",
+                      "metadata",
+                      "extensionProcessMode",
+                      "dataGroupIds",
+                      "process",
+                      "appIdentifierAllowList"
+                    ]
+                  }
+                },
+                "else": {
+                  "propertyNames": {
+                    "enum": [
+                      "priority",
+                      "name",
+                      "srcEntrance",
+                      "srcEntry",
+                      "icon",
+                      "label",
+                      "description",
+                      "type",
+                      "permissions",
+                      "uri",
+                      "readPermission",
+                      "writePermission",
+                      "visible",
+                      "exported",
+                      "skills",
+                      "metadata",
+                      "extensionProcessMode",
+                      "dataGroupIds",
+                      "process"
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "type": {
+                      "const": "embeddedUI"
+                    }
+                  }
+                },
+                "then": {
+                  "propertyNames": {
+                    "enum": [
+                      "priority",
+                      "name",
+                      "srcEntrance",
+                      "srcEntry",
+                      "icon",
+                      "label",
+                      "description",
+                      "type",
+                      "permissions",
+                      "uri",
+                      "readPermission",
+                      "writePermission",
+                      "visible",
+                      "exported",
+                      "skills",
+                      "metadata",
+                      "extensionProcessMode",
+                      "dataGroupIds",
+                      "process"
+                    ]
+                  }
+                },
+                "else": {
+                  "propertyNames": {
+                    "enum": [
+                      "priority",
+                      "name",
+                      "srcEntrance",
+                      "srcEntry",
+                      "icon",
+                      "label",
+                      "description",
+                      "type",
+                      "permissions",
+                      "uri",
+                      "readPermission",
+                      "writePermission",
+                      "visible",
+                      "exported",
+                      "skills",
+                      "metadata",
+                      "extensionProcessMode",
+                      "dataGroupIds",
+                      "appIdentifierAllowList"
+                    ]
+                  }
                 }
               }
-            },
-            "then": {
-              "oneOf": [
-                {
-                  "required": [
-                    "name",
-                    "srcEntrance",
-                    "type",
-                    "uri"
-                  ]
-                },
-                {
-                  "required": [
-                    "name",
-                    "srcEntry",
-                    "type",
-                    "uri"
-                  ]
-                }
-              ]
-            },
-            "else": {
-              "oneOf": [
-                {
-                  "required": [
-                    "name",
-                    "srcEntrance",
-                    "type"
-                  ]
-                },
-                {
-                  "required": [
-                    "name",
-                    "srcEntry",
-                    "type"
-                  ]
-                }
-              ]
-            },
-            "propertyNames": {
-              "enum": [
-                "priority",
-                "name",
-                "srcEntrance",
-                "srcEntry",
-                "icon",
-                "label",
-                "description",
-                "type",
-                "permissions",
-                "uri",
-                "readPermission",
-                "writePermission",
-                "visible",
-                "exported",
-                "skills",
-                "metadata",
-                "extensionProcessMode"
-              ]
-            },
+            ],
             "properties": {
               "priority": {
                 "description": "Indicates the priority of the ability.Only for system application.This field is used for implicit query.Range from 0 to 10, default value is 0.",
@@ -844,13 +1086,17 @@
                   "driver",
                   "action",
                   "adsService",
+                  "embeddedUI",
+				  "insightIntentUI",
                   "autoFill/password",
                   "hms/account",
                   "appAccountAuthorization",
                   "ads",
                   "remoteNotification",
                   "remoteLocation",
+                  "statusBarView",
                   "voip",
+                  "accountLogout",
                   "sysDialog/userAuth",
                   "sysDialog/common",
                   "sysDialog/atomicServicePanel",
@@ -863,10 +1109,30 @@
                   "sysPicker/share",
                   "sysPicker/meetimeContact",
                   "sysPicker/meetimeCallLog",
-                  "sysPicker/photoPicker",
+				  "sysPicker/photoPicker",
+				  "sysPicker/appSelector",
+                  "sysPicker/navigation",
+				  "sysPicker/photoEditor",
+				  "photoEditor",
+                  "sysPicker/filePicker",
+                  "sysPicker/audioPicker",
+                  "sys/visualExtension",
                   "sys/commonUI",
                   "fileAccess",
-                  "sysPicker/camera"
+                  "autoFill/smart",
+                  "liveViewLockScreen",
+                  "recentPhoto",
+                  "uiService",
+                  "fence",
+                  "callerInfoQuery",
+                  "assetAcceleration",
+				  "awc/webpage",
+				  "awc/newsfeed",
+                  "formEdit",
+                  "liveForm",
+                  "vpn",
+                  "screenTimeGuard",
+                  "appService"
                 ]
               },
               "permissions": {
@@ -876,6 +1142,16 @@
                 "items": {
                   "type": "string",
                   "maxLength": 255
+                }
+              },
+              "appIdentifierAllowList": {
+                "description": "List of applications that are allowed to launch this ExtensionAbility.",
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "maxLength": 128,
+                  "pattern": "[0-9a-zA-Z]+$"
                 }
               },
               "uri": {
@@ -914,7 +1190,8 @@
                     "enum": [
                       "actions",
                       "entities",
-                      "uris"
+                      "uris",
+                      "permissions"
                     ]
                   },
                   "properties": {
@@ -1013,6 +1290,16 @@
                           }
                         ]
                       }
+                    },
+                    "permissions": {
+                      "description": "Indicates the permissions required for extensionAbilities of another application to call the current extension.",
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z][a-zA-Z_.]*$",
+                        "maxLength": 255
+                      }
                     }
                   }
                 }
@@ -1049,15 +1336,58 @@
                   }
                 }
               },
-              "extensionProcessMode": {
-                "description": "Indicates the extension support multi instance model.",
+              "dataGroupIds": {
+                "description": "Indicates the data group IDs associated with the extension ability.",
+                "type": "array",
+                "maxItems": 1024,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024,
+                  "pattern": "^[\\x00-\\x7F]*$"
+                }
+              },
+              "process": {
+                "description": "Running process tag the extension ability.",
                 "type": "string",
-                "enum": [
-                  "instance",
-                  "type",
-                  "bundle"
-                ],
-                "default": "instance"
+                "maxLength": 31,
+                "pattern": "^[:][0-9a-zA-Z_]+$"
+              },
+              "if": {
+                "properties": {
+                  "type": {
+                    "const": "statusBarView"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "extensionProcessMode": {
+                    "description": "Indicates the extension support multi instance model.",
+                    "type": "string",
+                    "enum": [
+                      "instance",
+                      "type",
+                      "bundle",
+                      "runWithMainProcess"
+                    ],
+                    "default": "bundle"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "extensionProcessMode": {
+                    "description": "Indicates the extension support multi instance model.",
+                    "type": "string",
+                    "enum": [
+                      "instance",
+                      "type",
+                      "bundle"
+                    ],
+                    "default": "bundle"
+                  }
+                }
               }
             }
           }
@@ -1237,7 +1567,7 @@
               "moduleName": {
                 "description": "Indicates the module name of the dependency shared library.",
                 "type": "string",
-                "maxLength": 31
+                "maxLength": 128
               },
               "versionCode": {
                 "description": "Indicates the versionCode number of the dependency shared library. The value is an integer greater than 0. A larger value generally represents a later version.The system determines the dependency shared library version based on the tag value.This label cannot be left blank.",
@@ -1256,6 +1586,11 @@
           "description": "Specifies whether the libs libraries of the .hap file are compressed for storage. If this attribute is set to false, the libs libraries are stored without being compressed and will be directly loaded during the installation of the .hap file.",
           "type": "boolean",
           "default": false
+        },
+        "extractNativeLibs": {
+          "description": "Specifies whether to extract native libraries (so) of the .hap file during installation.",
+          "type": "boolean",
+          "default": true
         },
         "atomicService": {
           "description": "Indicates the module config in atomic service.",
@@ -1281,7 +1616,7 @@
                   "moduleName": {
                     "description": "Indicates module is preloaded when the current module is run.",
                     "type": "string",
-                    "maxLength": 31
+                    "maxLength": 128
                   }
                 }
               }
@@ -1292,7 +1627,7 @@
           "description": "Indicates the target module name of an overlay module.",
           "type": "string",
           "pattern": "[^\u4e00-\u9fa5]+",
-          "maxLength": 31
+          "maxLength": 128
         },
         "targetPriority": {
           "description": "Indicates the priority of the overlay module. 1 to 100, default value is 1.",
@@ -1380,6 +1715,88 @@
           "type": "string",
           "pattern": "^[$]profile:[0-9a-zA-Z_.]+$",
           "maxLength": 255
+        },
+        "querySchemes": {
+          "description": "Indicates the URL schemes control list",
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 50,
+          "items": {
+            "type": "string",
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z][0-9a-zA-Z+.-]*"
+          }
+        },
+        "routerMap": {
+          "description": "Indicates the path of router navigation profile.",
+          "type": "string",
+          "pattern": "^[$]profile:[0-9a-zA-Z_.]+$",
+          "maxLength": 255
+        },
+        "appEnvironments": {
+          "description": "Indicates the environment value of app.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "propertyNames": {
+              "enum": [
+                "name",
+                "value"
+              ]
+            },
+            "properties": {
+              "name": {
+                "description": "Indicates the key of a environment element. The value is a string with a maximum of 4096 bytes.",
+                "type": "string",
+                "maxLength": 4096
+              },
+              "value": {
+                "description": "Indicates the value of a environment element. The value is a string with a maximum of 4096 bytes.",
+                "type": "string",
+                "maxLength": 4096
+              }
+            }
+          }
+        },
+        "appStartup": {
+          "description": "Startup framework configuration file. The value is startup framework configuration file path.",
+          "type": "string",
+          "pattern": "^[$]profile:[0-9a-zA-Z_.]+$",
+          "maxLength": 255
+        },
+        "hnpPackages": {
+          "description": "Native package configuration file.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "propertyNames": {
+              "enum": [
+                "package",
+                "type"
+              ]
+            },
+            "required": [
+              "package",
+              "type"
+            ],
+            "properties": {
+              "package": {
+                "description": "Indicates the file name of native package.",
+                "type": "string",
+                "pattern": "^([a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/)?[a-zA-Z0-9_-]+\\.hnp$",
+                "maxLength": 255
+              },
+              "type": {
+                "description": "Indicates the type of native package.",
+                "type": "string",
+                "enum": [
+                  "public",
+                  "private"
+                ]
+              }
+            }
+          }
         }
       }
     }
