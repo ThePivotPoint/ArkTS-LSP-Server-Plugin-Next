@@ -41,6 +41,7 @@
     "cross-env": "catalog:scripts",
     "defu": "catalog:prod",
     "eslint": "catalog:lint",
+    "html5parser": "^2.0.2",
     "lodash": "catalog:prod",
     "magic-string": "^0.30.17",
     "oxc-parser": "catalog:scripts",

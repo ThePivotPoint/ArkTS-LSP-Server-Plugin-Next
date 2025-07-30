@@ -12,23 +12,24 @@ export function useCompiledWebview(htmlPath: MaybeRefOrGetter<string>, options: 
     .on('all', () => loadHtml(toValue(htmlPath)))
   watch(() => htmlPath, () => loadHtml(toValue(htmlPath)))
 
-  function loadHtml(htmlPath: string): void {
-    const content = fs.readFileSync(htmlPath, 'utf-8')
-    html.value = content.replace(/<script type="module" crossorigin src="([^"]+)"><\/script>/g, (_, src) => {
-      return `<script type="module" crossorigin src="https://file+.vscode-resource.vscode-cdn.net${vscode.Uri.joinPath(extensionContext.value!.extensionUri, 'build', src).fsPath}"></script>`
-    }).replace(/<link rel="stylesheet" crossorigin href="([^"]+)"/g, (_, src) => {
-      return `<link rel="stylesheet" crossorigin href="https://file+.vscode-resource.vscode-cdn.net${vscode.Uri.joinPath(extensionContext.value!.extensionUri, 'build', src).fsPath}"`
-    })
-  }
-  loadHtml(toValue(htmlPath))
-
-  return useWebviewView('ets-hilog-view', html, {
+  const webviewView = useWebviewView('ets-hilog-view', html, {
     ...options,
     webviewOptions: {
       enableScripts: true,
       enableCommandUris: true,
-      localResourceRoots: [vscode.Uri.joinPath(extensionContext.value!.extensionUri, 'build')],
       ...options?.webviewOptions,
     },
   })
+
+  function loadHtml(htmlPath: string): void {
+    const content = fs.readFileSync(htmlPath, 'utf-8')
+    html.value = content
+    html.value = html.value.replace(/\{\{(.*?)\}\}/g, (_, href) => {
+      const resourceUri = webviewView.view.value?.webview.asWebviewUri(vscode.Uri.file(path.resolve(extensionContext.value!.extensionPath, 'build', href)))
+      return decodeURIComponent(resourceUri?.toString() || '')
+    })
+  }
+  watch(() => webviewView.view.value?.webview, () => loadHtml(toValue(htmlPath)), { immediate: true })
+
+  return webviewView
 }

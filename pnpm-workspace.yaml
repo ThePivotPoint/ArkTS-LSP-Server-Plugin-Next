@@ -18,6 +18,7 @@ catalogs:
     '@vitejs/plugin-vue': ^5.2.4
     '@vitejs/plugin-vue-jsx': ^4.2.0
     '@vueuse/core': ^13.3.0
+    pinia: ^3.0.3
     unocss: ^66.2.0
     vite: npm:rolldown-vite@latest
     vue: ^3.5.16
@@ -28,6 +29,7 @@ catalogs:
   polyfill:
     reflect-metadata: ^0.2.2
   prod:
+    '@arkts/headless-jsonrpc': ^0.0.9
     '@arkts/sdk-downloader': ^0.1.22
     '@types/lodash': ^4.17.17
     '@types/unzipper': ^0.10.11
@@ -46,6 +48,7 @@ catalogs:
     lodash: ^4.17.21
     tar: ^7.4.3
     typescript: latest
+    unioc: ^0.0.21
     unzipper: ^0.12.3
     volar-service-css: volar-2.4
     volar-service-emmet: volar-2.4
