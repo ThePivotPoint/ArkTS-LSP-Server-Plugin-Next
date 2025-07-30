@@ -1,5 +1,15 @@
 # vscode-naily-ets
 
+## 1.0.21
+
+### Patch Changes
+
+- [#78](https://github.com/Groupguanfang/arkTS/pull/78) [`9af013a`](https://github.com/Groupguanfang/arkTS/commit/9af013abf63638fb27ed9fcb88cc89a014360334) Thanks [@github-actions](https://github.com/apps/github-actions)! - feat: update useCompiledWebview hook & deps
+
+- [#78](https://github.com/Groupguanfang/arkTS/pull/78) [`f421410`](https://github.com/Groupguanfang/arkTS/commit/f4214104fe92ce5aab0d52741a4fae36d01bdde3) Thanks [@github-actions](https://github.com/apps/github-actions)! - feat: update module.schema.json
+
+- [#78](https://github.com/Groupguanfang/arkTS/pull/78) [`d251b2d`](https://github.com/Groupguanfang/arkTS/commit/d251b2d31fc15038240890eb75bc141912e59488) Thanks [@github-actions](https://github.com/apps/github-actions)! - feat: test hilog & using env variable to pass the extension configuration to typescript plugin
+
 ## 1.0.20
 
 ### Patch Changes
