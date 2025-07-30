@@ -184,7 +184,7 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
       this.getServerOptions(),
       this.getClientOptions(force),
     ])
-    await this.configureTypeScriptPlugin(clientOptions)
+    this.configureTypeScriptPlugin(clientOptions)
 
     // If the lsp is already created, just restart the lsp
     if (this._client) {
