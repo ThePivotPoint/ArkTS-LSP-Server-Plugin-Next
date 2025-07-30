@@ -261,7 +261,6 @@
   "devDependencies": {
     "@arkts/language-server": "workspace:*",
     "@arkts/sdk-downloader": "catalog:prod",
-    "@arkts/typescript-plugin": "workspace:*",
     "@types/vscode": "^1.82.0",
     "@volar/language-server": "catalog:prod",
     "@volar/vscode": "catalog:prod",
@@ -276,6 +275,6 @@
     "ovsx": "catalog:scripts",
     "tar": "catalog:prod",
     "ts-macro": "catalog:dev",
-    "unioc": "^0.0.21"
+    "unioc": "catalog:prod"
   }
 }
