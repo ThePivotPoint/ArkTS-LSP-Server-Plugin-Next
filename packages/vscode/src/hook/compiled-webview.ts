@@ -2,7 +2,7 @@ import type { MaybeRefOrGetter, WebviewViewRegisterOptions } from 'reactive-vsco
 import fs from 'node:fs'
 import path from 'node:path'
 import { watch as watchFile } from 'chokidar'
-import { extensionContext, ref, toValue, useWebviewView, watch } from 'reactive-vscode'
+import { ref, toValue, useWebviewView, watch } from 'reactive-vscode'
 import * as vscode from 'vscode'
 
 export function useCompiledWebview(htmlPath: MaybeRefOrGetter<string>, options: WebviewViewRegisterOptions = {}): ReturnType<typeof useWebviewView> {
@@ -24,7 +24,7 @@ export function useCompiledWebview(htmlPath: MaybeRefOrGetter<string>, options: 
     const content = fs.readFileSync(htmlPath, 'utf-8')
     html.value = content
     html.value = html.value.replace(/\{\{(.*?)\}\}/g, (_, href) => {
-      const resourceUri = webviewView.view.value?.webview.asWebviewUri(vscode.Uri.file(path.resolve(extensionContext.value!.extensionPath, 'build', href)))
+      const resourceUri = webviewView.view.value?.webview.asWebviewUri(vscode.Uri.file(path.resolve(path.dirname(htmlPath), href?.trim?.() || href)))
       return decodeURIComponent(resourceUri?.toString() || '')
     })
   }

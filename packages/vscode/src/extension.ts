@@ -2,7 +2,6 @@
 import 'reflect-metadata'
 import type { LabsInfo } from '@volar/vscode'
 import type { ExtensionContext } from 'vscode'
-import path from 'node:path'
 import { extensionContext, watch } from 'reactive-vscode'
 import { CommandPlugin, DisposablePlugin, LanguageProviderPlugin, VSCodeBootstrap, WatchConfigurationPlugin } from 'unioc/vscode'
 import { useCompiledWebview } from './hook/compiled-webview'
@@ -41,8 +40,8 @@ class ArkTSExtension extends VSCodeBootstrap<Promise<LabsInfo | undefined>> {
     })
 
     const globalContainer = this.getGlobalContainer()
-    const webview = useCompiledWebview(path.resolve(context.extensionPath, 'build', 'hilog.html'))
-    const watchHandle = watch(() => webview.view.value?.webview, async (webView) => {
+    const webview = useCompiledWebview(vscode.Uri.joinPath(context.extensionUri, 'build', 'hilog.html').fsPath)
+    const closeWatch = watch(() => webview.view.value?.webview, async (webView) => {
       if (!webView)
         return
       const connection = createConnection({
@@ -52,7 +51,7 @@ class ArkTSExtension extends VSCodeBootstrap<Promise<LabsInfo | undefined>> {
       await connection.listen()
       await this.createValue(connection, 'hilog/connection').resolve()
       await globalContainer.findOne(HiLogServerService)?.resolve()
-      watchHandle.stop()
+      closeWatch()
     }, { immediate: true })
 
     const languageServer = globalContainer.findOne(EtsLanguageServer) as IClassWrapper<typeof EtsLanguageServer> | undefined
