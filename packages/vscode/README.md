@@ -34,6 +34,7 @@
 - ✨ 1.x版本开始支持`.ets`文件的`代码格式化`和`大纲`展示功能
 - ✂️ 支持和`TypeScript`一样的`snippets`，并且添加了`Struct Declaration`等`ArkTS`独有的`Snippets`
 - 🆓 `$r`，`$rawfile` 补全、`hilog`日志等功能正在计划支持的路上，欢迎PR👀
+- 🌐 **HTTP API**: 新增HTTP服务器功能，可以暴露LSP功能供外部调用，支持查找定义、查找引用、签名帮助等功能
 
 ## VSCode 文件图标包 🖼️
 
@@ -53,6 +54,7 @@ PR地址: [https://github.com/material-extensions/vscode-material-icon-theme/pul
 | `ets.baseSdkPath`  | %configuration.ets.baseSdkPath.description%                                                                | `string`  | `"${os.homedir}/OpenHarmony"` |
 | `ets.lspDebugMode` | %configuration.ets.lspDebugMode.description%                                                               | `boolean` | `false`                       |
 | `ets.sdkList`      | A list of installed OpenHarmony SDK paths. Keys should follow the pattern API[number] (e.g., API9, API10). | `object`  | `{}`                          |
+| `ets.httpServer`   | HTTP Server configuration for exposing LSP functionality | `object`  | `{"enabled": true, "port": 3000, "host": "localhost"}` |
 
 <!-- configs -->
 
@@ -60,9 +62,93 @@ PR地址: [https://github.com/material-extensions/vscode-material-icon-theme/pul
 
 <!-- commands -->
 
+## HTTP API
+
+这个扩展现在包含一个HTTP服务器，可以暴露LSP功能供外部调用。
+
+### 功能特性
+
+- ✅ 查找定义 (Go to Definition)
+- ✅ 查找引用 (Find References)  
+- ✅ 签名帮助 (Signature Help)
+- ✅ 悬停信息 (Hover)
+- ✅ 代码补全 (Completion)
+- ✅ 文档符号 (Document Symbols)
+
+### 配置
+
+在VSCode设置中配置HTTP服务器：
+
+```json
+{
+  "ets.httpServer": {
+    "enabled": true,
+    "port": 3000,
+    "host": "localhost"
+  }
+}
+```
+
+### 使用方法
+
+1. 安装并启动VSCode插件
+2. HTTP服务器会自动在配置的端口启动
+3. 使用HTTP API调用LSP功能
+
+详细API文档请参考 [HTTP_API.md](./HTTP_API.md)
+
+### 测试
+
+运行测试脚本来验证HTTP API：
+
+```bash
+npm run test:http
+```
+
+### 示例
+
+#### JavaScript 示例
+
+```javascript
+// 查找定义
+const response = await fetch('http://localhost:3000/definition', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    uri: 'file:///path/to/your/file.ets',
+    line: 10,
+    character: 15
+  })
+});
+```
+
+#### Python 示例
+
+```python
+import requests
+
+def get_definition(uri, line, character):
+    url = "http://localhost:3000/definition"
+    data = {
+        "uri": uri,
+        "line": line,
+        "character": character
+    }
+    
+    response = requests.post(url, json=data)
+    return response.json()
+
+# 使用示例
+definition = get_definition("file:///path/to/your/file.ets", 10, 15)
+print(definition)
+```
+
+更多Python示例请参考 [examples/](./examples/) 目录。
+
 | Command             | Title                        |
 | ------------------- | ---------------------------- |
 | `ets.restartServer` | ETS: %command.restartServer% |
 | `ets.installSDK`    | ETS: %command.installSDK%    |
+| `ets.restartHttpServer` | Restart HTTP Server    |
 
 <!-- commands -->

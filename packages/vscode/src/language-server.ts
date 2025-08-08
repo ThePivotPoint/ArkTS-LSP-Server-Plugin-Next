@@ -12,6 +12,8 @@ import * as vscode from 'vscode'
 import { LanguageServerContext } from './context/server-context'
 import { Translator } from './translate'
 import { sleep } from './utils'
+import { ArkTSHttpServer } from './http-server'
+import { HttpServerConfigManager } from './http-config'
 
 @Disposable
 @Command('ets.restartServer')
@@ -22,8 +24,16 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
   @Autowired(ExtensionContext)
   protected readonly context: ExtensionContext
 
+  private httpServer: ArkTSHttpServer | null = null
+
   onExecuteCommand(): void {
     this.restart().catch(e => this.handleLspError(e))
+  }
+
+  async restartHttpServer(): Promise<void> {
+    await this.stopHttpServer()
+    await this.startHttpServer()
+    vscode.window.showInformationMessage('HTTP Server restarted!')
   }
 
   async onActivate(context: vscode.ExtensionContext): Promise<void> {
@@ -172,6 +182,54 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
     return this._client
   }
 
+  private async startHttpServer(): Promise<void> {
+    const config = HttpServerConfigManager.getConfig()
+    console.log(`[Language Server] ===== 启动HTTP服务器 =====`)
+    console.log(`[Language Server] HTTP服务器配置:`, JSON.stringify(config, null, 2))
+    
+    if (!config.enabled) {
+      this.getConsola().info('HTTP服务器在配置中被禁用')
+      console.log(`[Language Server] ❌ HTTP服务器被禁用`)
+      return
+    }
+
+    if (!this.httpServer) {
+      console.log(`[Language Server] 🔧 创建新的HTTP服务器`)
+      this.httpServer = new ArkTSHttpServer({
+        port: config.port,
+        host: config.host
+      })
+    }
+
+    if (this._client) {
+      console.log(`[Language Server] 🔧 为HTTP服务器设置语言客户端`)
+      console.log(`[Language Server] 语言客户端信息:`, {
+        name: this._client.name,
+        isRunning: this._client.isRunning()
+      })
+      
+      this.httpServer.setLanguageClient(this._client)
+      console.log(`[Language Server] 🚀 启动HTTP服务器`)
+      await this.httpServer.start()
+      this.getConsola().info(`ArkTS HTTP服务器已启动: http://${config.host}:${config.port}`)
+      console.log(`[Language Server] ✅ HTTP服务器启动成功`)
+    } else {
+      console.log(`[Language Server] ❌ 语言客户端不可用，无法启动HTTP服务器`)
+    }
+  }
+
+  private async stopHttpServer(): Promise<void> {
+    if (this.httpServer) {
+      console.log(`[Language Server] 🛑 停止HTTP服务器`)
+      await this.httpServer.stop()
+      this.httpServer = null
+      this.getConsola().info('ArkTS HTTP服务器已停止')
+      console.log(`[Language Server] ✅ HTTP服务器停止成功`)
+    } else {
+      console.log(`[Language Server] ℹ️  没有HTTP服务器需要停止`)
+    }
+  }
+
   /**
    * Start the ETS Language Server.
    *
@@ -210,6 +268,9 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
     this.getConsola().info('ETS Language Server started!')
     vscode.window.setStatusBarMessage('ETS Language Server started!', 1000)
 
+    // Start HTTP server after LSP is ready
+    await this.startHttpServer()
+
     // support for https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volarjs-labs
     // ref: https://twitter.com/johnsoncodehk/status/1656126976774791168
     const labsInfo = createLabsInfo(serverProtocol)
@@ -225,8 +286,10 @@ export class EtsLanguageServer extends LanguageServerContext implements Command,
   async stop(willRestart: boolean = false): Promise<void> {
     if (this._client) {
       await this._client.stop()
-      if (!willRestart)
+      if (!willRestart) {
         this.watcher.removeAllListeners()
+        await this.stopHttpServer()
+      }
       this.getConsola().info('ETS Language Server stopped!')
       vscode.window.setStatusBarMessage('ETS Language Server stopped!', 1000)
     }

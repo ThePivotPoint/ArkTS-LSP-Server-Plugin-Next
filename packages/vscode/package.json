@@ -2,7 +2,7 @@
   "publisher": "NailyZero",
   "name": "vscode-naily-ets",
   "displayName": "Naily's ArkTS Support",
-  "version": "1.0.21",
+  "version": "2.0.0",
   "private": true,
   "description": "自用ArkTS扩展,支持代码跳转,欢迎PR! Naily's ArkTS Support.",
   "author": "Naily Zero <zero@naily.cc>",
@@ -123,6 +123,11 @@
         "command": "ets.installSDK",
         "title": "%command.installSDK%",
         "category": "ETS"
+      },
+      {
+        "command": "ets.restartHttpServer",
+        "title": "Restart HTTP Server",
+        "category": "ETS"
       }
     ],
     "configuration": {
@@ -187,6 +192,32 @@
             "type": "string",
             "description": "SDK path for the corresponding API version"
           }
+        },
+        "ets.httpServer": {
+          "type": "object",
+          "description": "HTTP Server configuration for exposing LSP functionality",
+          "default": {
+            "enabled": true,
+            "port": 3000,
+            "host": "localhost"
+          },
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable HTTP server for LSP functionality",
+              "default": true
+            },
+            "port": {
+              "type": "number",
+              "description": "HTTP server port",
+              "default": 3000
+            },
+            "host": {
+              "type": "string",
+              "description": "HTTP server host",
+              "default": "localhost"
+            }
+          }
         }
       }
     },
@@ -240,7 +271,8 @@
     "release": "npm run build && vsce publish --pre-release && ovsx publish --pre-release",
     "update": "vscode-ext-gen --output src/generated/meta.ts",
     "ovsx": "ovsx",
-    "vsce": "vsce"
+    "vsce": "vsce",
+    "test:http": "node test-http-api.js"
   },
   "devDependencies": {
     "@arkts/headless-jsonrpc": "catalog:prod",
